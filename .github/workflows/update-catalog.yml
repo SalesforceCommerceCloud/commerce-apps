@@ -1,0 +1,124 @@
+name: Update Catalog.json w New App Version PR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.zip'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-catalog-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed ZIPs, create tags, update catalog.json (in working tree)
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 1) Find ZIP files changed in this push to main (merge commit)
+          mapfile -t changed_zips < <(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- '**/*.zip')
+
+          if [[ ${#changed_zips[@]} -eq 0 ]]; then
+            echo "No .zip files changed. Exiting."
+            exit 0
+          fi
+
+          echo "Changed ZIPs:"
+          printf ' - %s\n' "${changed_zips[@]}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          updated_any=false
+
+          for zip_path in "${changed_zips[@]}"; do
+            # Only act on ZIPs that exist after the merge (skip deletions)
+            [[ -f "$zip_path" ]] || continue
+
+            zip_dir="$(dirname "$zip_path")"
+            catalog_path="$zip_dir/catalog.json"
+            manifest_path="$zip_dir/manifest.json"
+
+            # 2) If no catalog.json next to this zip, exit (no-op)
+            if [[ ! -f "$catalog_path" ]]; then
+              echo "No catalog.json at $catalog_path. Exiting."
+              exit 0
+            fi
+
+            if [[ ! -f "$manifest_path" ]]; then
+              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
+              exit 1
+            fi
+
+            # Version from manifest.json (expects .version)
+            version="$(jq -r '.version // empty' "$manifest_path")"
+            if [[ -z "$version" || "$version" == "null" ]]; then
+              echo "::error file=$manifest_path::Missing .version in manifest.json"
+              exit 1
+            fi
+
+            # 3) Tag name = zip filename without .zip
+            zip_file="$(basename "$zip_path")"
+            tag_name="${zip_file%.zip}"
+
+            # Create + push tag (skip if already exists)
+            if ! git rev-parse -q --verify "refs/tags/$tag_name" >/dev/null; then
+              git tag -a "$tag_name" -m "Release $tag_name"
+            fi
+            if ! git ls-remote --exit-code --tags origin "refs/tags/$tag_name" >/dev/null 2>&1; then
+              git push origin "refs/tags/$tag_name"
+            fi
+
+            # 4) Update latest and 5) Append a new versions entry
+            tmp="$(mktemp)"
+            jq --arg v "$version" --arg t "$tag_name" '
+              .versions = (.versions // []) |
+              .latest = {"version": $v, "tag": $t} |
+              .versions = (.versions + [{"version": $v, "tag": $t}])
+            ' "$catalog_path" > "$tmp"
+
+            mv "$tmp" "$catalog_path"
+            git add "$catalog_path"
+            updated_any=true
+          done
+
+          if [[ "$updated_any" != "true" ]]; then
+            echo "No catalog updates to propose. Exiting."
+            exit 0
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No effective catalog changes staged. Exiting."
+            exit 0
+          fi
+
+      - name: Create PR with catalog.json update
+        if: ${{ !cancelled() }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: CI/update-catalog-${{ github.run_id }}
+          delete-branch: true
+          commit-message: "CI: update catalog.json after ZIP merge"
+          title: "CI: update catalog.json after ZIP merge"
+          body: |
+            This PR was auto-generated after a ZIP file was merged into `main`.
+
+            - Creates a tag matching the ZIP filename (without `.zip`)
+            - Updates `catalog.json` `latest`
+            - Appends a new entry to `catalog.json` `versions`
+          labels: |
+            automation

@@ -1,0 +1,255 @@
+name: Verify CAP Checksum & Structure
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+    paths:
+      - '**/*.zip'
+
+jobs:
+  verify-zips:
+    runs-on: ubuntu-latest
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    steps:
+      - name: Checkout PR HEAD
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Step 1 - Verify sha256 in manifest.json for changed ZIPs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Collect changed ZIPs into a file that the next step can reuse
+          : > changed_zips.txt
+
+          while IFS= read -r -d '' f; do
+            [[ "$f" == *.zip ]] && printf '%s\n' "$f" >> changed_zips.txt
+          done < <(git diff --name-only -z "$BASE_SHA" "$HEAD_SHA")
+
+          if [[ ! -s changed_zips.txt ]]; then
+            echo "No .zip files changed in this PR. Nothing to verify."
+            exit 0
+          fi
+
+          echo "Changed ZIP files:"
+          sed 's/^/ - /' changed_zips.txt
+
+          while IFS= read -r zip_path; do
+            # If deleted in PR head, skip 
+            if [[ ! -f "$zip_path" ]]; then
+              echo "Skipping (not present in PR head): $zip_path"
+              continue
+            fi
+
+            dir="$(dirname "$zip_path")"
+            manifest_path="$dir/manifest.json"
+
+            if [[ ! -f "$manifest_path" ]]; then
+              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
+              exit 1
+            fi
+
+            # Compute checksum of the ZIP
+            computed="$(sha256sum "$zip_path" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')"
+
+            # Read sha256 from manifest.json
+            manifest_sha="$(jq -r '.sha256 // empty' "$manifest_path" | tr '[:upper:]' '[:lower:]')"
+
+            if [[ -z "$manifest_sha" || "$manifest_sha" == "null" ]]; then
+              echo "::error file=$manifest_path::Missing or empty \"sha256\" field in manifest.json"
+              exit 1
+            fi
+
+            echo "ZIP:      $zip_path"
+            echo "Computed: $computed"
+            echo "Manifest: $manifest_sha"
+
+            if [[ "$computed" != "$manifest_sha" ]]; then
+              echo "::error file=$manifest_path::sha256 mismatch for $zip_path (computed=$computed, manifest=$manifest_sha)"
+              exit 1
+            fi
+          done < changed_zips.txt
+
+      - name: Step 2 - Verify manifest zip matches file + manifest version is unique
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            dir="$(dirname "$zip_path")"
+            manifest_path="$dir/manifest.json"
+            catalog_path="$dir/catalog.json"
+
+            if [[ ! -f "$catalog_path" ]]; then
+              echo "::error file=$catalog_path::catalog.json not found next to ZIP ($zip_path)"
+              exit 1
+            fi
+
+            if [[ ! -f "$manifest_path" ]]; then
+              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
+              exit 1
+            fi
+
+            zip_file="$(basename "$zip_path")"
+            manifest_zip="$(jq -r '.zip // empty' "$manifest_path")"
+            if [[ -z "$manifest_zip" || "$manifest_zip" == "null" ]]; then
+              echo "::error file=$manifest_path::Missing \"zip\" field in manifest.json"
+              exit 1
+            fi
+
+            version="$(jq -r '.version // empty' "$manifest_path")"
+            if [[ -z "$version" || "$version" == "null" ]]; then
+              echo "::error file=$manifest_path::Missing \"version\" field in manifest.json"
+              exit 1
+            fi
+
+            # Verify zip field in manifest matches file name
+            if [[ "$manifest_zip" != "$zip_file" ]]; then
+              echo "::error file=$manifest_path::manifest.json \"zip\" ($manifest_zip) does not match changed zip filename ($zip_file)"
+              exit 1
+            fi
+
+            # Verify new version in manifest is unique
+            if jq -e --arg v "$version" '.versions[]? | select(.version == $v)' "$catalog_path" >/dev/null; then
+              echo "::error file=$catalog_path::Version $version already exists in catalog.json"
+              exit 1
+            fi
+          done < changed_zips.txt
+
+      - name: Step 3 - Unzip and verify top level folder structure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # List of allowed top level folder names
+          allowed=("impex" "app-configuration" "storefront-next" "cartridges")
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            # Unzip file to temp dir
+            tmpdir="$(mktemp -d)"
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            # Root should be exactly one directory (the wrapper folder)
+            mapfile -t roots < <(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v '^__MACOSX$' | sort -u)
+            if [[ ${#roots[@]} -ne 1 ]]; then
+              echo "::error file=$zip_path::Expected exactly 1 root directory after unzip, found ${#roots[@]}: ${roots[*]}"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+            root="$tmpdir/${roots[0]}"
+
+            # Check immediate child directories of root are allowed
+            mapfile -t children < <(find "$root" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v '^__MACOSX$' | sort -u)
+            for c in "${children[@]}"; do
+              ok=false
+              for a in "${allowed[@]}"; do
+                [[ "$c" == "$a" ]] && ok=true && break
+              done
+              if [[ "$ok" == "false" ]]; then
+                echo "::error file=$zip_path::Disallowed directory under root: \"$c\". Allowed: ${allowed[*]}"
+                rm -rf "$tmpdir"
+                exit 1
+              fi
+            done
+            rm -rf "$tmpdir"
+          done < changed_zips.txt
+          
+      - name: Step 4 - [Tax] Verify hooks exist and scripts resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_hooks=(
+            "dw.apps.checkout.tax.calculate"
+            "dw.apps.checkout.tax.commit"
+            "dw.apps.checkout.tax.cancel"
+          )
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          is_tax_app=false
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            # Only run for ZIPs under tax/ at repo root
+            case "$zip_path" in
+              tax/*) is_tax_app=true ;;
+              *) continue ;;
+            esac
+
+            tmpdir="$(mktemp -d)"
+            trap 'rm -rf "$tmpdir"' RETURN
+
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            # Find cartridges/site_cartridges anywhere under the unzip root
+            base="$(find "$tmpdir" -type d -path '*/cartridges/site_cartridges' -print -quit)"
+            if [[ -z "$base" || ! -d "$base" ]]; then
+              echo "::error file=$zip_path::Missing directory cartridges/site_cartridges in ZIP"
+              exit 1
+            fi
+
+            hooks_file="$(find "$base" -type f -name hooks.json -print -quit)"
+            if [[ -z "$hooks_file" ]]; then
+              echo "::error file=$zip_path::hooks.json not found under cartridges/site_cartridges"
+              exit 1
+            fi
+
+            hooks_dir="$(dirname "$hooks_file")"
+            echo "ZIP: $zip_path"
+            echo "hooks.json: $hooks_file"
+
+            # Ensure there are no non-required hook names
+            while IFS= read -r name; do
+              ok=false
+              for hook in "${required_hooks[@]}"; do
+                [[ "$name" == "$hook" ]] && ok=true && break
+              done
+              if [[ "$ok" == "false" ]]; then
+                echo "::error file=$hooks_file::Disallowed hook \"$name\". Only allowed: ${required_hooks[*]}"
+                exit 1
+              fi
+            done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
+
+            # Validate required hooks are present, and each has a script that exists
+            for hook in "${required_hooks[@]}"; do
+              script="$(jq -r --arg name "$hook" '.hooks[]? | select(.name == $name) | .script // empty' "$hooks_file" | head -n 1)"
+
+              if [[ -z "$script" || "$script" == "null" ]]; then
+                echo "::error file=$hooks_file::Missing hook or script for \"$hook\""
+                exit 1
+              fi
+
+              # script is relative to hooks.json location (strip leading ./)
+              rel="${script#./}"
+              target="$hooks_dir/$rel"
+
+              if [[ ! -f "$target" ]]; then
+                echo "::error file=$hooks_file::Script for \"$hook\" points to missing file: $script (resolved: $target)"
+                exit 1
+              fi
+            done
+
+            echo "SUCCESS - required tax hooks and scripts verified for $zip_path"
+
+            rm -rf "$tmpdir"
+            trap - RETURN
+          done < changed_zips.txt
+
+          if [[ "$is_tax_app" == "false" ]]; then
+            echo "No changed tax apps. Skipping Step 3."
+          fi
