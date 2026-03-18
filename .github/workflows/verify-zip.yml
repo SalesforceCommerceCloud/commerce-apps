@@ -166,8 +166,42 @@ jobs:
             done
             rm -rf "$tmpdir"
           done < changed_zips.txt
-          
-      - name: Step 4 - [Tax] Verify hooks exist and scripts resolve
+
+      - name: Step 4 - Disallow SFRA controllers under site_cartridge(s)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            tmpdir="$(mktemp -d)"
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            mapfile -t controllers_dirs < <(find "$tmpdir" -type d -name controllers -print | sort -u)
+
+            offending=()
+            for dir in "${controllers_dirs[@]}"; do
+              case "$dir" in
+                */site_cartridge/*|*/site_cartridges/*)
+                  offending+=("$dir")
+                  ;;
+              esac
+            done
+
+            if [[ ${#offending[@]} -gt 0 ]]; then
+              echo "::error file=$zip_path::Found disallowed SFRA controllers directory under site_cartridge(s):"
+              printf ' - %s\n' "${offending[@]}"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            rm -rf "$tmpdir"
+          done < changed_zips.txt
+
+      - name: Step 5 - [Tax] Verify hooks exist and scripts resolve
         shell: bash
         run: |
           set -euo pipefail
@@ -251,5 +285,6 @@ jobs:
           done < changed_zips.txt
 
           if [[ "$is_tax_app" == "false" ]]; then
-            echo "No changed tax apps. Skipping Step 3."
+            echo "No changed tax apps. Skipping Step 5."
           fi
+
