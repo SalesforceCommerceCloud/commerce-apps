@@ -125,7 +125,7 @@ jobs:
             fi
           done < changed_zips.txt
 
-      - name: Step 3 - Unzip and verify top level folder structure
+      - name: Step 3 - Unzip and verify CAP folder structure
         shell: bash
         run: |
           set -euo pipefail
@@ -164,6 +164,14 @@ jobs:
                 exit 1
               fi
             done
+
+            # Ensure app-configuration/taskList.json exists in the ZIP payload
+            required_task_list="$root/app-configuration/taskList.json"
+            if [[ ! -f "$required_task_list" ]]; then
+              echo "::error file=$zip_path::Missing required file app-configuration/taskList.json"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
             rm -rf "$tmpdir"
           done < changed_zips.txt
 
