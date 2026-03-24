@@ -23,6 +23,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source ".github/scripts/root-manifest-utils.sh"
+          manifest_path="commerce-apps-manifest/manifest.json"
+          validate_manifest "$manifest_path"
 
           # Collect changed ZIPs into a file that the next step can reuse
           : > changed_zips.txt
@@ -46,22 +49,17 @@ jobs:
               continue
             fi
 
-            dir="$(dirname "$zip_path")"
-            manifest_path="$dir/manifest.json"
-
-            if [[ ! -f "$manifest_path" ]]; then
-              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
-              exit 1
-            fi
+            zip_file="$(basename "$zip_path")"
+            entry="$(get_manifest_entry_for_zip "$zip_file" "$manifest_path")"
 
             # Compute checksum of the ZIP
             computed="$(sha256sum "$zip_path" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')"
 
-            # Read sha256 from manifest.json
-            manifest_sha="$(jq -r '.sha256 // empty' "$manifest_path" | tr '[:upper:]' '[:lower:]')"
+            # Read sha256 from manifest entry
+            manifest_sha="$(jq -r '.sha256 // empty' <<< "$entry" | tr '[:upper:]' '[:lower:]')"
 
             if [[ -z "$manifest_sha" || "$manifest_sha" == "null" ]]; then
-              echo "::error file=$manifest_path::Missing or empty \"sha256\" field in manifest.json"
+              echo "::error file=$manifest_path::Missing or empty \"sha256\" for ZIP $zip_file"
               exit 1
             fi
 
@@ -79,6 +77,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source ".github/scripts/root-manifest-utils.sh"
+          manifest_path="commerce-apps-manifest/manifest.json"
+          validate_manifest "$manifest_path"
 
           [[ -s changed_zips.txt ]] || exit 0
 
@@ -86,7 +87,6 @@ jobs:
             [[ -f "$zip_path" ]] || continue
 
             dir="$(dirname "$zip_path")"
-            manifest_path="$dir/manifest.json"
             catalog_path="$dir/catalog.json"
 
             if [[ ! -f "$catalog_path" ]]; then
@@ -94,27 +94,17 @@ jobs:
               exit 1
             fi
 
-            if [[ ! -f "$manifest_path" ]]; then
-              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
-              exit 1
-            fi
-
             zip_file="$(basename "$zip_path")"
-            manifest_zip="$(jq -r '.zip // empty' "$manifest_path")"
+            entry="$(get_manifest_entry_for_zip "$zip_file" "$manifest_path")"
+            manifest_zip="$(jq -r '.zip // empty' <<< "$entry")"
             if [[ -z "$manifest_zip" || "$manifest_zip" == "null" ]]; then
-              echo "::error file=$manifest_path::Missing \"zip\" field in manifest.json"
+              echo "::error file=$manifest_path::Missing \"zip\" for ZIP $zip_file"
               exit 1
             fi
 
-            version="$(jq -r '.version // empty' "$manifest_path")"
+            version="$(jq -r '.version // empty' <<< "$entry")"
             if [[ -z "$version" || "$version" == "null" ]]; then
-              echo "::error file=$manifest_path::Missing \"version\" field in manifest.json"
-              exit 1
-            fi
-
-            # Verify zip field in manifest matches file name
-            if [[ "$manifest_zip" != "$zip_file" ]]; then
-              echo "::error file=$manifest_path::manifest.json \"zip\" ($manifest_zip) does not match changed zip filename ($zip_file)"
+              echo "::error file=$manifest_path::Missing \"version\" for ZIP $zip_file"
               exit 1
             fi
 
@@ -165,10 +155,10 @@ jobs:
               fi
             done
 
-            # Ensure app-configuration/taskList.json exists in the ZIP payload
-            required_task_list="$root/app-configuration/taskList.json"
+            # Ensure app-configuration/tasksList.json exists in the ZIP payload
+            required_task_list="$root/app-configuration/tasksList.json"
             if [[ ! -f "$required_task_list" ]]; then
-              echo "::error file=$zip_path::Missing required file app-configuration/taskList.json"
+              echo "::error file=$zip_path::Missing required file app-configuration/tasksList.json"
               rm -rf "$tmpdir"
               exit 1
             fi
