@@ -27,6 +27,9 @@ jobs:
           AFTER_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          source ".github/scripts/root-manifest-utils.sh"
+          manifest_path="commerce-apps-manifest/manifest.json"
+          validate_manifest "$manifest_path"
 
           # 1) Find ZIP files changed in this push to main (merge commit)
           mapfile -t changed_zips < <(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- '**/*.zip')
@@ -50,7 +53,6 @@ jobs:
 
             zip_dir="$(dirname "$zip_path")"
             catalog_path="$zip_dir/catalog.json"
-            manifest_path="$zip_dir/manifest.json"
 
             # 2) If no catalog.json next to this zip, exit (no-op)
             if [[ ! -f "$catalog_path" ]]; then
@@ -58,20 +60,17 @@ jobs:
               exit 0
             fi
 
-            if [[ ! -f "$manifest_path" ]]; then
-              echo "::error file=$manifest_path::manifest.json not found next to ZIP ($zip_path)"
-              exit 1
-            fi
+            zip_file="$(basename "$zip_path")"
+            entry="$(get_manifest_entry_for_zip "$zip_file" "$manifest_path")"
 
-            # Version from manifest.json (expects .version)
-            version="$(jq -r '.version // empty' "$manifest_path")"
+            # Version from manifest entry (expects .version)
+            version="$(jq -r '.version // empty' <<< "$entry")"
             if [[ -z "$version" || "$version" == "null" ]]; then
-              echo "::error file=$manifest_path::Missing .version in manifest.json"
+              echo "::error file=$manifest_path::Missing .version for ZIP $zip_file"
               exit 1
             fi
 
             # 3) Tag name = zip filename without .zip
-            zip_file="$(basename "$zip_path")"
             tag_name="${zip_file%.zip}"
 
             # Create + push tag (skip if already exists)
