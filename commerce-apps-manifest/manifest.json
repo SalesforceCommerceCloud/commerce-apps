@@ -1,0 +1,69 @@
+{
+    "defaultLocale": "en-US",
+    "tax": [
+        {
+            "id": "salesforce-flat-tax",
+            "name": "Salesforce Flat Tax",
+            "description": "Configure a flat tax calculation.",
+            "iconName": "salesforce.svg",
+            "domain": "tax",
+            "type": "feature",
+            "provider": "salesforce",
+            "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
+        },
+        {
+            "id": "avalara-tax",
+            "name": "Avalara Tax",
+            "description": "Automated tax compliance solution by Avalara",
+            "iconName": "avalara.png",
+            "domain": "tax",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "0.1.0",
+            "zip": "avalara-tax-v0.1.0.zip",
+            "sha256": "54aebe32f15bd832585b5c6f338ccc060706209a7936f9347d21e83146cf9712"
+        },
+        {
+            "id": "custom-tax",
+            "name": "Custom Tax",
+            "description": "Configure a custom tax calculation by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "tax",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ],
+    "shipping": [
+        {
+            "id": "basic-shipping",
+            "name": "Basic Shipping",
+            "description": "Configure a basic shipping calculation.",
+            "iconName": "salesforce.svg",
+            "domain": "shipping",
+            "type": "feature",
+            "provider": "salesforce",
+            "configurationUrl": "/on/demandware.store/Sites-Site/default/ShippingMethodList-ListAll"
+        },
+        {
+            "id": "custom-shipping",
+            "name": "Custom Shipping",
+            "description": "Configure a custom shipping calculation by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "shipping",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ],
+    "payment": [
+        {
+            "id": "custom-payment",
+            "name": "Custom Payment",
+            "description": "Configure a custom payment integration by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "payment",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ],
+    "additionalFeature": []
+}
