@@ -1,0 +1,177 @@
+name: 🐛 Bug Report
+description: Report a bug in an existing Commerce App
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please provide as much detail as possible.
+
+  - type: input
+    id: app-name
+    attributes:
+      label: App Name
+      description: Which app has the bug?
+      placeholder: avalara-tax
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: App Version
+      description: Which version of the app are you using?
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug-category
+    attributes:
+      label: Bug Category
+      description: What type of bug is this?
+      options:
+        - Installation/Import Error
+        - Service Configuration Issue
+        - Hook Execution Error
+        - UI Component Issue
+        - Data/Calculation Error
+        - Performance Issue
+        - Documentation Issue
+        - Security Vulnerability
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear and concise description of the bug
+      placeholder: When I try to..., the following happens...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: I expected...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Instead, what happened was...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the bug
+      placeholder: |
+        1. Install app in sandbox
+        2. Configure service credentials
+        3. Place an order
+        4. Observe error
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Your SFCC environment details
+      placeholder: |
+        - SFCC Version:
+        - Storefront: Storefront Next / SiteGenesis / SFRA
+        - Browser (if UI bug): Chrome 122
+        - Mobile/Desktop:
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs/Error Messages
+      description: Any relevant log output or error messages
+      placeholder: |
+        Paste error messages here
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the problem
+      placeholder: Drag and drop images here
+    validations:
+      required: false
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration
+      description: Relevant configuration settings (DO NOT include credentials/secrets)
+      placeholder: |
+        Site Preferences:
+        - myAppEnabled: true
+        - myAppEnvironment: sandbox
+
+        Service Configuration:
+        - Service ID: myapp.api
+        - Timeout: 30000
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround
+      description: Have you found a temporary workaround?
+      placeholder: I was able to work around this by...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (complete failure, cannot use app)
+        - High (major feature broken, significant impact)
+        - Medium (feature partially working, moderate impact)
+        - Low (minor issue, minimal impact)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: additional-info
+    attributes:
+      label: Additional Information
+      options:
+        - label: I have checked that this bug hasn't already been reported
+          required: true
+        - label: I have tested with the latest version of the app
+          required: true
+        - label: I have removed all sensitive information (credentials, customer data, etc.)
+          required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+      placeholder: This started happening after...
+    validations:
+      required: false

@@ -73,7 +73,7 @@ jobs:
             fi
           done < changed_zips.txt
 
-      - name: Step 2 - Verify manifest zip matches file + manifest version is unique
+      - name: Step 2 - Verify manifest zip name matches + version is new vs catalog.json
         shell: bash
         run: |
           set -euo pipefail
@@ -121,7 +121,7 @@ jobs:
           set -euo pipefail
 
           # List of allowed top level folder names
-          allowed=("impex" "app-configuration" "storefront-next" "cartridges")
+          allowed=("impex" "app-configuration" "storefront-next" "cartridges" "icons")
 
           [[ -s changed_zips.txt ]] || exit 0
 
@@ -205,9 +205,9 @@ jobs:
           set -euo pipefail
 
           required_hooks=(
-            "dw.apps.checkout.tax.calculate"
-            "dw.apps.checkout.tax.commit"
-            "dw.apps.checkout.tax.cancel"
+            "sf.commerce.app.tax.calculate"
+            "sf.commerce.app.tax.commit"
+            "sf.commerce.app.tax.cancel"
           )
 
           [[ -s changed_zips.txt ]] || exit 0
@@ -285,4 +285,98 @@ jobs:
           if [[ "$is_tax_app" == "false" ]]; then
             echo "No changed tax apps. Skipping Step 5."
           fi
+
+      - name: Step 6 - Validate icon uniqueness
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          icons_manifest_dir="commerce-apps-manifest/icons"
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            # Extract ISV name from path: {domain}/{isv-name}/
+            isv_name="$(echo "$zip_path" | cut -d'/' -f2)"
+            if [[ -z "$isv_name" ]]; then
+              echo "::error file=$zip_path::Could not determine ISV name from path"
+              exit 1
+            fi
+
+            tmpdir="$(mktemp -d)"
+            trap 'rm -rf "$tmpdir"' RETURN
+
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            # Find icons directory in the extracted CAP
+            icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+
+            if [[ -z "$icons_dir" || ! -d "$icons_dir" ]]; then
+              echo "No icons directory found in $zip_path - skipping icon validation"
+              rm -rf "$tmpdir"
+              trap - RETURN
+              continue
+            fi
+
+            echo "ZIP: $zip_path"
+            echo "ISV: $isv_name"
+            echo "Icons dir: $icons_dir"
+
+            # Find all icon files (png, svg, jpg, jpeg)
+            mapfile -t icon_files < <(find "$icons_dir" -type f \( -iname "*.png" -o -iname "*.svg" -o -iname "*.jpg" -o -iname "*.jpeg" \) -print)
+
+            if [[ ${#icon_files[@]} -eq 0 ]]; then
+              echo "No icon files found in $icons_dir - skipping"
+              rm -rf "$tmpdir"
+              trap - RETURN
+              continue
+            fi
+
+            echo "Found ${#icon_files[@]} icon file(s)"
+
+            # Check each icon for uniqueness
+            for icon_file in "${icon_files[@]}"; do
+              icon_name="$(basename "$icon_file")"
+              icon_ext="${icon_name##*.}"
+
+              # Expected name in manifest: {isv-name}.{ext}
+              expected_name="${isv_name}.${icon_ext}"
+
+              echo "Checking icon: $icon_name"
+
+              # Compute hash of the new icon
+              new_hash="$(sha256sum "$icon_file" | awk '{print $1}')"
+              echo "  Hash: $new_hash"
+
+              # Check if an icon with this ISV name already exists
+              existing_icon="$icons_manifest_dir/$expected_name"
+
+              if [[ -f "$existing_icon" ]]; then
+                existing_hash="$(sha256sum "$existing_icon" | awk '{print $1}')"
+                echo "  Existing icon found: $existing_icon"
+                echo "  Existing hash: $existing_hash"
+
+                if [[ "$new_hash" != "$existing_hash" ]]; then
+                  echo "::warning file=$zip_path::Icon change detected for ISV '$isv_name'. The icon in your CAP (hash: $new_hash) differs from the existing icon in commerce-apps-manifest/icons/ (hash: $existing_hash). If this is a rebranding effort, this is expected. Otherwise, ensure you're using the correct icon file. This will overwrite the existing icon on merge."
+                  echo "  ⚠️  Icon will be updated on merge"
+                else
+                  echo "  ✓ Icon hash matches existing - OK"
+                fi
+              else
+                echo "  ✓ No existing icon for ISV '$isv_name' - will be added on merge"
+              fi
+
+              # Verify icon is named correctly (should be {isv-name}.{ext})
+              if [[ "$icon_name" != "$expected_name" ]]; then
+                echo "::warning file=$zip_path::Icon should be named '$expected_name' but is named '$icon_name'. Icon will be renamed to '$expected_name' when extracted."
+              fi
+            done
+
+            echo "SUCCESS - Icon validation passed for $zip_path"
+
+            rm -rf "$tmpdir"
+            trap - RETURN
+          done < changed_zips.txt
 

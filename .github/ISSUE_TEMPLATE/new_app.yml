@@ -1,0 +1,133 @@
+name: 📦 New App Submission
+description: Submit a new Commerce App to the registry
+title: "[New App] "
+labels: ["new-app", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting a new Commerce App! Please provide the following information.
+
+        **Before submitting:** Make sure you've followed the guidelines in [CONTRIBUTING.md](https://github.com/salesforce/commerce-apps/blob/main/CONTRIBUTING.md)
+
+  - type: input
+    id: app-name
+    attributes:
+      label: App Name
+      description: The kebab-case app name (e.g., avalara-tax)
+      placeholder: my-app
+    validations:
+      required: true
+
+  - type: input
+    id: display-name
+    attributes:
+      label: Display Name
+      description: Human-readable app name (e.g., Avalara Tax)
+      placeholder: My App
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      description: App domain
+      options:
+        - tax
+        - payment
+        - shipping
+        - gift-cards
+        - ratings-and-reviews
+        - loyalty
+        - search
+        - address-verification
+        - analytics
+        - approaching-discounts
+    validations:
+      required: true
+
+  - type: input
+    id: isv-name
+    attributes:
+      label: ISV/Vendor Name
+      description: Your company name (kebab-case, e.g., avalara)
+      placeholder: my-company
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Initial version (e.g., 1.0.0)
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief description of what your app does
+      placeholder: This app provides...
+    validations:
+      required: true
+
+  - type: input
+    id: publisher-url
+    attributes:
+      label: Publisher URL
+      description: Your company website
+      placeholder: https://example.com
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Submission Checklist
+      description: Please verify all items before submitting
+      options:
+        - label: I have created the ZIP file following the naming convention `{appName}-v{version}.zip`
+          required: true
+        - label: I have created `manifest.json` with all required fields
+          required: true
+        - label: I have created `catalog.json` with INIT values
+          required: true
+        - label: I have computed the SHA256 hash and added it to `manifest.json`
+          required: true
+        - label: My app follows the directory structure `{domain}/{isv-name}/`
+          required: true
+        - label: I am NOT committing extracted directories (only ZIP, manifest.json, catalog.json)
+          required: true
+        - label: The ZIP contains no junk files (.DS_Store, __MACOSX, hidden files)
+          required: true
+        - label: I have tested the app in a sandbox environment
+          required: true
+        - label: All credentials in impex files are placeholders (no production secrets)
+          required: true
+        - label: I have signed the Contributor License Agreement (CLA) if external contributor
+          required: false
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Performed
+      description: Describe how you tested this app
+      placeholder: |
+        - Installed in sandbox environment
+        - Tested service integration
+        - Verified UI components
+        - Ran unit tests
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any additional context or information
+      placeholder: Special requirements, dependencies, etc.
+    validations:
+      required: false

@@ -1,0 +1,26 @@
+{
+    "salesforce-flat-tax": {
+        "name": "Salesforce Flat Tax",
+        "description": "Configure a flat tax calculation."
+    },
+    "avalara-tax": {
+        "name": "Avalara",
+        "description": "Automate your sales tax compliance with Avalara."
+    },
+    "custom-tax": {
+        "name": "Custom Tax",
+        "description": "Configure a custom tax calculation by providing your own APIs."
+    },
+    "basic-shipping": {
+        "name": "Basic Shipping",
+        "description": "Configure a basic shipping calculation."
+    },
+    "custom-shipping": {
+        "name": "Custom Shipping",
+        "description": "Configure a custom shipping calculation by providing your own APIs."
+    },
+    "custom-payment": {
+        "name": "Custom Payment",
+        "description": "Configure a custom payment integration by providing your own APIs."
+    }
+}

@@ -1,0 +1,133 @@
+name: 🔄 App Update
+description: Submit an update to an existing Commerce App
+title: "[Update] "
+labels: ["app-update", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for updating your Commerce App! Please provide the following information.
+
+        **Before submitting:** Make sure you've followed the guidelines in [CONTRIBUTING.md](https://github.com/salesforce/commerce-apps/blob/main/CONTRIBUTING.md)
+
+  - type: input
+    id: app-name
+    attributes:
+      label: App Name
+      description: The kebab-case app name (e.g., avalara-tax)
+      placeholder: my-app
+    validations:
+      required: true
+
+  - type: input
+    id: current-version
+    attributes:
+      label: Current Version
+      description: The version currently in the registry
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: new-version
+    attributes:
+      label: New Version
+      description: The new version you're submitting
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: update-type
+    attributes:
+      label: Update Type
+      description: What type of version bump is this?
+      options:
+        - Patch (bug fixes, backwards-compatible)
+        - Minor (new features, backwards-compatible)
+        - Major (breaking changes)
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: What Changed
+      description: Describe the changes in this version
+      placeholder: |
+        - Fixed bug in tax calculation
+        - Added support for new regions
+        - Updated service endpoint
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: Are there any breaking changes?
+      options:
+        - label: This update contains breaking changes that require merchant action
+          required: false
+        - label: Migration guide included in README
+          required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Update Checklist
+      description: Please verify all items before submitting
+      options:
+        - label: I have updated the ZIP file with the new version
+          required: true
+        - label: I have updated `manifest.json` (version, zip, sha256 fields)
+          required: true
+        - label: I have NOT added new versions to `catalog.json` (CI will handle it automatically)
+          required: true
+        - label: If deprecating a version, I added `"deprecated":true` to that version only
+          required: false
+        - label: I have computed the new SHA256 hash and updated `manifest.json`
+          required: true
+        - label: Version in `commerce-app.json` matches version in `manifest.json`
+          required: true
+        - label: I am NOT committing extracted directories (only new ZIP and updated manifest.json)
+          required: true
+        - label: The ZIP contains no junk files (.DS_Store, __MACOSX, hidden files)
+          required: true
+        - label: I have deleted the old ZIP version
+          required: true
+        - label: I have tested the update in a sandbox environment
+          required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Performed
+      description: Describe how you tested this update
+      placeholder: |
+        - Tested upgrade from v1.0.0 to v1.0.1
+        - Verified all features still work
+        - Tested new functionality
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration-notes
+    attributes:
+      label: Migration Notes
+      description: Any special steps merchants need to take when upgrading?
+      placeholder: |
+        - No migration required (backwards-compatible)
+        OR
+        - Merchants must reconfigure XYZ setting after upgrade
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any additional context or information
+      placeholder: Bug fixes, performance improvements, etc.
+    validations:
+      required: false
