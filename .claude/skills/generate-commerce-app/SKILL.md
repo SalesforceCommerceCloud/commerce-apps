@@ -28,7 +28,42 @@ Gather from the user (or infer from context):
 | Publisher name | `Avalara` | Yes |
 | Publisher URL | `https://developer.avalara.com/` | Yes |
 
-## Step 2: Verify directory structure
+## Step 2: Check version and determine strategy
+
+**CRITICAL:** Before proceeding, check if this is a new app or an update to an existing app.
+
+1. **Check for existing catalog.json:**
+   ```bash
+   cat <domain>/<isv-name>/catalog.json
+   ```
+
+2. **Determine versioning strategy:**
+
+   - **IF catalog.json does NOT exist:**
+     - This is a brand new app
+     - Proceed with the version from commerce-app.json
+     - Skip to Step 3
+
+   - **IF catalog.json shows `"latest": { "version": "INIT" }` AND `"versions": []`:**
+     - Version hasn't been published yet
+     - **ASK USER:** "The current version `<version>` hasn't been published. Do you want to:"
+       1. Replace `<version>` with your changes (recommended if no one has it)
+       2. Bump to a new version (e.g., `<next-version>`) for better tracking
+     - Wait for user choice before proceeding
+
+   - **IF the version from commerce-app.json EXISTS in catalog.json's `versions` array:**
+     - **FORCE VERSION BUMP** - no option to replace
+     - **STOP and tell the user:** "Version `<version>` already exists in catalog.json and cannot be replaced. Please bump to a new version."
+     - **ASK USER:** "What version should this release be? (e.g., `<suggested-next-version>`)"
+     - Use `/update-app-version` skill instead for proper version bumping
+     - Do NOT proceed until user provides a new version number
+
+3. **Version validation rules:**
+   - If version exists in `catalog.json` versions → MUST bump version (no exceptions)
+   - Always confirm version with user before generating ZIP
+   - Never silently change version without explicit user approval
+
+## Step 3: Verify directory structure
 
 The extracted app directory must be named `commerce-<appName>-app-v<version>/` and contain:
 
@@ -71,7 +106,7 @@ commerce-<appName>-app-v<version>/
 
 Validate that every file referenced by the code actually exists and vice versa.
 
-## Step 3: Update commerce-app.json
+## Step 4: Update commerce-app.json
 
 This file provides package-level identity. Update it to match the current version:
 
@@ -91,7 +126,7 @@ This file provides package-level identity. Update it to match the current versio
 }
 ```
 
-## Step 4: Delete old ZIP versions
+## Step 5: Delete old ZIP versions
 
 **CRITICAL:** Before generating the new ZIP, delete any existing ZIP files for this app to avoid clutter:
 
@@ -105,7 +140,7 @@ This ensures:
 - No confusion about which ZIP is current
 - Clean git status
 
-## Step 5: Generate the ZIP
+## Step 6: Generate the ZIP
 
 Run from the **parent directory** of the app folder so the root entry is `commerce-<appName>-app-v<version>/`:
 
@@ -122,7 +157,7 @@ Verify the ZIP:
    - No `.DS_Store`, `__MACOSX`, or hidden files
    - No duplicate directory trees
 
-## Step 6: Compute SHA256 hash
+## Step 7: Compute SHA256 hash
 
 Generate the hash for the ZIP:
 
@@ -132,7 +167,7 @@ shasum -a 256 <domain>/<isv-name>/<appName>-v<version>.zip
 
 Copy the hex digest (the long string before the filename).
 
-## Step 7: Update root manifest
+## Step 8: Update root manifest
 
 **CRITICAL:** Update the root manifest at `commerce-apps-manifest/manifest.json`:
 
@@ -158,7 +193,7 @@ Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`
 **For new apps:** Add a new entry to the appropriate domain array.
 **For updates:** Update the existing entry's `version`, `zip`, and `sha256` fields.
 
-## Step 8: Handle catalog.json
+## Step 9: Handle catalog.json
 
 - **Existing app**: Do not modify `catalog.json` — CI updates it on merge.
 - **Brand new app**: Create `catalog.json` next to the ZIP:
@@ -173,7 +208,7 @@ Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`
 }
 ```
 
-## Step 9: Final validation checklist
+## Step 10: Final validation checklist
 
 - [ ] ZIP name matches `<appName>-v<version>.zip`
 - [ ] ZIP contains a single root folder `commerce-<appName>-app-v<version>/`
@@ -183,7 +218,7 @@ Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`
 - [ ] `sha256` in root manifest matches the actual ZIP hash
 - [ ] `catalog.json` included only for brand new apps
 
-## Step 10: Clean up extracted directory
+## Step 11: Clean up extracted directory
 
 After generating the ZIP, delete the extracted directory (it should NOT be committed):
 
