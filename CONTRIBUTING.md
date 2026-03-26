@@ -137,7 +137,7 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 - `name` - Display name
 - `description` - App description
 - `iconName` - Icon filename (e.g., `avalara.png`)
-- `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`
+- `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
 - `type` - Always `"app"` for commerce apps
 - `provider` - Always `"thirdParty"` for ISV apps
 - `version` - Semantic version (e.g., `"1.0.0"`)

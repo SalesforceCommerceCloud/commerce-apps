@@ -119,7 +119,7 @@ Copy the hex digest (the long string before the filename).
 
 **CRITICAL:** Update the root manifest at `commerce-apps-manifest/manifest.json`:
 
-Find your app's entry in the appropriate domain array (`tax`, `shipping`, `payment`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`) and update:
+Find your app's entry in the appropriate domain array (`tax`, `shipping`, `payment`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`) and update:
 
 ```json
 {

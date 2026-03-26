@@ -16,7 +16,7 @@ Gather the following information from the user:
 
 | Input | Example | Notes |
 |-------|---------|-------|
-| Domain | `tax` | One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts` |
+| Domain | `tax` | One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud` |
 | ISV/Vendor name | `avalara` | Your company name (lowercase, hyphens) |
 | App name (kebab-case) | `avalara-tax` | Unique app identifier |
 | Display name | `Avalara Tax` | Human-readable name with vendor |
@@ -47,6 +47,7 @@ Gather the following information from the user:
 - `address-verification` - Address validation and standardization
 - `analytics` - Analytics and reporting
 - `approaching-discounts` - Approaching discount notifications
+- `fraud` - Fraud detection and prevention
 
 ## Step 2: Create domain and ISV directories
 
@@ -82,7 +83,7 @@ mkdir -p cartridges/site_cartridges/<cartridgeName>/test/{mocks,unit}
 mkdir -p cartridges/bm_cartridges/bm_<appName>
 
 # Storefront Next extensions
-mkdir -p storefront-next/src/extensions/<appName>/components
+mkdir -p storefront-next/src/extensions/<appName>/{components,context,hooks,locales,middlewares,providers,routes,stores,tests}
 
 # Impex structure
 mkdir -p impex/install/meta

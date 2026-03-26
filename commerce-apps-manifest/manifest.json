@@ -64,5 +64,6 @@
             "type": "custom",
             "provider": "custom"
         }
-    ]
+    ],
+    "fraud": []
 }

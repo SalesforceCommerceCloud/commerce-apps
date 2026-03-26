@@ -80,9 +80,17 @@ commerce-{app-name}-app-v{version}/
 │   │   │   └── services/          # Service framework wrappers
 │   │   └── test/                  # Unit tests
 │   └── bm_cartridges/             # Business Manager extensions (optional)
-├── storefront-next/src/extensions/{name}/  # React components for UI Targets
+├── storefront-next/src/extensions/{name}/  # UI extension module
 │   ├── target-config.json         # Maps components → storefront extension points
-│   └── components/
+│   ├── components/                # React components
+│   ├── context/                   # React context providers
+│   ├── hooks/                     # Custom React hooks
+│   ├── locales/                   # i18n translation files
+│   ├── middlewares/               # Middleware functions
+│   ├── providers/                 # Data/service providers
+│   ├── routes/                    # Route definitions
+│   ├── stores/                    # State management stores
+│   └── tests/                     # Extension tests
 ├── impex/
 │   ├── install/                   # Service configs, custom attributes, preferences
 │   │   ├── services.xml
@@ -141,6 +149,7 @@ Every app's `domain` field must be one of these. Domains use hyphen-case. Provid
 | `address-verification` | Additional Setup | Address validation and standardization | |
 | `analytics` | Additional Setup | Analytics and reporting | |
 | `approaching-discounts` | Additional Setup | Approaching discount notifications | Salesforce Approaching Discounts |
+| `fraud` | Additional Setup | Fraud detection and prevention | |
 
 ## Tech Stack
 

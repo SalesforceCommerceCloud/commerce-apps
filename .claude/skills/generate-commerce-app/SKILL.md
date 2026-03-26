@@ -22,7 +22,7 @@ Gather from the user (or infer from context):
 |-------|---------|----------|
 | App name (kebab-case) | `avalara-tax` | Yes |
 | Display name | `Avalara Tax` | Yes |
-| Domain | `tax` | Yes (one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`) |
+| Domain | `tax` | Yes (one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`) |
 | Version | `0.2.8` | Yes |
 | Description | `Automated tax compliance by Avalara` | Yes |
 | Publisher name | `Avalara` | Yes |
@@ -50,7 +50,15 @@ commerce-<appName>-app-v<version>/
 │   └── bm_cartridges/<bm_cartridge_name>/     # BM extensions (can be empty)
 ├── storefront-next/src/extensions/<app-name>/
 │   ├── target-config.json                     # Extension target mappings
-│   └── components/                            # React components
+│   ├── components/                            # React components
+│   ├── context/                               # React context providers
+│   ├── hooks/                                 # Custom React hooks
+│   ├── locales/                               # i18n translation files
+│   ├── middlewares/                            # Middleware functions
+│   ├── providers/                             # Data/service providers
+│   ├── routes/                                # Route definitions
+│   ├── stores/                                # State management stores
+│   └── tests/                                 # Extension tests
 ├── impex/
 │   ├── install/
 │   │   ├── services.xml                       # Service credential, profile, definition
@@ -145,7 +153,7 @@ Find the entry for your app in the appropriate domain array (e.g., `tax`, `payme
 }
 ```
 
-Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`.
+Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`.
 
 **For new apps:** Add a new entry to the appropriate domain array.
 **For updates:** Update the existing entry's `version`, `zip`, and `sha256` fields.

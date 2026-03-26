@@ -14,7 +14,7 @@ Run comprehensive validation checks on a commerce app before submitting a PR.
 ## Step 1: Identify the app to validate
 
 Gather or infer:
-- Domain (one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`)
+- Domain (one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`)
 - App name (e.g., `avalara-tax`)
 - Version to validate (or use latest ZIP in directory)
 
@@ -46,7 +46,7 @@ Check that the app entry in `commerce-apps-manifest/manifest.json` contains all 
 - `name` - human-readable display name
 - `description` - app description
 - `iconName` - icon filename (e.g., `avalara.png`)
-- `domain` - must be one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`
+- `domain` - must be one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
 - `type` - must be `"app"`
 - `provider` - must be `"thirdParty"`
 - `version` - semantic version (e.g., `0.2.8`)

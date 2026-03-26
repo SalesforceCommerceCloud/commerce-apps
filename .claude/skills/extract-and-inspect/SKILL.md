@@ -110,7 +110,15 @@ commerce-<appName>-app-v<version>/
 │   └── bm_cartridges/<bm_cartridge_name>/
 ├── storefront-next/src/extensions/<app-name>/
 │   ├── target-config.json
-│   └── components/
+│   ├── components/
+│   ├── context/
+│   ├── hooks/
+│   ├── locales/
+│   ├── middlewares/
+│   ├── providers/
+│   ├── routes/
+│   ├── stores/
+│   └── tests/
 ├── impex/
 │   ├── install/
 │   │   ├── services.xml
