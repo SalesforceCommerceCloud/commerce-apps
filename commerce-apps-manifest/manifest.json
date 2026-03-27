@@ -19,9 +19,9 @@
             "domain": "tax",
             "type": "app",
             "provider": "thirdParty",
-            "version": "0.1.0",
-            "zip": "avalara-tax-v0.1.0.zip",
-            "sha256": "54aebe32f15bd832585b5c6f338ccc060706209a7936f9347d21e83146cf9712"
+            "version": "0.1.1",
+            "zip": "avalara-tax-v0.1.1.zip",
+            "sha256": "473d75c20002176dbc81bec487d9c6eaf618df3ea0652e6d8a6bc2b5d5def047"
         },
         {
             "id": "custom-tax",
