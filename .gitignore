@@ -1,0 +1,80 @@
+# ==========================================
+# macOS System Files
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+__MACOSX/
+
+# ==========================================
+# Windows System Files
+# ==========================================
+# Windows thumbnails
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on separate drives
+$RECYCLE.BIN/
+
+# Windows Installer temporary files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# ==========================================
+# Linux System Files
+# ==========================================
+# Temporary files (often created by text editors like Vim)
+*~
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder
+.trash
+
+# ==========================================
+# General Hidden Files
+# ==========================================
+# Ignore all hidden files/folders by default
+.*
+
+# But keep GitHub automation files tracked
+!.github/
+!.github/**
+
+# Keep the .gitignore file itself!
+!.gitignore
+
+# Keep Claude Code and Cursor directories
+!.claude/
+!.claude/**
+!.cursor/
+!.cursor/**
+
+# But exclude local settings files
+.claude/settings.local.json
+.cursor/settings.local.json
+
+# ==========================================
+# Commerce Apps - Extracted Directories
+# ==========================================
+# Do NOT commit extracted app directories
+# Only commit ZIP files, manifest.json, and catalog.json
+**/commerce-*-app-v*/
+**/commerce-*-app-*/

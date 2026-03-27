@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/salesforce/commerce-apps/discussions
+    about: Ask questions and discuss Commerce Apps with the community
+  - name: 📚 Documentation
+    url: https://developer.salesforce.com/docs/commerce/b2c-commerce
+    about: Read the official Salesforce Commerce Cloud documentation
+  - name: 🆘 Support
+    url: https://help.salesforce.com
+    about: Get enterprise support from Salesforce

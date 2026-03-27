@@ -1,0 +1,26 @@
+{
+    "salesforce-flat-tax": {
+        "name": "Salesforce 정액세",
+        "description": "정액세 계산을 구성합니다."
+    },
+    "avalara-tax": {
+        "name": "Avalara",
+        "description": "Avalara로 판매세 규정 준수를 자동화합니다."
+    },
+    "custom-tax": {
+        "name": "맞춤 세금",
+        "description": "자체 API를 제공하여 맞춤 세금 계산을 구성합니다."
+    },
+    "basic-shipping": {
+        "name": "기본 배송",
+        "description": "기본 배송 계산을 구성합니다."
+    },
+    "custom-shipping": {
+        "name": "맞춤 배송",
+        "description": "자체 API를 제공하여 맞춤 배송 계산을 구성합니다."
+    },
+    "custom-payment": {
+        "name": "맞춤 결제",
+        "description": "자체 API를 제공하여 맞춤 결제 통합을 구성합니다."
+    }
+}

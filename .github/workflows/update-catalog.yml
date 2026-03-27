@@ -46,6 +46,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           updated_any=false
+          icons_manifest_dir="commerce-apps-manifest/icons"
+          mkdir -p "$icons_manifest_dir"
 
           for zip_path in "${changed_zips[@]}"; do
             # Only act on ZIPs that exist after the merge (skip deletions)
@@ -92,6 +94,50 @@ jobs:
             mv "$tmp" "$catalog_path"
             git add "$catalog_path"
             updated_any=true
+
+            # Extract and copy icons from CAP
+            # Extract ISV name from path: {domain}/{isv-name}/
+            isv_name="$(echo "$zip_path" | cut -d'/' -f2)"
+
+            if [[ -n "$isv_name" ]]; then
+              tmpdir="$(mktemp -d)"
+              unzip -q "$zip_path" -d "$tmpdir"
+
+              # Find icons directory in the extracted CAP
+              icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+
+              if [[ -n "$icons_dir" && -d "$icons_dir" ]]; then
+                echo "Extracting icons from $zip_path for ISV: $isv_name"
+
+                # Find all icon files (png, svg, jpg, jpeg)
+                mapfile -t icon_files < <(find "$icons_dir" -type f \( -iname "*.png" -o -iname "*.svg" -o -iname "*.jpg" -o -iname "*.jpeg" \) -print)
+
+                for icon_file in "${icon_files[@]}"; do
+                  icon_basename="$(basename "$icon_file")"
+                  dest_icon="$icons_manifest_dir/${icon_basename}"
+
+                  # Only copy if it doesn't exist or is different
+                  if [[ ! -f "$dest_icon" ]]; then
+                    echo "  Adding new icon: $dest_icon"
+                    cp "$icon_file" "$dest_icon"
+                    git add "$dest_icon"
+                  else
+                    # Check if different
+                    new_hash="$(sha256sum "$icon_file" | awk '{print $1}')"
+                    existing_hash="$(sha256sum "$dest_icon" | awk '{print $1}')"
+                    if [[ "$new_hash" != "$existing_hash" ]]; then
+                      echo "  Updating icon: $dest_icon"
+                      cp "$icon_file" "$dest_icon"
+                      git add "$dest_icon"
+                    else
+                      echo "  Icon already exists and is identical: $dest_icon"
+                    fi
+                  fi
+                done
+              fi
+
+              rm -rf "$tmpdir"
+            fi
           done
 
           if [[ "$updated_any" != "true" ]]; then
@@ -119,5 +165,6 @@ jobs:
             - Creates a tag matching the ZIP filename (without `.zip`)
             - Updates `catalog.json` `latest`
             - Appends a new entry to `catalog.json` `versions`
+            - Extracts and adds app icons to `commerce-apps-manifest/icons/`
           labels: |
             automation
