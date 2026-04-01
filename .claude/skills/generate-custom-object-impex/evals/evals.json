@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I need to cache API responses for my ratings app. How do I store that data?",
+      "context": "User describing caching need without mentioning custom objects",
+      "expected_behavior": "Should recognize caching requirement and trigger generate-custom-object-impex with cache pattern"
+    },
+    {
+      "prompt": "Can you help me set up custom object storage for configuration data? It needs to persist across sessions.",
+      "context": "User needs persistent storage for app configuration",
+      "expected_behavior": "Should trigger generate-custom-object-impex with configuration storage pattern"
+    },
+    {
+      "prompt": "I want to log all API calls my app makes for auditing. What's the best way to store that?",
+      "context": "User describing audit log requirement",
+      "expected_behavior": "Should trigger generate-custom-object-impex with audit log pattern, set appropriate retention"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I need to integrate with the Avalara Tax API. Can you create the service configuration files?",
+      "context": "User needs service impex for external API integration",
+      "expected_behavior": "Should trigger generate-service-impex skill, collect API details, generate install/uninstall services.xml"
+    },
+    {
+      "prompt": "My app needs to call a REST API for shipping rates. How do I set up the service in SFCC?",
+      "context": "User describing API integration need without mentioning 'services'",
+      "expected_behavior": "Should recognize API integration requirement and trigger generate-service-impex"
+    },
+    {
+      "prompt": "Generate the services.xml files for a payment gateway integration with timeout 10 seconds and rate limiting",
+      "context": "User explicitly requesting service files with specific configuration",
+      "expected_behavior": "Should trigger generate-service-impex and create properly configured service files"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "Merchants need to configure API keys and select sandbox vs production. Can you create the site preferences?",
+      "context": "User needs configurable merchant settings",
+      "expected_behavior": "Should trigger generate-site-preferences-impex skill, create attribute definitions with API key (string), secret (password), environment (enum)"
+    },
+    {
+      "prompt": "I need to add some settings that merchants can configure in Business Manager for my tax app",
+      "context": "User describing need for merchant-configurable settings",
+      "expected_behavior": "Should recognize settings requirement and trigger generate-site-preferences-impex"
+    },
+    {
+      "prompt": "Create site preferences for enabling/disabling features, max items (1-100), and debug mode",
+      "context": "User explicitly requesting specific preference types",
+      "expected_behavior": "Should trigger generate-site-preferences-impex and create boolean, integer with min/max, and boolean preferences"
+    }
+  ]
+}

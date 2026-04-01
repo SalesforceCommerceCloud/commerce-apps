@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns="http://www.demandware.com/xml/impex/services/2015-07-01">
+    <service-credential credential-id="{{appName}}.credential">
+        <url>https://api.example.com</url>
+        <user-id>YOUR_API_KEY</user-id>
+        <password>YOUR_API_SECRET</password>
+    </service-credential>
+
+    <service-profile profile-id="{{appName}}.profile">
+        <timeout-millis>30000</timeout-millis>
+        <rate-limit-enabled>true</rate-limit-enabled>
+        <rate-limit-calls>100</rate-limit-calls>
+        <rate-limit-millis>1000</rate-limit-millis>
+        <circuit-breaker-enabled>true</circuit-breaker-enabled>
+    </service-profile>
+
+    <service service-id="{{serviceId}}">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>{{appName}}</log-prefix>
+        <credential credential-id="{{appName}}.credential"/>
+        <profile profile-id="{{appName}}.profile"/>
+    </service>
+</services>

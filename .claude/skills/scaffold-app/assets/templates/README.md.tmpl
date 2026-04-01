@@ -1,0 +1,71 @@
+# {{displayName}}
+
+{{description}}
+
+## Overview
+
+[Describe what this app does and the problem it solves]
+
+## Features
+
+- Feature 1
+- Feature 2
+- Feature 3
+
+## Prerequisites
+
+- Salesforce Commerce Cloud B2C Commerce instance
+- API access enabled
+- [Any other requirements]
+
+## Installation
+
+1. Download the app from the Commerce App Registry
+2. Import the app using Business Manager
+3. Navigate to Administration > Site Development > Manage Sites
+4. Select your site and add the cartridge to the cartridge path
+5. Configure the service credentials
+
+## Configuration
+
+### Service Credentials
+
+1. Navigate to Administration > Operations > Services
+2. Find the `{{serviceId}}` service
+3. Configure credentials:
+   - **Username/API Key:** [Instructions]
+   - **Password/Secret:** [Instructions]
+   - **Endpoint URL:** [Instructions]
+
+### Site Preferences
+
+1. Navigate to Merchant Tools > Site Preferences > Custom Preferences
+2. Configure {{displayName}} settings
+
+## Post-Installation Checklist
+
+- [ ] Configure service credentials
+- [ ] Set site preferences
+- [ ] Test the integration on a test site
+
+## Testing
+
+```bash
+cd cartridges/site_cartridges/{{cartridgeName}}
+npm install
+npm test
+```
+
+## Support
+
+For questions or issues:
+- Documentation: {{publisherUrl}}/docs
+
+## License
+
+[Your license information]
+
+## Changelog
+
+### v{{version}}
+- Initial release
