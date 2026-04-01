@@ -205,9 +205,9 @@ jobs:
           set -euo pipefail
 
           required_hooks=(
-            "sf.commerce.app.tax.calculate"
-            "sf.commerce.app.tax.commit"
-            "sf.commerce.app.tax.cancel"
+            "sfcc.app.tax.calculate"
+            "sfcc.app.tax.commit"
+            "sfcc.app.tax.cancel"
           )
 
           [[ -s changed_zips.txt ]] || exit 0
@@ -379,4 +379,3 @@ jobs:
             rm -rf "$tmpdir"
             trap - RETURN
           done < changed_zips.txt
-
