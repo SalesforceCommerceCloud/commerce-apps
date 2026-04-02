@@ -1,0 +1,32 @@
+'use strict';
+
+/**
+ * Calculate hook for {{displayName}}
+ * @param {dw.order.Basket} basket - The current basket
+ * @returns {Object} Result object
+ */
+function calculate(basket) {
+    var Logger = require('dw/system/Logger');
+    var logger = Logger.getLogger('{{appName}}', 'calculate');
+
+    try {
+        logger.info('Starting calculation for basket: {0}', basket.UUID);
+
+        // TODO: Implement your business logic here
+
+        return {
+            success: true,
+            message: 'Calculation completed successfully'
+        };
+    } catch (e) {
+        logger.error('Error in calculate: {0}', e.message);
+        return {
+            success: false,
+            error: e.message
+        };
+    }
+}
+
+module.exports = {
+    calculate: calculate
+};

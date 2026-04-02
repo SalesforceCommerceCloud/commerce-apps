@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I just created some impex files. Can you check if they're valid before I import them?",
+      "context": "User wants to validate impex files before importing to Business Manager",
+      "expected_behavior": "Should trigger validate-impex skill, check XML syntax, validate services, site preferences, cross-references"
+    },
+    {
+      "prompt": "My services.xml import failed. Help me figure out what's wrong.",
+      "context": "User debugging import failure",
+      "expected_behavior": "Should trigger validate-impex to identify XML or configuration errors"
+    },
+    {
+      "prompt": "Validate the impex files in my app to make sure they're correct",
+      "context": "General impex validation request",
+      "expected_behavior": "Should trigger validate-impex, run all validation checks, report specific errors with fixes"
+    }
+  ]
+}

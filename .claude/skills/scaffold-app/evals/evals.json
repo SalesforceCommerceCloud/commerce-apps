@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I need to create a new tax app for Avalara. Can you set up the basic structure?",
+      "context": "User wants to start a new commerce app from scratch",
+      "expected_behavior": "Should trigger scaffold-commerce-app skill and collect necessary information (domain=tax, vendor=avalara, app type, etc.)"
+    },
+    {
+      "prompt": "Let's build a payment integration for Stripe. What do I need to get started?",
+      "context": "User starting a new payment app without explicitly saying 'scaffold'",
+      "expected_behavior": "Should recognize payment integration = new app and trigger scaffolding workflow"
+    },
+    {
+      "prompt": "I want to make a commerce app for shipping rates from FedEx. Help me start.",
+      "context": "User describing a new app project",
+      "expected_behavior": "Should trigger scaffold-commerce-app and guide through directory creation, templates, and initial files"
+    }
+  ]
+}

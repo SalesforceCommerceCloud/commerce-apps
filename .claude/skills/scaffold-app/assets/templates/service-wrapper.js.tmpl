@@ -1,0 +1,54 @@
+'use strict';
+
+var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
+
+/**
+ * Create service definition
+ */
+var service = LocalServiceRegistry.createService('{{serviceId}}', {
+    createRequest: function(svc, params) {
+        svc.setRequestMethod('POST');
+        svc.addHeader('Content-Type', 'application/json');
+
+        var credential = svc.getConfiguration().getCredential();
+        if (credential && credential.getUser()) {
+            svc.addHeader('Authorization', 'Bearer ' + credential.getPassword());
+        }
+
+        return JSON.stringify(params);
+    },
+
+    parseResponse: function(svc, client) {
+        return JSON.parse(client.text);
+    },
+
+    filterLogMessage: function(msg) {
+        return msg;
+    }
+});
+
+/**
+ * Call the service
+ * @param {Object} params - Request parameters
+ * @returns {Object} Service response
+ */
+function call(params) {
+    var result = service.call(params);
+
+    if (result.status === 'OK') {
+        return {
+            success: true,
+            data: result.object
+        };
+    } else {
+        return {
+            success: false,
+            error: result.errorMessage,
+            errorCode: result.error
+        };
+    }
+}
+
+module.exports = {
+    call: call
+};

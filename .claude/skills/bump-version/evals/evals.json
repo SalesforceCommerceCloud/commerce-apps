@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I fixed a bug in the avalara-tax app. Let's bump it to version 0.2.9",
+      "context": "User made bug fix and needs to increment patch version",
+      "expected_behavior": "Should trigger bump-version skill, extract current ZIP, update commerce-app.json, regenerate ZIP with new version"
+    },
+    {
+      "prompt": "Need to release a new version of my shipping app. It's currently 1.0.0 and I added some new features.",
+      "context": "User describing version update for new features (minor bump)",
+      "expected_behavior": "Should trigger bump-version, suggest minor version bump (1.1.0), handle full version update workflow"
+    },
+    {
+      "prompt": "Update the payment app to version 2.0.0 - we made breaking changes",
+      "context": "Major version bump with breaking changes",
+      "expected_behavior": "Should trigger bump-version with major version update, update all files, regenerate ZIP and manifest"
+    }
+  ]
+}

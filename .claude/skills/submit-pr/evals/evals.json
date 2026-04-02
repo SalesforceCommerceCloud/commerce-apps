@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "My app is validated and ready. Let's submit it to the registry.",
+      "context": "User has packaged and validated app, ready for PR submission",
+      "expected_behavior": "Should trigger submit-pr skill, check gh CLI auth, create branch, push, and open PR"
+    },
+    {
+      "prompt": "How do I create a pull request for my avalara-tax v0.2.8?",
+      "context": "User asking about PR creation",
+      "expected_behavior": "Should trigger submit-pr workflow with PR template and automation"
+    },
+    {
+      "prompt": "Time to open a PR for this app. Can you help?",
+      "context": "Casual request for PR submission",
+      "expected_behavior": "Should trigger submit-pr, validate files exist, check auth, and create PR"
+    }
+  ]
+}

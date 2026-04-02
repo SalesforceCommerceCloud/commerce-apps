@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "Can you validate my avalara-tax app before I submit? Want to make sure everything is correct.",
+      "context": "User wants pre-submission validation",
+      "expected_behavior": "Should trigger validate-app skill, check ZIP structure, manifest, SHA256, impex files, run full checklist"
+    },
+    {
+      "prompt": "Check if my app package is ready to submit",
+      "context": "Casual validation request",
+      "expected_behavior": "Should trigger validate-app and run comprehensive validation checks"
+    },
+    {
+      "prompt": "My PR failed CI checks. Can you help me figure out what's wrong with the app?",
+      "context": "User debugging validation failure",
+      "expected_behavior": "Should trigger validate-app to identify root cause of validation issues"
+    }
+  ]
+}

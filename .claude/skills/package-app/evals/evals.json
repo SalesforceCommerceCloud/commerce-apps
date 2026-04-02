@@ -1,0 +1,19 @@
+{
+  "evals": [
+    {
+      "prompt": "I'm done making changes to the avalara-tax app. How do I create the ZIP?",
+      "context": "User has modified extracted app directory and needs to package it",
+      "expected_behavior": "Should trigger package-app skill, locate extracted directory, and generate ZIP with proper structure"
+    },
+    {
+      "prompt": "Can you build the app package for me? I think it's ready to submit.",
+      "context": "User ready to package but using casual language",
+      "expected_behavior": "Should recognize 'build app package' as packaging request and trigger package-app workflow"
+    },
+    {
+      "prompt": "Generate the ZIP file for my ratings-reviews app version 1.0.2",
+      "context": "User explicitly requesting ZIP generation",
+      "expected_behavior": "Should trigger package-app, find extracted directory, create ZIP with correct naming, compute SHA256"
+    }
+  ]
+}
