@@ -1,19 +1,218 @@
 {
+  "skill_name": "validate-app",
   "evals": [
     {
-      "prompt": "Can you validate my avalara-tax app before I submit? Want to make sure everything is correct.",
-      "context": "User wants pre-submission validation",
-      "expected_behavior": "Should trigger validate-app skill, check ZIP structure, manifest, SHA256, impex files, run full checklist"
+      "id": 1,
+      "eval_name": "backend-only-tax-app-validation",
+      "prompt": "Can you validate my avalara-tax app before I submit? It's backend-only with tax calculation hooks. The ZIP is at tax/avalara/avalara-tax-v0.2.8.zip",
+      "expected_output": "Should detect Backend-only architecture, validate commerce-app.json, impex files (services.xml install/uninstall), hooks.json, skip storefront validation, verify SHA256 matches manifest, check tasksList.json exists",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects backend-only architecture",
+          "description": "Should identify cartridges/ present, no storefront-next/"
+        },
+        {
+          "name": "validates ZIP structure",
+          "description": "Single root folder, no junk files, no domain prefixes"
+        },
+        {
+          "name": "computes and verifies SHA256",
+          "description": "Hash computation and manifest comparison"
+        },
+        {
+          "name": "validates commerce-app.json fields",
+          "description": "Required fields present: id, name, description, domain, version, publisher"
+        },
+        {
+          "name": "checks tasksList.json exists",
+          "description": "Required merchant post-installation task list"
+        },
+        {
+          "name": "validates impex services.xml",
+          "description": "Well-formed XML, valid service config, no hardcoded credentials"
+        },
+        {
+          "name": "validates install/uninstall pair match",
+          "description": "Service IDs in install and uninstall must match exactly"
+        },
+        {
+          "name": "skips storefront validation",
+          "description": "Should not check for target-config.json or TypeScript files"
+        },
+        {
+          "name": "checks hooks.json uses explicit script paths",
+          "description": "Hook paths must be explicit, not relative"
+        },
+        {
+          "name": "verifies package.json has hooks field",
+          "description": "Cartridge package.json must include 'hooks' field"
+        }
+      ]
     },
     {
-      "prompt": "Check if my app package is ready to submit",
-      "context": "Casual validation request",
-      "expected_behavior": "Should trigger validate-app and run comprehensive validation checks"
+      "id": 2,
+      "eval_name": "ui-only-product-reviews-validation",
+      "prompt": "Validate my product reviews widget app before submitting. It's UI-only with no backend. ZIP is at ratings-and-reviews/reviewhub/reviewhub-reviews-v1.0.0.zip",
+      "expected_output": "Should detect UI-only architecture, validate storefront-next structure, check for target-config.json, verify all three locales, check Apache 2.0 headers, verify 'use client' directives, skip impex validation, check tasksList.json",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects UI-only architecture",
+          "description": "Should identify storefront-next/ present, no cartridges/"
+        },
+        {
+          "name": "validates target-config.json exists",
+          "description": "Extension config file at storefront-next/src/extensions/<appName>/"
+        },
+        {
+          "name": "checks target-config.json structure",
+          "description": "Must have components array with targetId, path, order"
+        },
+        {
+          "name": "validates index.ts barrel file",
+          "description": "Must exist at storefront-next/src/extensions/<appName>/index.ts"
+        },
+        {
+          "name": "checks all three required locales",
+          "description": "en-US, en-GB, it-IT translations.json files must exist"
+        },
+        {
+          "name": "validates locales have identical structure",
+          "description": "All locale files should have same keys"
+        },
+        {
+          "name": "checks for Apache 2.0 copyright headers",
+          "description": "All .ts/.tsx files must start with license header"
+        },
+        {
+          "name": "verifies 'use client' directives",
+          "description": "Components must have 'use client' after copyright, before imports"
+        },
+        {
+          "name": "checks no hardcoded strings",
+          "description": "Should verify useTranslation() usage, no English hardcoded"
+        },
+        {
+          "name": "skips impex validation",
+          "description": "Should not check for services.xml or impex directory"
+        },
+        {
+          "name": "skips cartridge validation",
+          "description": "Should not look for hooks.json or package.json"
+        },
+        {
+          "name": "checks tasksList.json exists",
+          "description": "Required merchant post-installation task list"
+        }
+      ]
     },
     {
-      "prompt": "My PR failed CI checks. Can you help me figure out what's wrong with the app?",
-      "context": "User debugging validation failure",
-      "expected_behavior": "Should trigger validate-app to identify root cause of validation issues"
+      "id": 3,
+      "eval_name": "fullstack-loyalty-app-validation",
+      "prompt": "I need to validate my loyalty program app before PR. It's fullstack - has both UI components and backend hooks. ZIP at loyalty/loyaltymax/loyaltymax-points-v1.0.0.zip",
+      "expected_output": "Should detect Fullstack architecture, validate both storefront-next files AND impex files, check target-config.json, locales, copyright headers, 'use client' directives, hooks.json, services.xml, install/uninstall pairs, tasksList.json",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects fullstack architecture",
+          "description": "Should identify both storefront-next/ and cartridges/ present"
+        },
+        {
+          "name": "validates storefront structure",
+          "description": "target-config.json, index.ts, components exist"
+        },
+        {
+          "name": "checks all three locales",
+          "description": "en-US, en-GB, it-IT must be present"
+        },
+        {
+          "name": "validates copyright headers and use client",
+          "description": "Apache 2.0 headers and 'use client' directives"
+        },
+        {
+          "name": "validates backend cartridges",
+          "description": "Cartridge structure, package.json with hooks field"
+        },
+        {
+          "name": "validates hooks.json configuration",
+          "description": "Explicit script paths, domain-appropriate hooks"
+        },
+        {
+          "name": "validates impex files",
+          "description": "Well-formed services.xml in install/ and uninstall/"
+        },
+        {
+          "name": "checks install/uninstall match",
+          "description": "Service IDs must match between install and uninstall"
+        },
+        {
+          "name": "validates commerce-app.json",
+          "description": "All required fields for fullstack app"
+        },
+        {
+          "name": "checks tasksList.json exists",
+          "description": "Required merchant post-installation task list with both UI and backend tasks"
+        },
+        {
+          "name": "verifies SHA256 hash",
+          "description": "Computed hash matches manifest entry"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "validation-failure-debugging",
+      "prompt": "My PR failed CI checks for the shipping app. Can you help me figure out what's wrong? The app is at shipping/fedex/fedex-shipping-v2.0.0.zip",
+      "expected_output": "Should run validate-app to identify specific issues, report line numbers and file paths for errors, provide fix recommendations",
+      "files": [],
+      "assertions": [
+        {
+          "name": "runs comprehensive validation",
+          "description": "Should check ZIP structure, manifest, impex, architecture"
+        },
+        {
+          "name": "reports specific errors with file paths",
+          "description": "Errors should include file names and line numbers"
+        },
+        {
+          "name": "provides fix recommendations",
+          "description": "Should suggest how to fix each identified issue"
+        },
+        {
+          "name": "checks common failure points",
+          "description": "SHA256 mismatch, XML syntax, missing files, junk files"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "pre-submission-ready-check",
+      "prompt": "Check if my app package is ready to submit for PR",
+      "expected_output": "Should trigger validate-app proactively, detect architecture, run full validation checklist, provide clear PASS/FAIL status",
+      "files": [],
+      "assertions": [
+        {
+          "name": "triggers validate-app skill",
+          "description": "Should use validate-app skill for comprehensive check"
+        },
+        {
+          "name": "asks for app details if not provided",
+          "description": "Domain, app name, version to locate ZIP"
+        },
+        {
+          "name": "detects architecture type",
+          "description": "UI-only, Backend-only, or Fullstack"
+        },
+        {
+          "name": "runs architecture-specific validation",
+          "description": "Only checks relevant files based on architecture"
+        },
+        {
+          "name": "provides clear pass/fail status",
+          "description": "Final summary: ✅ PASS or ❌ FAIL with issue list"
+        }
+      ]
     }
   ]
 }

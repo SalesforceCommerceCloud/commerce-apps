@@ -1,19 +1,231 @@
 {
+  "skill_name": "package-app",
   "evals": [
     {
-      "prompt": "I'm done making changes to the avalara-tax app. How do I create the ZIP?",
-      "context": "User has modified extracted app directory and needs to package it",
-      "expected_behavior": "Should trigger package-app skill, locate extracted directory, and generate ZIP with proper structure"
+      "id": 1,
+      "eval_name": "backend-only-tax-app-packaging",
+      "prompt": "I'm done working on the avalara-tax app. Can you create the ZIP for version 0.2.8? It's a backend-only tax app with hooks and services.",
+      "expected_output": "Should detect Backend-only architecture, verify cartridges/ and impex/ exist, no storefront-next/, generate ZIP with proper naming, compute SHA256, update root manifest, verify tasksList.json present",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects backend-only architecture",
+          "description": "Should identify cartridges/ present, no storefront-next/"
+        },
+        {
+          "name": "verifies directory structure",
+          "description": "Checks for commerce-app.json, README.md, app-configuration/tasksList.json"
+        },
+        {
+          "name": "verifies backend-specific files",
+          "description": "Checks cartridges/, impex/install/, impex/uninstall/"
+        },
+        {
+          "name": "generates ZIP with correct name",
+          "description": "ZIP named avalara-tax-v0.2.8.zip"
+        },
+        {
+          "name": "ZIP has single root folder",
+          "description": "commerce-avalara-tax-app-v0.2.8/ as only root"
+        },
+        {
+          "name": "no junk files in ZIP",
+          "description": "Excludes .DS_Store, __MACOSX, hidden files"
+        },
+        {
+          "name": "computes SHA256 hash",
+          "description": "Generates hash for ZIP file"
+        },
+        {
+          "name": "updates root manifest with hash",
+          "description": "Updates commerce-apps-manifest/manifest.json"
+        },
+        {
+          "name": "deletes extracted directory after packaging",
+          "description": "Cleans up commerce-avalara-tax-app-v0.2.8/ folder"
+        },
+        {
+          "name": "does not include storefront-next in ZIP",
+          "description": "Backend-only should have no UI directories"
+        }
+      ]
     },
     {
-      "prompt": "Can you build the app package for me? I think it's ready to submit.",
-      "context": "User ready to package but using casual language",
-      "expected_behavior": "Should recognize 'build app package' as packaging request and trigger package-app workflow"
+      "id": 2,
+      "eval_name": "ui-only-reviews-app-packaging",
+      "prompt": "Package my product reviews widget app version 1.0.0. It's UI-only with React components and locales, no backend stuff.",
+      "expected_output": "Should detect UI-only architecture, verify storefront-next/ exists with target-config.json and locales, no cartridges/ or impex/, generate ZIP, compute SHA256, update manifest",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects UI-only architecture",
+          "description": "Should identify storefront-next/ present, no cartridges/"
+        },
+        {
+          "name": "verifies UI-specific files",
+          "description": "Checks target-config.json, index.ts, locales/"
+        },
+        {
+          "name": "checks all three locales present",
+          "description": "Verifies en-US, en-GB, it-IT directories exist"
+        },
+        {
+          "name": "generates ZIP without backend directories",
+          "description": "No cartridges/ or impex/ in ZIP"
+        },
+        {
+          "name": "ZIP name matches convention",
+          "description": "<appName>-v<version>.zip format"
+        },
+        {
+          "name": "computes and reports SHA256",
+          "description": "Hash computed for manifest update"
+        },
+        {
+          "name": "updates commerce-app.json version",
+          "description": "Version field matches ZIP version"
+        },
+        {
+          "name": "verifies tasksList.json in ZIP",
+          "description": "Merchant post-installation checklist present"
+        }
+      ]
     },
     {
-      "prompt": "Generate the ZIP file for my ratings-reviews app version 1.0.2",
-      "context": "User explicitly requesting ZIP generation",
-      "expected_behavior": "Should trigger package-app, find extracted directory, create ZIP with correct naming, compute SHA256"
+      "id": 3,
+      "eval_name": "fullstack-loyalty-app-packaging",
+      "prompt": "Create the ZIP for my loyalty program app v1.0.0. It's fullstack - has both storefront components and backend hooks for points calculation.",
+      "expected_output": "Should detect Fullstack architecture, verify both storefront-next/ AND cartridges/ AND impex/ exist, generate complete ZIP with all directories, compute SHA256",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects fullstack architecture",
+          "description": "Should identify both storefront-next/ and cartridges/ present"
+        },
+        {
+          "name": "verifies UI components included",
+          "description": "Checks storefront-next structure with target-config.json"
+        },
+        {
+          "name": "verifies backend components included",
+          "description": "Checks cartridges/ and impex/ directories"
+        },
+        {
+          "name": "checks all locales for UI",
+          "description": "en-US, en-GB, it-IT present in storefront-next"
+        },
+        {
+          "name": "checks hooks.json for backend",
+          "description": "Cartridge includes hooks configuration"
+        },
+        {
+          "name": "verifies install and uninstall impex",
+          "description": "Both impex/install/ and impex/uninstall/ present"
+        },
+        {
+          "name": "generates complete fullstack ZIP",
+          "description": "ZIP contains both UI and backend directories"
+        },
+        {
+          "name": "updates manifest with correct domain",
+          "description": "Root manifest entry has loyalty domain"
+        },
+        {
+          "name": "verifies tasksList.json includes both UI and backend tasks",
+          "description": "Merchant checklist covers both architectures"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "version-bump-required",
+      "prompt": "Can you package the shipping app? I made some updates.",
+      "expected_output": "Should check catalog.json, detect if version already exists, force version bump if needed, ask user for new version, possibly trigger /bump-version skill",
+      "files": [],
+      "assertions": [
+        {
+          "name": "checks catalog.json for existing versions",
+          "description": "Reads catalog.json to see version history"
+        },
+        {
+          "name": "detects version conflict",
+          "description": "Identifies if current version already published"
+        },
+        {
+          "name": "forces version bump when needed",
+          "description": "Won't allow replacing published version"
+        },
+        {
+          "name": "asks user for new version number",
+          "description": "Prompts for semantic version bump"
+        },
+        {
+          "name": "suggests /bump-version skill",
+          "description": "Recommends using version bump workflow"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "new-app-first-package",
+      "prompt": "Generate the ZIP for my new payment gateway app, version 1.0.0. This is the first time packaging it.",
+      "expected_output": "Should detect new app (no catalog.json), package normally, create catalog.json with INIT values, update root manifest with new entry",
+      "files": [],
+      "assertions": [
+        {
+          "name": "detects new app scenario",
+          "description": "No existing catalog.json found"
+        },
+        {
+          "name": "packages app normally",
+          "description": "Creates ZIP with proper structure"
+        },
+        {
+          "name": "creates catalog.json with INIT",
+          "description": "New catalog.json has version: INIT, tag: INIT"
+        },
+        {
+          "name": "adds new entry to root manifest",
+          "description": "Creates new entry in appropriate domain array"
+        },
+        {
+          "name": "computes SHA256 for manifest",
+          "description": "Hash included in new manifest entry"
+        },
+        {
+          "name": "verifies architecture-specific structure",
+          "description": "Detects and validates correct architecture"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "delete-old-zips-before-packaging",
+      "prompt": "Build the app package for the tax app. I want to make sure we don't have multiple ZIP versions lying around.",
+      "expected_output": "Should delete old ZIP files before creating new one, generate new ZIP, verify only latest version exists",
+      "files": [],
+      "assertions": [
+        {
+          "name": "checks for existing ZIP files",
+          "description": "Finds old <appName>-v*.zip files"
+        },
+        {
+          "name": "deletes old ZIP versions",
+          "description": "Removes previous ZIP files before creating new one"
+        },
+        {
+          "name": "generates new ZIP",
+          "description": "Creates fresh ZIP with current version"
+        },
+        {
+          "name": "verifies single ZIP exists",
+          "description": "Only latest version ZIP in directory"
+        },
+        {
+          "name": "cleans extracted directory",
+          "description": "Removes extracted folder after packaging"
+        }
+      ]
     }
   ]
 }

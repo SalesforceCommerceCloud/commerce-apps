@@ -1,333 +1,255 @@
 ---
 name: scaffold-app
 description: >-
-  Generate initial directory structure and template files for a new commerce app.
-  Creates the complete app scaffolding including cartridges, extensions, impex files,
-  and configuration. Use this skill immediately when starting ANY new commerce app from scratch,
-  when the user mentions "new app", "scaffold", "starter template", or "create app structure".
-  This skill provides the fastest path to a working app skeleton with all required files.
+  Generate complete commerce app scaffolding with architecture-aware structure.
+  Use immediately when users mention "new app", "create app", "scaffold", "starter template",
+  or describe building a commerce integration (tax, payment, shipping, loyalty, etc.).
+  Supports three architectures: UI-only (frontend components), Backend-only (SFCC hooks/services),
+  and Fullstack (both). Don't wait for explicit "scaffold" request - trigger proactively when
+  starting any new commerce app from scratch.
 ---
 
 # Scaffold Commerce App
 
-Generate a complete starter structure for a new commerce app with all required files and templates.
+Generate a complete starter structure for commerce apps with architecture-appropriate files and templates.
 
-## When to use this skill
+## Architecture Types
 
-Use this skill proactively whenever:
-- User mentions creating a "new app", "new commerce app", or "starter app"
-- User asks to "scaffold" or "generate" an app structure
-- User wants to build an app "from scratch"
-- User needs a template or boilerplate for a commerce app
-- Starting any new tax, payment, shipping, or other commerce integration
+Three patterns optimize for different integration needs:
 
-**Don't wait for the user to explicitly say "scaffold" - if they're starting a new app, use this skill.**
+**UI-only** - Storefront components without backend
+- Use when: Adding visual features, widgets, or UI enhancements that don't need server-side logic
+- Creates: storefront-next/, components, hooks, no cartridges
+- Example: Product review display, image gallery, custom carousel
 
-## Step 1: Collect app information
+**Backend-only** - Server-side logic without UI
+- Use when: Integrating external services, processing data, or Business Manager functionality
+- Creates: cartridges/, hooks.json, services, impex/, no storefront-next
+- Example: Tax calculation API, payment processor, shipping rates
 
-Gather the following information from the user:
+**Fullstack** - Both UI and backend
+- Use when: Complete features needing both presentation and business logic
+- Creates: Both storefront-next/ and cartridges/
+- Example: Loyalty program with points display and calculation
 
-| Input | Example | Notes |
-|-------|---------|-------|
-| Domain | `tax` | One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud` |
-| ISV/Vendor name | `avalara` | Your company name (lowercase, hyphens) |
-| App name (kebab-case) | `avalara-tax` | Unique app identifier |
-| Display name | `Avalara Tax` | Human-readable name with vendor |
-| Initial version | `1.0.0` | Usually start with 1.0.0 |
-| Description | `Automate your sales tax compliance with Avalara` | Brief description |
-| Publisher name | `Avalara` | Your company name |
-| Publisher URL | `https://developer.avalara.com` | Your company website |
-| Cartridge name | `int_avalara_tax` | Usually `int_<appname>` |
-| Service ID | `avalara.tax.api` | Dotted notation with vendor |
+## Workflow
 
-**Valid domains:**
-`tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
+### 1. Determine Architecture
 
-## Step 2: Create directory structure
+If the user's description clearly indicates type, proceed directly. Otherwise ask:
 
-Run the structure creation script:
+"What type of app are you building?
+1. UI-only (frontend components)
+2. Backend-only (SFCC hooks/services)  
+3. Fullstack (both UI and backend)"
+
+### 2. Collect Information
+
+**All apps need:**
+- Domain (tax, payment, shipping, gift-cards, ratings-and-reviews, loyalty, search, address-verification, analytics, approaching-discounts, fraud)
+- ISV/vendor name (lowercase-with-hyphens)
+- App name (kebab-case, unique identifier)
+- Display name (human-readable with vendor)
+- Version (typically 1.0.0)
+- Description (one sentence)
+- Publisher name and URL
+- Additional context (optional - docs, requirements, API details)
+
+**UI-only and Fullstack also need:**
+- **Target IDs:** Commerce apps typically span multiple UI targets (e.g., checkout flow + order summary + header). Ask which targets the app needs rather than assuming single-component usage. Common patterns:
+  - Tax/shipping: `checkout.shippingOptions`, `checkout.orderSummary`, `orderSummary.tax.after`
+  - Payment: `checkout.payment`, `checkout.payment.paymentMethods`, `checkout.placeOrder.before`
+  - Loyalty: `header.before.cart`, `checkout.orderSummary`, `orderSummary.adjustments.after`
+  - Reviews: `pdp.after.addToCart`, header/footer links
+
+**Backend-only and Fullstack also need:**
+- Cartridge name (convention: `int_<vendor>_<appname>`, max 50 characters)
+- Service ID (dotted notation: `vendor.appname.api`)
+
+UI-only apps skip cartridge/service questions since they don't need backend infrastructure.
+
+### 3. Create Structure
+
+Use the creation script when available:
+```bash
+bash scripts/create_structure.sh <domain> <isv> <appName> <version> <cartridgeName>
+```
+
+Or create manually based on architecture:
 
 ```bash
-bash scripts/create_structure.sh <domain> <isv-name> <appName> <version> <cartridgeName>
-```
+mkdir -p <domain>/<isv>/commerce-<appName>-app-v<version>
+cd <domain>/<isv>/commerce-<appName>-app-v<version>
+mkdir -p icons
 
-This creates:
-```
-{domain}/{isv-name}/commerce-{appName}-app-v{version}/
-├── commerce-app.json
-├── README.md
-├── app-configuration/
-├── cartridges/site_cartridges/{cartridgeName}/
-├── storefront-next/src/extensions/{appName}/
-└── impex/
-```
+# All apps get these base directories
+mkdir -p app-configuration  # Required for tasksList.json
 
-**If script fails or you prefer manual creation:**
-```bash
-mkdir -p <domain>/<isv-name>
-cd <domain>/<isv-name>
-mkdir -p commerce-<appName>-app-v<version>
-cd commerce-<appName>-app-v<version>
+# UI-only OR Fullstack: Add storefront (extension system)
+mkdir -p storefront-next/src/extensions/<appName>/{components,hooks,context,providers,routes,tests}
+mkdir -p storefront-next/src/extensions/<appName>/locales/en-US
 
-# Create all directories
-mkdir -p app-configuration icons
+# Backend-only OR Fullstack: Add cartridges and impex
 mkdir -p cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/{hooks,helpers,services}
 mkdir -p cartridges/site_cartridges/<cartridgeName>/test/{mocks,unit}
+mkdir -p impex/{install/meta,install/sites/SITEID,uninstall}
+
+# Fullstack only: Add Business Manager cartridge
 mkdir -p cartridges/bm_cartridges/bm_<appName>
-mkdir -p storefront-next/src/extensions/<appName>/{components,context,hooks,locales,middlewares,providers,routes,stores,tests}
-mkdir -p impex/install/meta
-mkdir -p impex/install/sites/SITEID
-mkdir -p impex/uninstall
 ```
 
-## Step 3: Generate files from templates
+**Why this structure matters:** The app registry expects this specific layout. The domain/vendor nesting helps organize multiple apps, and the version in the directory name allows side-by-side development of updates.
 
-All template files are in `assets/templates/`. Read each template, replace placeholders, and write to the app directory.
+### 4. Generate Files
 
-### Template Variables
+Read templates from `assets/templates/`, replace placeholders, and write to app directory.
 
-When reading templates, replace these placeholders:
-- `{{appName}}` - app name (e.g., `avalara-tax`)
-- `{{displayName}}` - display name (e.g., `Avalara Tax`)
-- `{{version}}` - version (e.g., `1.0.0`)
-- `{{description}}` - app description
-- `{{domain}}` - domain (e.g., `tax`)
-- `{{publisherName}}` - publisher name
-- `{{publisherUrl}}` - publisher URL
-- `{{cartridgeName}}` - cartridge name
-- `{{serviceId}}` - service ID
+**Template variables:**
+- `{{appName}}`, `{{displayName}}`, `{{version}}`, `{{description}}`
+- `{{domain}}`, `{{publisherName}}`, `{{publisherUrl}}`
+- `{{cartridgeName}}`, `{{serviceId}}` (backend only)
 
-### Core Files
+**All apps:**
+- `commerce-app.json` (from template: `assets/templates/commerce-app.json.tmpl`)
+- `README.md` (from template: `assets/templates/README.md.tmpl`)
+- `app-configuration/tasksList.json` (required - post-installation checklist for merchants)
 
-**1. commerce-app.json**
-- Template: `assets/templates/commerce-app.json.tmpl`
-- Location: `commerce-app.json` (root)
+**tasksList.json structure:**
+Generate merchant-facing tasks that guide post-installation setup and verification. These are steps merchants complete after installing the app.
 
-**2. README.md**
-- Template: `assets/templates/README.md.tmpl`
-- Location: `README.md` (root)
-
-**3. app-configuration/tasksList.json**
-Create manually:
 ```json
 {
   "tasks": [
     {
-      "id": "configure-service",
-      "title": "Configure Service Credentials",
-      "description": "Set up API credentials for {{displayName}} service",
-      "required": true
-    },
-    {
-      "id": "configure-preferences",
-      "title": "Configure Site Preferences",
-      "description": "Set site-specific preferences for {{displayName}}",
-      "required": true
+      "id": "setup-credentials",
+      "title": "Configure API Credentials",
+      "description": "Add your [vendor] API key in Business Manager > Merchant Tools > Custom Site Preferences",
+      "completed": false
     },
     {
       "id": "test-integration",
-      "title": "Test Integration",
-      "description": "Verify the integration is working correctly",
-      "required": true
+      "title": "Test Integration in Sandbox",
+      "description": "Process a test order to verify the integration is working correctly",
+      "completed": false
     }
   ]
 }
 ```
 
-### Cartridge Files
+Tailor tasks to domain for merchant post-installation:
+- **Tax/Shipping/Payment:** Add API credentials, configure service settings, test checkout transactions
+- **Loyalty/Gift Cards:** Configure points rules, test balance lookups, verify redemption
+- **UI-only apps:** Verify components appear on storefront, check responsive behavior
+- **Fullstack:** Both UI verification and backend configuration steps
 
-**4. package.json**
-- Template: `assets/templates/package.json.tmpl`
-- Location: `cartridges/site_cartridges/<cartridgeName>/package.json`
+**Backend/Fullstack apps:**
+- `cartridges/site_cartridges/<cartridgeName>/package.json` (template: `package.json.tmpl`) - **Must include `"hooks": "cartridge/scripts/hooks.json"` field** to establish contract between app manifest and hook registry
+- `cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/hooks.json` (template: `hooks.json.tmpl` - adjust for domain) - **Use explicit script paths, never return undefined from hooks (always return dw.system.Status)**
+- Hook script (template: `hook-script.js.tmpl`) - **Use `require()` not `importPackage()` for module loading**
+- Service wrapper (template: `service-wrapper.js.tmpl`)
+- Helper and test files (inline templates in Step 4 reference below)
+- **Both install and uninstall:** `impex/install/services.xml` and `impex/uninstall/services.xml` (templates: `services-install.xml.tmpl`, `services-uninstall.xml.tmpl`) - **Dual IMPEX structure ensures safe merchant lifecycle management and proper cleanup on app removal**
 
-**5. hooks.json**
-- Template: `assets/templates/hooks.json.tmpl`
-- Location: `cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/hooks.json`
-- **Note:** Adjust hooks based on domain (tax, payment, shipping)
+For site preferences, invoke `/generate-site-preferences-impex` skill.
 
-**6. Hook Script**
-- Template: `assets/templates/hook-script.js.tmpl`
-- Location: `cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/hooks/calculate.js`
+**UI/Fullstack apps (Storefront Next Extension):**
+- `storefront-next/src/extensions/<appName>/target-config.json` - Component registration with targetId
+- `storefront-next/src/extensions/<appName>/index.ts` - Barrel file exports
+- TypeScript components (`.tsx`) with prop interfaces and i18n support
+- **All three locales:** `locales/en-US/translations.json`, `locales/en-GB/translations.json`, `locales/it-IT/translations.json` - Internationalization (must use useTranslation, not hardcoded strings)
+- Test files (`.test.tsx`) for component testing (vi.mock MUST be outside describe/it blocks)
 
-**7. Helper Template**
-Create `cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/helpers/<appName>Helper.js`:
-```javascript
-'use strict';
+**Important:** All storefront files must use TypeScript (.ts/.tsx), not JavaScript. The extension system requires:
+- **Apache 2.0 copyright header** at the top of every .ts/.tsx file (before 'use client' directive) with ISV/vendor name and current year
+- Proper type annotations and interfaces
+- **All components MUST include `'use client'` directive** at the top (after copyright header, before imports) for client-side interactivity
+- Components and providers MUST use default export (extension system uses dynamic imports)
+- Use `import type` for ALL types/interfaces (React types, custom types); regular `import` only for runtime values
+- Context providers registered in target-config.json (not inline wrapping)
+- Unit tests (.test.tsx) for coverage enforcement
+- Always use `useTranslation()` - never hardcode English strings; namespace uses ext + PascalCase (e.g., `useTranslation('extProductReviews')`), JSON root key uses camelCase (e.g., `"productReviews"`)
+- **Generate all three locales:** en-US, en-GB, it-IT with identical key structures
+- **Configuration:** Use `useConfig<AppConfig>()` with direct property access (`appConfig.extension?.appName?.key || defaultValue`), NEVER use `.get()` method. PUBLIC__ env vars with double underscores (e.g., `PUBLIC__app__extension__appName__apiKey`)
+- **Follow Storefront Next ESLint and Prettier rules:** semicolons, single quotes, 4-space indentation, trailing commas (ES5), parentheses around arrow params, bracket spacing, JSX bracket same line, no hardcoded Tailwind colors, no duplicate imports, no array index as React key, consistent type imports, no console statements, printWidth 120, useCallback formatting (see references/storefront-plugin-templates.md for complete config)
+- **Use 4-space indentation** for all TypeScript, JSX, and JSON files (1 level = 4 spaces)
+- Verify target IDs exist before using (grep for UITarget in codebase or check the complete target ID reference)
 
-function processRequest(params) {
-    var Logger = require('dw/system/Logger');
-    var logger = Logger.getLogger('{{appName}}', 'helper');
+**Critical Exclusions (DO NOT generate):**
+- ❌ No Tailwind config files (Storefront Next uses `@theme inline` with CSS 4)
+- ❌ No hardcoded Salesforce version numbers in dependencies
+- ❌ No direct color/spacing values in components (use theme variables)
+- ❌ No `importPackage()` in hook implementations (use `require()`)
+- ❌ No components without `'use client'` directive
 
-    try {
-        // TODO: Implement helper logic
-        return { success: true, data: {} };
-    } catch (e) {
-        logger.error('Error: {0}', e.message);
-        throw e;
-    }
-}
+See `references/storefront-plugin-templates.md` for complete extension templates.
 
-module.exports = { processRequest: processRequest };
-```
+### 5. Domain-Specific Hooks
 
-**8. Service Wrapper**
-- Template: `assets/templates/service-wrapper.js.tmpl`
-- Location: `cartridges/site_cartridges/<cartridgeName>/cartridge/scripts/services/<appName>Service.js`
+Configure hooks.json based on domain:
+- **Tax:** `app.tax.calculate`, `app.tax.commit`, `app.tax.cancel`
+- **Payment:** `app.payment.processor.<appName>`
+- **Shipping:** `app.shipping.calculate`
+- **Loyalty:** `app.loyalty.calculate`, `app.loyalty.points`
+- **Gift Cards:** `app.payment.processor.<appName>`, `app.giftcard.balance`
+- **Ratings/Reviews:** `app.data.enrich`
 
-**9. Test Template**
-Create `cartridges/site_cartridges/<cartridgeName>/test/unit/<appName>Helper.test.js`:
-```javascript
-'use strict';
+### 6. Validate and Guide
 
-const helper = require('../../cartridge/scripts/helpers/<appName>Helper');
+Check:
+- [ ] All required directories exist
+- [ ] commerce-app.json has correct version and metadata
+- [ ] README created
+- [ ] **app-configuration/tasksList.json created** with merchant post-installation tasks
+- [ ] Backend apps: cartridge files, hooks.json (with explicit script paths), **both install/ and uninstall/ impex directories**
+- [ ] Backend apps: package.json includes `"hooks": "cartridge/scripts/hooks.json"` field
+- [ ] Backend apps: Hook implementations use `require()` not `importPackage()`, always return dw.system.Status
+- [ ] UI apps: storefront-next structure with target-config.json, TypeScript components, tests
+- [ ] UI apps: **All .ts/.tsx files include Apache 2.0 copyright header** with ISV/vendor name and current year
+- [ ] UI apps: **All components include `'use client'` directive** after copyright header, before imports
+- [ ] UI apps: index.ts barrel file, **all three locale files** (en-US, en-GB, it-IT), i18n usage with useTranslation
+- [ ] UI apps: Configuration uses `useConfig<AppConfig>()` with **direct property access** (never `.get()` method), PUBLIC__ env vars
+- [ ] UI apps: Verify target IDs exist in codebase (check Complete Target ID Reference)
+- [ ] UI apps: ESLint and Prettier compliance (semicolons, single quotes, 4-space indent, trailing commas ES5, parentheses around arrow params, bracket spacing, JSX bracket same line, no duplicate imports, no array index keys, import type, no hardcoded colors, no console)
+- [ ] UI apps: **No Tailwind config files, no hardcoded theme values**
+- [ ] .gitignore updated to exclude `**/commerce-*-app-*/`
 
-describe('<appName>Helper', () => {
-    describe('processRequest', () => {
-        it('should process request successfully', () => {
-            const params = {};
-            const result = helper.processRequest(params);
-            expect(result.success).toBe(true);
-        });
-    });
-});
-```
-
-### Impex Files
-
-**10. Services Install**
-- Template: `assets/templates/services-install.xml.tmpl`
-- Location: `impex/install/services.xml`
-
-**11. Services Uninstall**
-- Template: `assets/templates/services-uninstall.xml.tmpl`
-- Location: `impex/uninstall/services.xml`
-
-**12. Site Preferences**
-Use the `/generate-site-preferences-impex` skill to create:
-- `impex/install/meta/system-objecttype-extensions.xml`
-- `impex/install/sites/SITEID/preferences.xml`
-
-### Storefront Extension
-
-**13. Target Config**
-Create `storefront-next/src/extensions/<appName>/target-config.json`:
-```json
-{
-  "targets": {
-    "product-details": {
-      "slots": [
-        {
-          "id": "{{appName}}-product-details",
-          "component": "./components/ProductDetails"
-        }
-      ]
-    }
-  }
-}
-```
-
-**14. React Component**
-Create `storefront-next/src/extensions/<appName>/components/ProductDetails.jsx`:
-```jsx
-import React from 'react';
-
-const ProductDetails = ({ product }) => {
-  return (
-    <div className="{{appName}}-product-details">
-      <h3>{{displayName}}</h3>
-      {/* TODO: Implement component */}
-    </div>
-  );
-};
-
-export default ProductDetails;
-```
-
-## Step 4: Update repository .gitignore
-
-Ensure the repository root has a `.gitignore` that excludes extracted directories:
-
-```gitignore
-# Commerce App - Extracted directories (DO NOT COMMIT)
-**/commerce-*-app-*/
-
-# System files
-.DS_Store
-__MACOSX/
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-```
-
-## Step 5: Validation checklist
-
-- [ ] All directories created
-- [ ] commerce-app.json generated with correct version
-- [ ] README.md created
-- [ ] tasksList.json created
-- [ ] Cartridge files created (package.json, hooks.json, scripts)
-- [ ] Impex files created (services.xml, site preferences)
-- [ ] Storefront extension created
-- [ ] .gitignore updated
-
-## Step 6: Next steps guidance
-
-Guide the developer:
+Provide next steps:
 
 ```
-✅ App structure created successfully!
+✅ App structure created at: <domain>/<isv>/commerce-<appName>-app-v<version>/
 
 Next steps:
+1. **Review and customize app-configuration/tasksList.json** - update tasks to match your implementation
+2. Customize generated files for your use case
+3. {UI: Implement components | Backend: Implement hooks/helpers | Fullstack: Implement both}
+4. {Backend/Fullstack: Update service credentials and test with SFCC}
+5. Write tests
+6. **Add app icon to icons/ directory** (required before submission - PNG format, 512x512px recommended)
+7. Use /package-app when ready
+8. Use /validate-app before submission
+9. Delete extracted directory before committing (commit only the ZIP)
 
-1. Review and customize the generated files
-2. Implement your business logic in hooks and helpers
-3. Update service endpoints and credentials
-4. Write unit tests for your code
-5. Test locally with your SFCC instance
-6. Use /generate-commerce-app to package into ZIP when ready
-7. Use /validate-commerce-app before submitting
-8. Delete the extracted directory before committing (only commit ZIP)
+⚠️  Only commit: <appName>-v<version>.zip, catalog.json (if new), and update commerce-apps-manifest/manifest.json
 
-Directory: <domain>/<isv-name>/commerce-<appName>-app-v<version>/
+Get started: cd <domain>/<isv>/commerce-<appName>-app-v<version>
+{Backend/Fullstack: cd cartridges/site_cartridges/<cartridgeName> && npm install}
 
-⚠️  IMPORTANT: This extracted directory is for development only.
-    Do NOT commit it to git. Only commit:
-    - <appName>-v<version>.zip
-    - catalog.json (new apps only)
-    - Update root manifest: commerce-apps-manifest/manifest.json
-
-To get started:
-  cd <domain>/<isv-name>/commerce-<appName>-app-v<version>
-  cd cartridges/site_cartridges/<cartridgeName>
-  npm install
+📚 Related skills for implementation guidance:
+{UI/Fullstack: - Check references/storefront-plugin-templates.md for complete UI patterns and ESLint rules}
+{Backend/Fullstack: - Use /generate-service-impex for additional service configurations}
+{Backend/Fullstack: - Use /generate-site-preferences-impex for configuration options}
+{Backend/Fullstack: - Use /generate-custom-object-impex for data storage needs}
+{All: - Use /validate-impex to check XML files before importing}
 ```
 
-## Domain-specific hook patterns
+## Best Practices
 
-### Tax App
-Hooks: `app.tax.calculate`, `app.tax.commit`, `app.tax.cancel`
-
-### Payment App
-Hooks: `app.payment.processor.<appName>`
-
-### Shipping App
-Hooks: `app.shipping.calculate`
-
-### Ratings/Reviews App
-Hooks: `app.data.enrich` (product data)
-
-### Loyalty App
-Hooks: `app.loyalty.calculate`, `app.loyalty.points`
-
-### Gift Cards App
-Hooks: `app.payment.processor.<appName>`, `app.giftcard.balance`
-
-## Tips
-
-- Always use the template files in `assets/templates/` - don't recreate manually
-- Replace ALL placeholders (`{{variable}}`) with actual values
-- Adjust hooks.json based on the app domain
-- Use descriptive service IDs with dotted notation
-- Follow naming conventions: camelCase for preferences, kebab-case for app names
+- Use templates from `assets/templates/` - they include proper structure and error handling
+- **Multi-target approach:** Commerce apps typically span multiple UI targets, not single components. Ask about all needed targets (e.g., checkout flow + order summary + header) and generate all component shells together.
+- **Task list and icons:** Always generate `app-configuration/tasksList.json` with merchant-facing post-installation tasks (credential setup, testing, verification). Remind vendors to customize the task list for their app and **add app icon to icons/ directory before submission** (PNG, 512x512px recommended).
+- **UI-only apps:** Use TypeScript (.tsx) for all components with proper type annotations. **All .ts/.tsx files must start with Apache 2.0 copyright header** (ISV/vendor name, current year), followed by **`'use client'` directive** for components. Focus on component reusability with clear prop interfaces. Must include tests (.test.tsx) for coverage enforcement. Always use `useTranslation()` for i18n - never hardcode strings. **Generate all three locales** (en-US, en-GB, it-IT) with identical key structures. Configuration uses `useConfig<AppConfig>()` with **direct property access** (`appConfig.extension?.appName?.key || defaultValue`), never `.get()` method. PUBLIC__ env vars follow double underscore convention. **Follow Prettier and ESLint rules:** 4-space indentation, trailing commas, parentheses around arrow params, single quotes, consistent type imports, no duplicate imports, no array index keys, no hardcoded Tailwind colors, no console statements, useCallback proper indentation. **Never generate Tailwind config files** - use `@theme inline`.
+- **Storefront extension system:** Register components via target-config.json using `targetId`, `path`, `order` fields. Context providers go in `contextProviders` array, not inline wrapping. Locales use `locales/{locale}/translations.json` structure. **Always verify targetId exists** using the Complete Target ID Reference in storefront-plugin-templates.md - non-existent targets cause components to never render.
+- **Backend apps:** Need comprehensive error handling and logging for production debugging. **Hook implementations must use `require()` not `importPackage()`**, always return `dw.system.Status` (never undefined). **package.json must include `"hooks": "cartridge/scripts/hooks.json"` field.** Generate **both install/ and uninstall/ impex directories** for safe merchant lifecycle management.
+- **Fullstack apps:** Maintain separation - UI in storefront-next/, business logic in cartridges/
+- **Naming conventions:** Cartridge names: `int_<vendor>_<product>` (max 50 characters), Service IDs: dotted notation
+- **Context capture:** Document API details, auth methods, special requirements for future reference

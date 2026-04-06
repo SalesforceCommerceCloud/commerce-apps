@@ -1,19 +1,857 @@
 {
+  "skill_name": "scaffold-app",
   "evals": [
     {
-      "prompt": "I need to create a new tax app for Avalara. Can you set up the basic structure?",
-      "context": "User wants to start a new commerce app from scratch",
-      "expected_behavior": "Should trigger scaffold-commerce-app skill and collect necessary information (domain=tax, vendor=avalara, app type, etc.)"
+      "id": 1,
+      "eval_name": "ui-only-product-reviews-widget",
+      "prompt": "Hey, I'm building a product reviews widget for our storefront. Just UI components - display star ratings and customer reviews on the PDP. No backend needed, pure frontend stuff. We're calling it ReviewHub from ReviewTech, version 1.0.0. Publisher: ReviewTech Inc at https://reviewtech.io. I want the reviews to show up right after the product details section if that's possible.",
+      "expected_output": "Should create UI-only structure with target-config.json (NOT plugin-config.json), using targetId field (NOT pluginId), TypeScript components with i18n via useTranslation(), tests with vi.mock outside describe blocks, index.ts barrel file, and nested locales/en-US/translations.json structure. Configuration uses useConfig() from @salesforce/storefront-next-runtime/config with PUBLIC__ prefix. No Salesforce copyright headers. Should suggest targetId like 'product.details.after'.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "app-configuration/tasksList.json exists",
+          "description": "All apps require post-installation task list for merchants"
+        },
+        {
+          "name": "tasksList.json has valid JSON structure",
+          "description": "Must contain tasks array with id, title, description, completed fields for merchant setup"
+        },
+        {
+          "name": "storefront-next directory exists",
+          "description": "UI-only apps need storefront-next"
+        },
+        {
+          "name": "target-config.json exists (not plugin-config.json)",
+          "description": "Must use correct config file name per actual implementation"
+        },
+        {
+          "name": "target-config.json uses targetId field (not pluginId)",
+          "description": "Config must use targetId for component registration"
+        },
+        {
+          "name": "target-config.json has components array",
+          "description": "Config must use components array with targetId/path/order"
+        },
+        {
+          "name": "index.ts barrel file exists",
+          "description": "Extensions require index.ts for public API exports"
+        },
+        {
+          "name": "TypeScript files only (.tsx)",
+          "description": "All components must be TypeScript, not JavaScript"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "components use useTranslation() for i18n",
+          "description": "Must use react-i18next, never hardcode strings"
+        },
+        {
+          "name": "all three locale files exist (en-US, en-GB, it-IT)",
+          "description": "Must generate en-US, en-GB, and it-IT translations with identical key structures"
+        },
+        {
+          "name": "locales use nested structure",
+          "description": "Each locale: locales/{locale}/translations.json (not flat)"
+        },
+        {
+          "name": "tests directory exists",
+          "description": "Test coverage enforcement requires test files"
+        },
+        {
+          "name": "test files have vi.mock outside describe blocks",
+          "description": "Vitest hoists mocks - must be outside blocks"
+        },
+        {
+          "name": "configuration uses useConfig<AppConfig>() with direct property access",
+          "description": "Must use useConfig<AppConfig>() with direct property access (appConfig.extension?.appName?.key || defaultValue), never .get() method. PUBLIC__app__extension__appName__key env vars"
+        },
+        {
+          "name": "Apache 2.0 copyright headers with ISV name",
+          "description": "All .ts/.tsx files must have Apache 2.0 license header with ISV/vendor name (not Salesforce) and current year"
+        },
+        {
+          "name": "'use client' directive after copyright header",
+          "description": "Components must have 'use client' directive after copyright header, before imports"
+        },
+        {
+          "name": "cartridges directory does NOT exist",
+          "description": "UI-only shouldn't create backend"
+        },
+        {
+          "name": "impex directory does NOT exist",
+          "description": "UI-only doesn't need impex"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "useTranslation namespace pattern",
+          "description": "Namespace uses ext + PascalCase (e.g., 'extProductReviews'), JSON root key uses camelCase (e.g., 'productReviews')"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        },
+        {
+          "name": "uses single quotes for strings",
+          "description": "ESLint rule: single quotes for string literals (template literals allowed)"
+        },
+        {
+          "name": "no hardcoded Tailwind color utilities",
+          "description": "ESLint rule: use theme colors (bg-primary, text-foreground) not hardcoded (bg-blue-500)"
+        },
+        {
+          "name": "no console statements",
+          "description": "ESLint rule: no console.log, console.error in production code"
+        }
+      ]
     },
     {
-      "prompt": "Let's build a payment integration for Stripe. What do I need to get started?",
-      "context": "User starting a new payment app without explicitly saying 'scaffold'",
-      "expected_behavior": "Should recognize payment integration = new app and trigger scaffolding workflow"
+      "id": 2,
+      "eval_name": "backend-only-tax-calculation",
+      "prompt": "I'm building a tax service integration for TaxJar. This is backend only - hooks for tax calculation, service calls to their API, Business Manager configuration stuff. App name: taxjar-tax, v1.0.0, cartridge: int_taxjar_tax, service ID: taxjar.tax.api, domain is tax. Publisher: TaxJar Corp, https://developers.taxjar.com. We need to handle calculate, commit, and void for transactions.",
+      "expected_output": "Should create backend-only structure with cartridges, impex, hooks.json but NO storefront-next. Should configure tax domain hooks (app.tax.calculate, app.tax.commit, app.tax.cancel).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "app-configuration/tasksList.json exists",
+          "description": "All apps require post-installation task list for merchants"
+        },
+        {
+          "name": "tasksList.json includes backend-specific merchant tasks",
+          "description": "Should include merchant setup tasks: add API credentials in Business Manager, test transactions"
+        },
+        {
+          "name": "cartridges directory exists",
+          "description": "Backend apps need cartridges"
+        },
+        {
+          "name": "impex directory with services.xml",
+          "description": "Backend needs service config for install/uninstall"
+        },
+        {
+          "name": "hooks.json configured for tax domain",
+          "description": "Should include app.tax.calculate, app.tax.commit, app.tax.cancel"
+        },
+        {
+          "name": "storefront-next does NOT exist",
+          "description": "Backend-only shouldn't create UI"
+        },
+        {
+          "name": "cartridge name follows convention",
+          "description": "Should use int_taxjar_tax format"
+        },
+        {
+          "name": "commerce-app.json exists with correct metadata",
+          "description": "All apps need manifest"
+        }
+      ]
     },
     {
-      "prompt": "I want to make a commerce app for shipping rates from FedEx. Help me start.",
-      "context": "User describing a new app project",
-      "expected_behavior": "Should trigger scaffold-commerce-app and guide through directory creation, templates, and initial files"
+      "id": 3,
+      "eval_name": "fullstack-loyalty-program",
+      "prompt": "We need a complete loyalty rewards program - PointsPlus from LoyaltyMax. Full stack: backend for calculating points during checkout and calling their API, plus frontend components to show point balance in the header (right before the cart icon) and redemption options on the cart page. App: pointsplus-loyalty, v1.0.0, cartridge: int_loyaltymax_points, service: loyaltymax.points.api, loyalty domain. Publisher: LoyaltyMax at https://loyaltymax.com.",
+      "expected_output": "Should create fullstack structure with both storefront-next (with target-config.json using targetId) AND cartridges/impex. UI should use TypeScript, i18n, proper tests, and useConfig() with PUBLIC__ prefix. Target config should target 'header.before.cart' slot.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "app-configuration/tasksList.json exists",
+          "description": "All apps require post-installation task list for merchants"
+        },
+        {
+          "name": "tasksList.json includes fullstack merchant tasks",
+          "description": "Should include both UI verification (check components display) and backend setup (credentials, test transactions)"
+        },
+        {
+          "name": "storefront-next with target-config.json",
+          "description": "UI needs correct extension config file"
+        },
+        {
+          "name": "target-config.json uses targetId field",
+          "description": "Must use correct field name"
+        },
+        {
+          "name": "cartridges directory exists",
+          "description": "Backend logic needs cartridges"
+        },
+        {
+          "name": "impex directory exists",
+          "description": "Backend needs service configuration"
+        },
+        {
+          "name": "target-config.json uses components array",
+          "description": "Must use correct format with targetId/path/order"
+        },
+        {
+          "name": "TypeScript components (.tsx) with useTranslation",
+          "description": "Storefront must use TypeScript and i18n"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "index.ts exists",
+          "description": "Extension needs barrel file"
+        },
+        {
+          "name": "tests with vi.mock outside describe",
+          "description": "Test mocking must follow Vitest hoisting rules"
+        },
+        {
+          "name": "configuration with useConfig<AppConfig>() and direct property access",
+          "description": "Client-side config uses useConfig<AppConfig>() with direct property access (appConfig.extension?.appName?.key), never .get() method"
+        },
+        {
+          "name": "hooks.json for loyalty domain",
+          "description": "Should include loyalty-specific hooks"
+        },
+        {
+          "name": "all three locale files exist (en-US, en-GB, it-IT)",
+          "description": "Must generate en-US, en-GB, and it-IT translations with identical key structures"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        },
+        {
+          "name": "uses single quotes for strings",
+          "description": "ESLint rule: single quotes for string literals (template literals allowed)"
+        },
+        {
+          "name": "no hardcoded Tailwind colors",
+          "description": "ESLint rule: use theme colors not hardcoded color utilities"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "ui-context-provider-registration",
+      "prompt": "Building a store locator widget (UI only) called StoreFinder from LocationTech, v1.0.0. It needs a context provider to manage store data across components - like current selected store, search radius, that kind of stuff. The widget should appear in the header after the user action buttons. Publisher: LocationTech at https://locationtech.io.",
+      "expected_output": "Should create UI-only structure and register context provider in target-config.json contextProviders array, NOT inline wrapping. Provider must be TypeScript with proper exports. Configuration uses useConfig() with PUBLIC__ prefix.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "target-config.json has contextProviders array",
+          "description": "Provider registration in config, not inline"
+        },
+        {
+          "name": "providers directory exists",
+          "description": "Context providers go in providers/"
+        },
+        {
+          "name": "provider is TypeScript (.tsx)",
+          "description": "All files must be TypeScript"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "target-config.json has components array with targetId",
+          "description": "Component registration for header slot using correct field"
+        },
+        {
+          "name": "index.ts exports provider and hook",
+          "description": "Provider and useContext hook in barrel exports"
+        },
+        {
+          "name": "tests for provider exist",
+          "description": "Providers need test coverage too"
+        },
+        {
+          "name": "configuration guidance included",
+          "description": "Should mention useConfig<AppConfig>() with direct property access pattern, never .get() method"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "inferred-ui-only-from-widget",
+      "prompt": "I want to add a wishlist heart icon next to products. Just a simple UI widget that shows up on product tiles and the detail page when you're looking at items. Calling it WishWidget from WishCo, v1.0.0. We'll use the ratings-and-reviews domain since it's product engagement stuff. Publisher: WishCo LLC, https://wishco.io.",
+      "expected_output": "Should infer UI-only architecture from 'widget' and 'icon' keywords without explicit architecture mention. Should create proper extension structure with target-config.json, targetId, TypeScript, i18n, tests, and config system usage.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "infers UI-only architecture",
+          "description": "Widget/icon implies UI-only without asking"
+        },
+        {
+          "name": "storefront-next with extension system",
+          "description": "Creates proper extension structure"
+        },
+        {
+          "name": "target-config.json with targetId",
+          "description": "Uses correct config format"
+        },
+        {
+          "name": "NO cartridges created",
+          "description": "Shouldn't create backend for pure UI"
+        },
+        {
+          "name": "TypeScript components with i18n",
+          "description": "Must use .tsx files with useTranslation"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "proper test structure",
+          "description": "Tests with vi.mock outside blocks"
+        },
+        {
+          "name": "config system mentioned",
+          "description": "Should reference useConfig<AppConfig>() with direct property access, never .get() method"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "inferred-backend-from-api-integration",
+      "prompt": "Need to integrate with Stripe for payment processing. We'll call their API endpoints for authorize, capture, and void operations. Backend hooks to handle the payment flow. App name: stripe-payment, cartridge int_stripe_payment, service stripe.payment.api, v1.0.0, payment domain. Publisher: Stripe Inc, https://stripe.com/docs. Just the backend stuff, no UI components needed for this.",
+      "expected_output": "Should infer backend-only from API integration and hooks mention. No UI components needed. Should create cartridges, impex, hooks.json for payment processor.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "infers backend-only architecture",
+          "description": "API/hooks/no UI implies backend-only"
+        },
+        {
+          "name": "cartridges with payment hooks",
+          "description": "Payment processor requires hooks"
+        },
+        {
+          "name": "NO storefront-next",
+          "description": "Backend-only doesn't need UI"
+        },
+        {
+          "name": "hooks.json for payment domain",
+          "description": "app.payment.processor.<appName> hook configured"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "typescript-i18n-and-config-enforcement",
+      "prompt": "Create a UI-only app for product badges that show things like 'New Arrival' or 'Best Seller' on product cards. App name: badge-display from BadgeCo, v1.0.0, analytics domain. These badges need to be translatable for international sites and configurable via environment variables. Publisher: BadgeCo at https://badgeco.com. Make sure everything follows the TypeScript, internationalization, and configuration standards.",
+      "expected_output": "Should emphasize TypeScript requirement (.tsx with interfaces), i18n with useTranslation(), and proper config system usage (useConfig() with PUBLIC__ prefix). Should explain why hardcoded strings are not allowed.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "all component files are .tsx",
+          "description": "No .jsx or .js files allowed"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "components have TypeScript interfaces",
+          "description": "Props must have exported interfaces"
+        },
+        {
+          "name": "components use useTranslation()",
+          "description": "Must import and use react-i18next hook"
+        },
+        {
+          "name": "no hardcoded English strings",
+          "description": "All text must come from translation keys"
+        },
+        {
+          "name": "locales/en-US/translations.json with badge keys",
+          "description": "Translation keys defined for badge text"
+        },
+        {
+          "name": "configuration uses useConfig<AppConfig>() with direct property access",
+          "description": "Must use useConfig<AppConfig>() with direct property access (appConfig.extension?.appName?.key), never .get() method"
+        },
+        {
+          "name": "explains why config system matters",
+          "description": "Should mention unified config, PUBLIC__ double underscore syntax, and direct property access pattern"
+        },
+        {
+          "name": "index.ts is TypeScript",
+          "description": "Barrel file must be .ts not .js"
+        },
+        {
+          "name": "test files are .test.tsx",
+          "description": "Tests in TypeScript"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses useConfig<AppConfig>() with direct property access",
+          "description": "Must use useConfig<AppConfig>() with direct property access (appConfig.extension?.appName?.key), never .get() method"
+        },
+        {
+          "name": "useTranslation namespace pattern",
+          "description": "Namespace uses ext + PascalCase (e.g., 'extProductReviews'), JSON root key uses camelCase (e.g., 'productReviews')"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "eval_name": "target-id-validation-guidance",
+      "prompt": "Building a promo banner component (UI only) that should appear at the top of product pages in that promo content area I've seen on other sites. App: promo-banner from PromoCo, v1.0.0. Publisher: PromoCo, https://promoco.io. How do I know which target IDs are actually available?",
+      "expected_output": "Should suggest appropriate targetId like 'product.promoContent', provide guidance on verifying target IDs exist in codebase (grep for UITarget), and warn about non-existent targets causing components to never render.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "suggests relevant targetId",
+          "description": "Should recommend product.promoContent or similar"
+        },
+        {
+          "name": "target-config.json with targetId field",
+          "description": "Config uses targetId not pluginId"
+        },
+        {
+          "name": "provides verification commands",
+          "description": "Should show grep commands to find valid UITarget slots"
+        },
+        {
+          "name": "warns about non-existent targets",
+          "description": "Should explain components won't render with invalid targetId"
+        },
+        {
+          "name": "lists common target IDs",
+          "description": "Should reference common slots available"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "eval_name": "test-mocking-coverage",
+      "prompt": "Create a UI app for size chart display - modal that pops up when you click 'Size Guide' on product pages. App: sizechart from SizeGuide, v1.0.0, analytics domain. Publisher: SizeGuide at https://sizeguide.com. I need full test coverage with proper mocking for i18n and any hooks we use.",
+      "expected_output": "Should create test files with vi.mock() OUTSIDE describe blocks (Vitest hoisting). Should explain coverage enforcement requirements and proper mocking patterns.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "tests directory created",
+          "description": "Tests required for coverage enforcement"
+        },
+        {
+          "name": ".test.tsx files with vi.mock BEFORE describe",
+          "description": "Mocks must be outside describe/it blocks due to hoisting"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "mocks react-i18next properly",
+          "description": "Should mock useTranslation hook"
+        },
+        {
+          "name": "NO stories directory created",
+          "description": "Stories not required, only tests"
+        },
+        {
+          "name": "explains test coverage enforcement",
+          "description": "Should mention why tests required"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "eval_name": "routes-and-file-based-routing",
+      "prompt": "Building a fullstack store locator. Backend for getting store data from our API, frontend for displaying an interactive map and list of stores. Need a dedicated /store-locator route page plus individual store detail pages like /store-locator/store-123. App: store-locator from MapTech, cartridge int_maptech_locator, service maptech.locator.api, v1.0.0, search domain. Publisher: MapTech, https://maptech.io.",
+      "expected_output": "Should create routes/ directory in extension and explain file-based routing system. Full stack with both UI (target-config.json with config system) and backend (cartridges/impex).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "routes directory exists in extension",
+          "description": "File-based routes supported in extensions"
+        },
+        {
+          "name": "explains route file naming pattern",
+          "description": "Should mention how route files map to paths"
+        },
+        {
+          "name": "fullstack structure with both UI and backend",
+          "description": "Needs both storefront-next and cartridges"
+        },
+        {
+          "name": "target-config.json for map component",
+          "description": "Map display needs component registration with targetId"
+        },
+        {
+          "name": "TypeScript route files",
+          "description": "Routes use .ts files"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "backend service configuration",
+          "description": "impex/services.xml for API integration"
+        },
+        {
+          "name": "configuration system for UI",
+          "description": "Should mention useConfig<AppConfig>() with direct property access, never .get() method"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "eval_name": "minimal-info-clarification",
+      "prompt": "I need to create a new app for gift cards, can you help me get started?",
+      "expected_output": "Should ask clarifying questions: architecture type (likely fullstack since gift cards need balance checking backend + UI for redemption), vendor name, version, cartridge name, service ID, publisher info, domain. Should NOT create structure until complete info gathered.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "asks about architecture type",
+          "description": "Should clarify if UI-only, backend-only, or fullstack"
+        },
+        {
+          "name": "requests vendor/ISV name",
+          "description": "Needs vendor for naming"
+        },
+        {
+          "name": "requests app name",
+          "description": "Needs app identifier"
+        },
+        {
+          "name": "asks for version",
+          "description": "Version required for directory naming"
+        },
+        {
+          "name": "asks for publisher info",
+          "description": "Publisher name and URL required"
+        },
+        {
+          "name": "doesn't create files prematurely",
+          "description": "Should wait for complete info before generating"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "eval_name": "nested-locale-structure",
+      "prompt": "Create UI-only app for multi-language product labels that show translated product attributes. App: labels-i18n from LangTech, v1.0.0, analytics domain. Need to support English, Spanish, and French from day one. Publisher: LangTech, https://langtech.io.",
+      "expected_output": "Should create nested locale structure locales/{locale}/translations.json (NOT flat files like locales/en-US.json). Should explain how to add additional locales and use useTranslation() hook.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "locales/en-US directory exists",
+          "description": "Nested structure required"
+        },
+        {
+          "name": "translations.json inside locale dir",
+          "description": "File is locales/en-US/translations.json not locales/en-US.json"
+        },
+        {
+          "name": "explains nested structure requirement",
+          "description": "Should clarify why nested not flat"
+        },
+        {
+          "name": "shows how to add more locales",
+          "description": "Should explain creating locales/es-ES, locales/fr-FR"
+        },
+        {
+          "name": "components use useTranslation hook",
+          "description": "Must use react-i18next for accessing translations"
+        },
+        {
+          "name": "namespace matches pattern",
+          "description": "Should use 'extAppName' namespace format"
+        },
+        {
+          "name": "useTranslation namespace pattern",
+          "description": "Namespace uses ext + PascalCase (e.g., 'extProductReviews'), JSON root key uses camelCase (e.g., 'productReviews')"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "eval_name": "copyright-header-guidance",
+      "prompt": "I'm building a shipping rate calculator app - ShipFast from FastShip LLC, v1.0.0. Backend for calling shipping APIs, UI for displaying rates. Fullstack app, cartridge int_fastship_rates, service fastship.rates.api, shipping domain. Publisher: FastShip LLC at https://fastship.io. Do I need to add copyright headers to the files?",
+      "expected_output": "Should explain that Apache 2.0 copyright headers are REQUIRED for all SFNext .ts/.tsx files with ISV/vendor name (FastShip LLC) and current year (2026), not Salesforce. Should clarify registry is Salesforce-owned but individual apps are ISV-owned. Headers go at top of file, before 'use client' directive.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "Apache 2.0 copyright headers required for SFNext files",
+          "description": "All .ts/.tsx files in storefront-next must have Apache 2.0 license header"
+        },
+        {
+          "name": "uses ISV name not Salesforce in headers",
+          "description": "Copyright line must use ISV/vendor name (FastShip LLC), not Salesforce"
+        },
+        {
+          "name": "explains ISV owns app copyright",
+          "description": "Should clarify these are third-party vendor apps - ISVs retain copyright"
+        },
+        {
+          "name": "copyright header before 'use client' directive",
+          "description": "Header must be first thing in file, before 'use client' and imports"
+        },
+        {
+          "name": "creates fullstack structure",
+          "description": "Both UI and backend components"
+        },
+        {
+          "name": "target-config.json with targetId",
+          "description": "UI uses correct extension format"
+        },
+        {
+          "name": "configuration system mentioned",
+          "description": "Should reference useConfig<AppConfig>() with direct property access, never .get() method"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "eval_name": "domain-specific-hooks-shipping",
+      "prompt": "Setting up a shipping integration with FedEx - backend only, no UI needed. Calculating shipping rates based on weight, dimensions, destination. App: fedex-shipping, cartridge int_fedex_ship, service fedex.shipping.api, v1.0.0, shipping domain. Publisher: FedEx, https://developer.fedex.com.",
+      "expected_output": "Should configure hooks.json with shipping domain hooks (app.shipping.calculate). Should NOT create storefront-next. Backend-only with cartridges and impex.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "backend-only structure",
+          "description": "No UI components"
+        },
+        {
+          "name": "hooks.json with app.shipping.calculate",
+          "description": "Shipping domain requires calculate hook"
+        },
+        {
+          "name": "service configuration in impex",
+          "description": "Service credentials and profiles"
+        },
+        {
+          "name": "NO storefront-next directory",
+          "description": "Backend-only doesn't need UI"
+        },
+        {
+          "name": "cartridge follows naming convention",
+          "description": "int_fedex_ship format"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "eval_name": "config-with-api-key",
+      "prompt": "I want to build a Loqate address verification widget (UI only) that validates addresses as users type. The Loqate API key needs to be configured. App: loqate-address from Loqate, v1.0.0, address-verification domain. Publisher: Loqate at https://loqate.com. The API key is client-side safe like a Google Maps key.",
+      "expected_output": "Should create UI-only app with proper configuration pattern. Must use PUBLIC__app__extension__loqate__apiKey environment variable accessed via useConfig(). Should explain the PUBLIC__ double underscore syntax and how it maps to nested config paths.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "UI-only structure with target-config.json",
+          "description": "Creates extension system"
+        },
+        {
+          "name": "configuration uses PUBLIC__ prefix with double underscores",
+          "description": "Must use PUBLIC__app__extension__loqate__apiKey format"
+        },
+        {
+          "name": "uses useConfig<AppConfig>() with direct property access",
+          "description": "Must use useConfig<AppConfig>() from @salesforce/storefront-next-runtime/config with direct property access, never .get() method"
+        },
+        {
+          "name": "explains PUBLIC__ double underscore syntax",
+          "description": "Should explain how __ maps to nested paths (PUBLIC__app__extension__loqate__apiKey → config.app.extension.loqate.apiKey)"
+        },
+        {
+          "name": "provides example env var name",
+          "description": "Should show PUBLIC__app__extension__loqate__apiKey"
+        },
+        {
+          "name": "shows direct property access usage in component",
+          "description": "Component should demonstrate appConfig.extension?.loqate?.apiKey || '' pattern with optional chaining, NOT config.get()"
+        },
+        {
+          "name": "TypeScript with i18n",
+          "description": "Components use .tsx and useTranslation"
+        },
+        {
+          "name": "components use default export",
+          "description": "Extension system requires default export for dynamic imports"
+        },
+        {
+          "name": "uses import type for TypeScript types",
+          "description": "ReactElement/ReactNode must use import type to avoid Vite ESM/CJS issues"
+        },
+        {
+          "name": "tests with proper mocking",
+          "description": "vi.mock outside describe blocks"
+        },
+        {
+          "name": "no tsconfig.json at extension level",
+          "description": "Extensions inherit TypeScript config from parent - no extension-level tsconfig"
+        },
+        {
+          "name": "uses 4-space indentation",
+          "description": "All TypeScript, JSX, and JSON files use 4-space indentation (1 level = 4 spaces)"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "eval_name": "multi-locale-and-eslint-compliance",
+      "prompt": "Build a UI-only wishlist feature - HeartList from WishCo, v1.0.0. Display a heart icon on product cards that users can click to save items. I need it to work in English (US and UK) and Italian since we're expanding to Europe. Make sure the code follows all the quality standards and best practices. Publisher: WishCo at https://wishco.io. Show the wishlist icon in the header before the cart icon.",
+      "expected_output": "Should create UI-only app with all three locales (en-US, en-GB, it-IT) and follow ESLint rules (single quotes, import type, no hardcoded colors, no console statements). Target config should use header.before.cart slot.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "all three locale directories created",
+          "description": "Must create en-US, en-GB, and it-IT locale directories"
+        },
+        {
+          "name": "en-US translations.json exists",
+          "description": "English (US) translations file created"
+        },
+        {
+          "name": "en-GB translations.json exists",
+          "description": "English (UK) translations file created"
+        },
+        {
+          "name": "it-IT translations.json exists",
+          "description": "Italian translations file created"
+        },
+        {
+          "name": "all locale files have identical key structure",
+          "description": "All three locale files must have the same JSON keys for consistency"
+        },
+        {
+          "name": "Italian translations are different from English",
+          "description": "it-IT file should have Italian text (Invia/Annulla), not English"
+        },
+        {
+          "name": "uses single quotes consistently",
+          "description": "All string literals use single quotes (ESLint rule)"
+        },
+        {
+          "name": "all types use import type",
+          "description": "ReactElement, ReactNode, and custom types use import type (ESLint rule)"
+        },
+        {
+          "name": "no duplicate imports from same module",
+          "description": "Imports from same module are combined into single statement (ESLint: no-duplicate-imports)"
+        },
+        {
+          "name": "no array index used as React key",
+          "description": "Components don't use array index as key prop in map() (ESLint: react/no-array-index-key)"
+        },
+        {
+          "name": "no hardcoded Tailwind color classes",
+          "description": "Uses theme colors (bg-primary, text-foreground) not hardcoded (bg-blue-500) (ESLint rule)"
+        },
+        {
+          "name": "no console.log or console.error",
+          "description": "No console statements in production code (ESLint rule)"
+        },
+        {
+          "name": "max 120 characters per line",
+          "description": "Lines don't exceed 120 characters (ESLint rule, ignoring URLs/long strings)"
+        },
+        {
+          "name": "object shorthand used",
+          "description": "Uses { name } not { name: name } where applicable (ESLint rule)"
+        },
+        {
+          "name": "template literals for dynamic strings",
+          "description": "Uses template literals over string concatenation (ESLint rule)"
+        },
+        {
+          "name": "components are self-closing where appropriate",
+          "description": "Empty components use <Component /> not <Component></Component> (ESLint rule)"
+        },
+        {
+          "name": "trailing commas in multi-line structures",
+          "description": "Objects, arrays, function params have trailing commas (Prettier rule)"
+        },
+        {
+          "name": "parentheses around arrow function parameters",
+          "description": "Single arrow params use parentheses: (item) => not item => (Prettier: arrowParens: 'always')"
+        },
+        {
+          "name": "semicolons used consistently",
+          "description": "All statements end with semicolons (Prettier: semi: true)"
+        },
+        {
+          "name": "bracket spacing in objects",
+          "description": "Spaces inside object brackets: { key: value } (Prettier: bracketSpacing: true)"
+        },
+        {
+          "name": "JSX closing bracket same line",
+          "description": "JSX closing > on same line as last prop (Prettier: bracketSameLine: true)"
+        },
+        {
+          "name": "target-config.json uses header.before.cart",
+          "description": "Uses correct targetId from Complete Target ID Reference"
+        }
+      ]
     }
   ]
 }
