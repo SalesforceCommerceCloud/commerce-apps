@@ -10,7 +10,7 @@ This is a **Commerce App Registry** for Salesforce Commerce Cloud B2C Commerce. 
 
 **Key Concepts:**
 - **Commerce App Package (CAP):** A ZIP file containing cartridges, UI extensions, impex configs, and documentation
-- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`)
+- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`)
 - **ISV:** Independent Software Vendor (the company publishing the app)
 - **Impex:** XML configuration files for SFCC (services, site preferences, custom objects)
 
@@ -365,6 +365,7 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 | `address-verification` | Address validation and standardization | Smarty, Google Address Validation |
 | `analytics` | Analytics and reporting | Google Analytics, Segment |
 | `approaching-discounts` | Approaching discount notifications | Salesforce Approaching Discounts |
+| `fraud` | Fraud detection and prevention | Signifyd, Forter, Riskified |
 
 ### Common App Patterns
 | Type | What It Does | Typical Components |
@@ -515,7 +516,7 @@ A: Depends on what you're doing:
 - Anything else: NO - CI manages it
 
 **Q: "Where does my app go in the registry?"**
-A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, or `approaching-discounts`. The domain uses hyphen-case and is specified directly in the manifest.
+A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, or `fraud`. The domain uses hyphen-case and is specified directly in the manifest.
 
 ## Key Files to Reference
 
