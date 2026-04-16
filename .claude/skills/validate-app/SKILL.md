@@ -1,232 +1,178 @@
 ---
 name: validate-app
 description: >-
-  Run comprehensive validation on a commerce app package before PR submission. Use this skill
-  immediately before ANY submission attempt, when users mention "validate", "check app", "verify",
-  "ready to submit", or after packaging an app. Also trigger proactively BEFORE calling submit-pr
-  to catch errors early and save CI/CD cycles. This is a REQUIRED pre-submission step - don't let
-  users submit without validation. Checks directory structure, manifest format, SHA256 hashes,
-  impex XML syntax, and runs the complete CONTRIBUTING.md checklist. Use whenever debugging
-  validation failures or import errors - it will identify the root cause.
+  Run comprehensive pre-submission validation on commerce app packages. Use IMMEDIATELY when users
+  mention "validate", "check", "verify", or "ready to submit". REQUIRED before calling submit-app
+  - trigger proactively to catch errors early. Validates directory structure, manifest format,
+  SHA256 hashes, impex XML, security issues, and runs complete CONTRIBUTING.md checklist. Also use
+  when debugging validation failures or import errors to identify root cause quickly.
 ---
 
 # Validate Commerce App Package
 
 Run comprehensive validation checks on a commerce app before submitting a PR.
 
-## Step 1: Identify the app to validate
+## Step 1: Identify app
 
-Gather or infer:
-- Domain (one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`)
+Gather:
+- Domain (e.g., `tax`, `payment`, `shipping`)
 - App name (e.g., `avalara-tax`)
-- Version to validate (or use latest ZIP in directory)
+- Version (or use latest ZIP)
 
-## Step 2: Validate ZIP file exists
+**Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. See `references/folder-structure.md`.
 
-Check that ZIP file exists at `<domain>/<isv-name>/<appName>-v<version>.zip`
+## Step 2: Verify ZIP exists
 
-## Step 3: Compute and verify SHA256
+```bash
+ls -lh <domain>/<appName>/<appName>-v<version>.zip
+```
 
-1. Compute SHA256 hash:
-   ```bash
-   shasum -a 256 <domain>/<isv-name>/<appName>-v<version>.zip
-   ```
+## Step 3: Validate SHA256
 
-2. Read the root manifest at `commerce-apps-manifest/manifest.json`
+```bash
+# Compute hash
+shasum -a 256 <domain>/<appName>/<appName>-v<version>.zip
 
-3. Find your app's entry in the appropriate domain array (e.g., `tax`, `payment`, `gift-cards`)
+# Compare with commerce-apps-manifest/manifest.json
+jq '.[] | .[] | select(.id == "<appName>")' commerce-apps-manifest/manifest.json
+```
 
-4. Compare computed hash with `sha256` field in the manifest entry
+Hashes must match exactly.
 
-5. **CRITICAL**: Hashes must match exactly
+## Step 4: Validate manifest entry
 
-## Step 4: Validate root manifest entry
+Check `commerce-apps-manifest/manifest.json` has all required fields:
 
-Check that the app entry in `commerce-apps-manifest/manifest.json` contains all required fields:
-
-**Required fields:**
-- `id` - must match app name
-- `name` - human-readable display name
-- `description` - app description
-- `iconName` - icon filename (e.g., `avalara.png`)
-- `domain` - must be one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
+- `id` - matches app name
+- `name` - display name
+- `description`
+- `iconName` - matches icon in ZIP `icons/` directory
+- `domain` - valid domain (hyphen-case)
 - `type` - must be `"app"`
 - `provider` - must be `"thirdParty"`
-- `version` - semantic version (e.g., `0.2.8`)
-- `zip` - must match `<appName>-v<version>.zip`
-- `sha256` - must match actual ZIP hash
-
-**Validation steps:**
-1. Verify entry exists in correct domain array
-2. Verify all required fields are present and non-empty
-3. Verify `domain` is a valid value (hyphen-case)
-4. Verify version format follows semantic versioning
-6. Verify zip filename matches the actual file
-7. Verify SHA256 matches computed hash
+- `version` - semantic versioning
+- `zip` - matches actual filename
+- `sha256` - matches computed hash
 
 ## Step 5: Validate ZIP contents
 
-Extract and inspect the ZIP structure:
-
-1. List ZIP contents without extracting:
-   ```bash
-   unzip -l <domain>/<isv-name>/<appName>-v<version>.zip
-   ```
-
-2. Check for common issues:
-   - [ ] Single root folder named `commerce-<appName>-app-v<version>/`
-   - [ ] No registry path prefixes (no `tax/`, `domain/`, etc.)
-   - [ ] No junk files (`.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files)
-   - [ ] No duplicate directory trees
-   - [ ] commerce-app.json exists at root
-
-3. Verify required files are present:
-   - [ ] `commerce-app.json`
-   - [ ] `README.md`
-   - [ ] `app-configuration/tasksList.json`
-   - [ ] `cartridges/` directory with at least one cartridge
-   - [ ] `impex/install/services.xml`
-
-## Step 6: Validate commerce-app.json
-
-Extract and read `commerce-<appName>-app-v<version>/commerce-app.json`:
-
-**Required fields:**
-- `id` - must match app name
-- `name` - display name
-- `description`
-- `domain` - must match root manifest domain
-- `version` - must match root manifest version
-- `publisher.name`
-- `publisher.url`
-- `publisher.support`
-
-**Validation steps:**
-1. Verify version in commerce-app.json matches root manifest version
-2. Verify id matches app name
-3. Verify domain matches
-4. Check that publisher fields are valid URLs
-
-## Step 7: Validate impex files
-
-Extract the ZIP and validate all impex XML files for correctness:
-
-### XML Syntax Validation
-
-Validate all XML files are well-formed:
 ```bash
+unzip -l <domain>/<appName>/<appName>-v<version>.zip | head -30
+```
+
+Check:
+- Single root: `commerce-<appName>-app-v<version>/`
+- No junk files (`.DS_Store`, `__MACOSX`, hidden files)
+- No registry paths (`tax/`, `domain/`)
+- Required: `commerce-app.json`, `README.md`, `app-configuration/tasksList.json`
+
+## Step 6: Detect architecture
+
+```bash
+HAS_UI=$(unzip -l <zip> | grep -c "storefront-next/" || echo 0)
+HAS_BACKEND=$(unzip -l <zip> | grep -c "cartridges/" || echo 0)
+```
+
+Determine:
+- **UI-only:** Has `storefront-next/`, NO `cartridges/`
+- **Backend-only:** Has `cartridges/`, NO `storefront-next/`
+- **Fullstack:** Has both
+
+## Step 7: Validate commerce-app.json
+
+Extract and check:
+
+```bash
+unzip -p <zip> */commerce-app.json | jq .
+```
+
+Required fields:
+- `id`, `name`, `description`, `domain`, `version`
+- `publisher.name`, `publisher.url`, `publisher.support`
+
+Version must match root manifest version.
+
+## Step 8: Validate storefront files (UI-only/Fullstack)
+
+**Skip if Backend-only.**
+
+Check for:
+- `storefront-next/src/extensions/<appName>/target-config.json`
+- `storefront-next/src/extensions/<appName>/index.ts`
+- Required locales: `en-US/`, `en-GB/`, `it-IT/`
+
+## Step 9: Validate impex (Backend-only/Fullstack)
+
+**Skip if UI-only.**
+
+```bash
+# Extract and validate XML
+unzip -q <zip>
 find commerce-<appName>-app-v<version>/impex/ -name "*.xml" -exec xmllint --noout {} \;
 ```
 
-### Services Validation
+See `references/impex-validation.md` for detailed rules:
+- Services use dotted notation
+- Install/uninstall pairs match
+- Attribute IDs use camelCase with app prefix
+- SITEID placeholder (not actual site ID)
+- No hardcoded credentials
 
-**Install file (`impex/install/services.xml`):**
-- [ ] XML namespace is `http://www.demandware.com/xml/impex/services/2015-07-01`
-- [ ] All service IDs use dotted notation (e.g., `vendor.service.api`)
-- [ ] All services reference valid credentials and profiles
-- [ ] No hardcoded production credentials or secrets
-- [ ] Timeouts are reasonable (5000-60000 ms)
-- [ ] Rate limiting configured for external APIs
+## Step 10: Verify catalog.json
 
-**Uninstall file (`impex/uninstall/services.xml`):**
-- [ ] All services use `mode="delete"`
-- [ ] Deletion order: service → profile → credential
-- [ ] All service/profile/credential IDs match install file exactly
-
-### Site Preferences Validation
-
-**Metadata file (`impex/install/meta/system-objecttype-extensions.xml`):**
-- [ ] XML namespace is `http://www.demandware.com/xml/impex/metadata/2006-10-31`
-- [ ] All attribute IDs use camelCase (not snake_case)
-- [ ] All attribute IDs prefixed with app name
-- [ ] All attributes have display names and descriptions
-- [ ] Default values match data types
-- [ ] All attributes added to group definition
-- [ ] Valid attribute types used (string, boolean, integer, enum-of-string, etc.)
-
-**Preferences file (`impex/install/sites/SITEID/preferences.xml`):**
-- [ ] Uses `SITEID` placeholder (not actual site ID)
-- [ ] All preference IDs match attribute definitions
-- [ ] Default values match data types
-- [ ] No sensitive data (API keys, secrets)
-
-### Custom Objects Validation (if present)
-
-**Custom object definitions (`impex/install/meta/custom-objecttype-definitions.xml`):**
-- [ ] `key-attribute` defined and mandatory
-- [ ] Storage scope is `site` or `organization`
-- [ ] Retention policy set (0 or 1-365 days)
-- [ ] Valid staging mode (`no-sharing`, `shared`, or `source-to-target`)
-- [ ] All attributes added to group
-
-### Cross-File Validation
-
-Verify install/uninstall pairs match:
-```bash
-# Extract and compare service IDs
-grep 'service-id=' impex/install/services.xml | sed 's/.*service-id="\([^"]*\)".*/\1/' | sort > /tmp/install.txt
-grep 'service-id=' impex/uninstall/services.xml | sed 's/.*service-id="\([^"]*\)".*/\1/' | sort > /tmp/uninstall.txt
-diff /tmp/install.txt /tmp/uninstall.txt
+- **Existing app:** catalog.json exists, unchanged in PR
+- **New app:** catalog.json has INIT values:
+```json
+{
+  "latest": {"version": "INIT", "tag": "INIT"},
+  "versions": []
+}
 ```
 
-### Common Impex Errors
+## Step 11: Validate translations
 
-Check for these common issues:
-- [ ] No unescaped special characters (`&` → `&amp;`, `<` → `&lt;`, etc.)
-- [ ] No duplicate service/credential/profile IDs
-- [ ] Service IDs don't use underscores (use dots instead)
-- [ ] Attribute IDs don't use underscores (use camelCase)
-- [ ] All XML files are well-formed (no unclosed tags)
+```bash
+jq '."<appName>"' commerce-apps-manifest/translations/en-US.json
+```
 
-If any impex validation fails, report specific issues with file paths and lines.
+Check:
+- Entry exists in `en-US.json` (minimum)
+- Has `name` and `description` fields
+- Valid JSON structure
 
-## Step 8: Check for catalog.json
+## Step 12: Validate icon
 
-- If this is an **existing app** (catalog.json already exists):
-  - [ ] Do NOT modify catalog.json - CI will update it
-  - [ ] Verify catalog.json exists but unchanged in PR
+```bash
+# Get iconName from manifest
+ICON_NAME=$(jq -r '.[] | .[] | select(.id == "<appName>") | .iconName' commerce-apps-manifest/manifest.json)
 
-- If this is a **brand new app** (no catalog.json):
-  - [ ] Verify catalog.json is created with INIT values:
-    ```json
-    {
-      "latest": {
-        "version": "INIT",
-        "tag": "INIT"
-      },
-      "versions": []
-    }
-    ```
+# Check ZIP contains matching icon
+unzip -l <zip> | grep "icons/$ICON_NAME"
+```
 
-## Step 9: Run final PR checklist
+Icon filename must match `iconName` field exactly. CI extracts automatically.
 
-From CONTRIBUTING.md:
+## Step 13: Security scan
 
-**Package Structure:**
-- [ ] ZIP file name follows format: `<appName>-v<version>.zip`
-- [ ] ZIP contains no junk files (.DS_Store, __MACOSX, etc.)
-- [ ] No extracted directories are committed
-- [ ] All file paths are relative to app root (no absolute paths)
+```bash
+unzip -q <zip>
+bash .github/scripts/security-scan.sh commerce-<appName>-app-v<version>/
+```
 
-**Manifest Validation:**
-- [ ] Root manifest (commerce-apps-manifest/manifest.json) is updated
-- [ ] Root manifest entry has all required fields
-- [ ] version, zip, and sha256 in root manifest are correct
-- [ ] SHA256 hash matches the actual ZIP file
-- [ ] commerce-app.json version matches root manifest version
-- [ ] catalog.json is included for new apps only (with INIT values)
+**If blocking findings (exit 1):** FAIL - fix issues first.
+**If warnings only:** Continue with warnings for review.
 
-**Impex Validation:**
-- [ ] All XML files are well-formed (pass xmllint validation)
-- [ ] Services have valid configuration and no hardcoded credentials
-- [ ] Install/uninstall services match exactly
-- [ ] Site preferences use camelCase and app-name prefixes
-- [ ] SITEID placeholder used (not actual site ID)
-- [ ] No sensitive data in impex files
+See `references/security-scan.md` for details.
 
-## Report validation results
+## Step 14: Clean up
 
-Provide a clear summary:
-- **✅ PASS** - All validations passed, ready for PR
-- **❌ FAIL** - List specific issues found with file paths and line numbers
-- Provide fix recommendations for each issue
+```bash
+rm -rf commerce-<appName>-app-v<version>/
+```
+
+## Report results
+
+- **✅ PASS** - All validations passed, ready for `/submit-app`
+- **❌ FAIL** - List specific issues with file paths and line numbers
+
+Provide fix recommendations for each issue.

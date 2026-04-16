@@ -52,7 +52,7 @@ body:
     id: isv-name
     attributes:
       label: ISV/Vendor Name
-      description: Your company name (kebab-case, e.g., avalara)
+      description: Your company name (kebab-case, e.g., avalara, bazaarvoice)
       placeholder: my-company
     validations:
       required: true

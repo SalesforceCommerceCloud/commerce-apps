@@ -474,7 +474,7 @@ return data;
 
 **Using Claude Code:**
 ```
-/validate-commerce-app
+/validate-app
 /validate-impex
 ```
 
@@ -634,9 +634,8 @@ If you encounter testing issues:
    - Internal team if part of organization
 
 4. **Use validation skills:**
-   - `/validate-commerce-app`
+   - `/validate-app`
    - `/validate-impex`
-   - `/extract-and-inspect`
 
 ---
 

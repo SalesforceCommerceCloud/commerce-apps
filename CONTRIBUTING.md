@@ -9,8 +9,8 @@ Please follow the guidelines below when submitting new or updated commerce app v
 If you're using Claude Code, several skills are available to streamline the contribution process:
 
 ### Building Apps
-- **`/scaffold-commerce-app`** - Generate initial directory structure and template files for a new commerce app from scratch
-- **`/generate-commerce-app`** - Package an existing app directory into a registry-ready Commerce App Package (CAP) ZIP
+- **`/scaffold-app`** - Generate initial directory structure and template files for a new commerce app from scratch
+- **`/package-app`** - Package an existing app directory into a registry-ready Commerce App Package (CAP) ZIP
 
 ### Impex Generation
 - **`/generate-service-impex`** - Generate SFCC service configuration impex (credentials, profiles, definitions)
@@ -19,23 +19,19 @@ If you're using Claude Code, several skills are available to streamline the cont
 - **`/validate-impex`** - Validate all impex XML files for syntax and common errors
 
 ### Validation & Updates
-- **`/validate-commerce-app`** - Comprehensive validation before submission (checks structure, manifest, SHA256, impex XML, etc.)
-- **`/validate-impex`** - Deep validation of impex files only (useful during development, also included in `/validate-commerce-app`)
-- **`/update-app-version`** - Streamline version bumps for existing apps (updates version, regenerates ZIP, computes hash)
-
-### Inspection & Comparison
-- **`/extract-and-inspect`** - Extract and inspect ZIP files to review structure and contents
-- **`/compare-app-versions`** - Compare two versions to see what changed (useful for code review and changelogs)
+- **`/validate-app`** - Comprehensive validation before submission (checks structure, manifest, SHA256, impex XML, icons, translations)
+- **`/validate-impex`** - Deep validation of impex files only (useful during development, also included in `/validate-app`)
+- **`/package-app`** - Package app into registry-ready ZIP (handles both new apps and version bumps)
 
 ### Submission
-- **`/submit-app-pr`** - Guide through the PR submission process with proper formatting and checklist
+- **`/submit-app`** - Guide through the PR submission process with proper formatting and checklist
 
 **Typical workflow:**
-1. Start new app → `/scaffold-commerce-app`
+1. Start new app → `/scaffold-app`
 2. Build your app code and logic
-3. Package for registry → `/generate-commerce-app`
-4. Validate before submitting → `/validate-commerce-app`
-5. Submit PR → `/submit-app-pr`
+3. Package for registry → `/package-app`
+4. Validate before submitting → `/validate-app`
+5. Submit PR → `/submit-app`
 
 These skills automate many of the manual steps described below and help catch common issues early.
 
@@ -137,7 +133,7 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 - `name` - Display name
 - `description` - App description
 - `iconName` - Icon filename (e.g., `avalara.png`)
-- `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
+- `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`
 - `type` - Always `"app"` for commerce apps
 - `provider` - Always `"thirdParty"` for ISV apps
 - `version` - Semantic version (e.g., `"1.0.0"`)
@@ -180,9 +176,39 @@ On **Linux**, the equivalent is usually `sha256sum /path/to/zip`.
 }
 ```
 
-**Multiple providers under one domain:**
+**Additional domain (multiple providers under one domain):**
+```json
+{
+  "ratings-and-reviews": [
+    {
+      "id": "bazaarvoice-ratings",
+      "name": "Bazaarvoice Ratings & Reviews",
+      "description": "Customer ratings and reviews powered by Bazaarvoice.",
+      "iconName": "bazaarvoice.png",
+      "domain": "ratings-and-reviews",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.0",
+      "zip": "bazaarvoice-ratings-v1.0.0.zip",
+      "sha256": "abc123..."
+    },
+    {
+      "id": "yotpo-reviews",
+      "name": "Yotpo Reviews",
+      "description": "Product reviews and UGC powered by Yotpo.",
+      "iconName": "yotpo.png",
+      "domain": "ratings-and-reviews",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.0",
+      "zip": "yotpo-reviews-v1.0.0.zip",
+      "sha256": "def456..."
+    }
+  ]
+}
+```
 
-> Entries sharing the same domain are displayed as provider options under a single hub tile. Domains `tax`, `payment`, and `shipping` show under "Providers" on the checkout hub; all other domains show under "Additional Setup".
+> Entries sharing the same domain are displayed as provider options under a single hub tile (e.g., a "Ratings & Reviews" tile with Bazaarvoice and Yotpo as choices). Domains `tax`, `payment`, and `shipping` show under "Providers" on the checkout hub; all other domains show under "Additional Setup".
 
 ---
 
@@ -200,6 +226,10 @@ Your app should be organized in the registry as follows:
 ```
 tax/avalara/
 ├── avalara-tax-v0.2.8.zip
+└── catalog.json
+
+ratings-and-reviews/bazaarvoice/
+├── bazaarvoice-ratings-v1.0.0.zip
 └── catalog.json
 ```
 
@@ -248,7 +278,7 @@ At minimum, your app directory must contain:
 
 - **`icons/`** - App/ISV icon for display in the registry
   - Place icon files (PNG, SVG, JPG, or JPEG) in the `icons/` directory at the root of your CAP
-  - Icons should be named `{isv-name}.{ext}` (e.g., `avalara.png`)
+  - Icons should be named `{isv-name}.{ext}` (e.g., `avalara.png`, `bazaarvoice.svg`)
   - **Icon Updates:**
     - ✅ **Allowed:** Submitting the same icon (same hash) in new app versions
     - ✅ **Allowed:** First-time icon submission for your ISV
@@ -427,14 +457,14 @@ Before submitting your PR, please verify:
 - [ ] Old ZIP versions removed (if updating)
 
 ### CI Workflow Readiness
-- [ ] Ran `/validate-commerce-app` skill (if using Claude Code)
+- [ ] Ran `/validate-app` skill (if using Claude Code)
 - [ ] Tested ZIP extraction locally
 - [ ] Reviewed ZIP contents with `unzip -l`
 - [ ] Ready for `verify-zip.yml` CI workflow
 
 ### Icons (Optional but Recommended)
 - [ ] Icon file included in `icons/` directory at CAP root
-- [ ] Icon named `{isv-name}.{ext}` (e.g., `avalara.png`)
+- [ ] Icon named `{isv-name}.{ext}` (e.g., `avalara.png`, `bazaarvoice.svg`)
 - [ ] Icon format is PNG, SVG, JPG, or JPEG
 - [ ] Icon is unique to your ISV (not a duplicate of another vendor's icon)
 - [ ] Icon is high quality: 512x512px for raster formats, scalable for SVG
@@ -481,7 +511,12 @@ zip -r [appName]-v[version].zip commerce-[appName]-app-v[version]/
 ### Missing Required Files
 **Problem:** CI can't find `commerce-app.json`, `services.xml`, or other required files.
 
-**Solution:** Extract the ZIP and verify all required files exist in the correct locations. Use `/extract-and-inspect` skill to review structure.
+**Solution:** Extract the ZIP and verify all required files exist in the correct locations:
+```bash
+unzip -l [appName]-v[version].zip
+# Or extract fully to inspect:
+unzip [appName]-v[version].zip
+```
 
 ---
 
@@ -521,7 +556,7 @@ Thumbs.db
 ## Getting Help
 
 - **CI Failures:** Check GitHub Actions logs for specific error messages
-- **Validation Issues:** Use `/validate-commerce-app` skill for detailed diagnostics
+- **Validation Issues:** Use `/validate-app` skill for detailed diagnostics
 - **Questions:** Open a discussion or contact the registry maintainers
 
 

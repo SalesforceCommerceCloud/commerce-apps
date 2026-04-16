@@ -1,19 +1,83 @@
 {
+  "skill_name": "validate-app",
   "evals": [
     {
-      "prompt": "Can you validate my avalara-tax app before I submit? Want to make sure everything is correct.",
-      "context": "User wants pre-submission validation",
-      "expected_behavior": "Should trigger validate-app skill, check ZIP structure, manifest, SHA256, impex files, run full checklist"
+      "id": 1,
+      "prompt": "I just packaged avalara-tax v0.2.8. Can you validate it before I submit the PR?",
+      "context": "User has packaged app and wants pre-submission validation",
+      "expected_behavior": "Triggers validate-app skill. Identifies app at tax/avalara-tax/avalara-tax-v0.2.8.zip. Checks: ZIP exists, SHA256 matches manifest, manifest has all required fields, ZIP structure (single root, no junk files), detects architecture (Backend-only/UI-only/Fullstack), validates commerce-app.json version matches manifest, checks architecture-specific requirements, validates impex if Backend/Fullstack, verifies icon filename matches, confirms translations in en-US.json, runs security scan, reports PASS or FAIL with specific issues."
     },
     {
-      "prompt": "Check if my app package is ready to submit",
-      "context": "Casual validation request",
-      "expected_behavior": "Should trigger validate-app and run comprehensive validation checks"
+      "id": 2,
+      "prompt": "Check if my payment/stripe-payments-v1.0.0.zip is ready to submit. I think I got everything right this time.",
+      "context": "User wants validation on specific ZIP file",
+      "expected_behavior": "Validates payment/stripe-payments/stripe-payments-v1.0.0.zip. Computes SHA256 and compares with commerce-apps-manifest/manifest.json. Lists ZIP contents with unzip -l. Checks for: single root folder, no .DS_Store/__MACOSX, commerce-app.json exists, detects architecture, validates manifest entry completeness (id, name, description, iconName, domain, version, zip, sha256 all present), checks icon in ZIP matches iconName field, validates translations, runs xmllint on impex if present, executes security scan script, reports all findings."
     },
     {
-      "prompt": "My PR failed CI checks. Can you help me figure out what's wrong with the app?",
-      "context": "User debugging validation failure",
-      "expected_behavior": "Should trigger validate-app to identify root cause of validation issues"
+      "id": 3,
+      "prompt": "The CI is failing on my PR for gift-cards/salesforce-giftcards-v2.0.0.zip saying SHA256 mismatch. Can you help debug this?",
+      "context": "User has CI failure and needs help identifying issue",
+      "expected_behavior": "Runs validation focusing on SHA256. Computes hash with shasum -a 256, reads manifest entry for salesforce-giftcards, compares hashes, reports exact mismatch (shows expected vs actual), explains how to fix (recompute hash and update manifest.json), may also check if ZIP was modified after manifest was updated, provides fix command: shasum -a 256 gift-cards/salesforce-giftcards/salesforce-giftcards-v2.0.0.zip"
+    },
+    {
+      "id": 4,
+      "prompt": "Validate the fullstack app at loyalty/acme-rewards/acme-rewards-v1.5.0.zip. It has both UI and backend components.",
+      "context": "Fullstack app validation request",
+      "expected_behavior": "Detects Fullstack architecture (has both storefront-next/ and cartridges/). Validates BOTH UI requirements (target-config.json exists, index.ts exists, locales en-US/en-GB/it-IT present) AND Backend requirements (cartridges/site_cartridges/ exists, package.json has hooks field, impex/install/ and impex/uninstall/ directories present, XML validates with xmllint, services use dotted notation, no hardcoded credentials). Reports architecture detection and validates all applicable rules."
+    },
+    {
+      "id": 5,
+      "prompt": "I'm getting impex import errors in Business Manager for my shipping app. Can you validate the impex files in shipping/fedex-shipping-v2.0.0.zip to see what's wrong?",
+      "context": "User has impex-specific issues",
+      "expected_behavior": "Extracts ZIP, focuses on impex validation. Runs xmllint on all XML files in impex/ directory. Checks: services.xml syntax, install/uninstall pairs match (service IDs identical), attribute IDs use camelCase with app prefix, SITEID placeholder used (not actual site ID), no hardcoded credentials, service IDs use dotted notation. Reports specific XML errors with file paths and line numbers. References impex-validation.md for detailed rules."
+    },
+    {
+      "id": 6,
+      "prompt": "Is my UI-only ratings widget ready? It's at ratings-and-reviews/yotpo-ratings/yotpo-ratings-v1.0.0.zip",
+      "context": "UI-only architecture validation",
+      "expected_behavior": "Detects UI-only architecture (has storefront-next/, NO cartridges/ or impex/). Validates UI-specific requirements: target-config.json exists with valid components array, index.ts barrel file exists, all three required locales present (en-US/, en-GB/, it-IT/) with translations.json, checks TypeScript files use proper structure. Skips backend/impex validation. Reports PASS if UI requirements met."
+    },
+    {
+      "id": 7,
+      "prompt": "Check address-verification/smarty-address-v1.2.0.zip - I want to make sure the icon is correct. Last time CI said it couldn't find the icon file.",
+      "context": "Icon validation focus",
+      "expected_behavior": "Validates icon matching. Reads manifest entry for smarty-address, extracts iconName field (e.g., 'smarty.png'), checks ZIP with unzip -l for icons/smarty.png, confirms filename match exactly (case-sensitive), explains CI extracts icons by filename so mismatch breaks references. If mismatch found, reports expected vs actual and provides fix (rename icon file in ZIP or update manifest iconName)."
+    },
+    {
+      "id": 8,
+      "prompt": "My app ZIP is at tax/avalara-tax/avalara-tax-v0.2.9.zip but when I check git status I see the extracted directory commerce-avalara-tax-app-v0.2.9/ is also there. Is this ready to submit?",
+      "context": "User has extracted directory present",
+      "expected_behavior": "Validates ZIP itself but WARNS that extracted directory should NOT be committed. Explains extracted directories are for development only and should be deleted before PR. Provides cleanup command: rm -rf tax/avalara-tax/commerce-avalara-tax-app-v0.2.9/. Continues validation on ZIP if structure is correct. Reports what SHOULD be committed (ZIP, manifest.json, translations, catalog.json for new apps only)."
+    },
+    {
+      "id": 9,
+      "prompt": "Validate everything for analytics/google-analytics-v3.0.0.zip. I want a complete check before submitting.",
+      "context": "Comprehensive validation request",
+      "expected_behavior": "Runs ALL 14 validation steps: (1) identifies app, (2) verifies ZIP exists, (3) validates SHA256, (4) validates manifest entry, (5) validates ZIP contents, (6) detects architecture, (7) validates commerce-app.json, (8) validates storefront files if UI/Fullstack, (9) validates impex if Backend/Fullstack, (10) verifies catalog.json, (11) validates translations, (12) validates icon matching, (13) runs security scan, (14) cleans up. Reports comprehensive PASS/FAIL with all findings."
+    },
+    {
+      "id": 10,
+      "prompt": "The security scan is failing for my payment app. Can you run validation and show me what security issues were found?",
+      "context": "Security-focused validation",
+      "expected_behavior": "Runs validation including security scan step. Extracts ZIP, executes bash .github/scripts/security-scan.sh on extracted directory. Reports: blocking findings (exit code 1) vs warnings. Shows specific findings with file paths and line numbers. Explains blocking findings prevent packaging/submission, warnings should be reviewed. References security-scan.md for complete list of checks. Marks validation as FAIL if blocking findings present."
+    },
+    {
+      "id": 11,
+      "prompt": "I just updated the translations for my app but forgot - do I need to update all locale files or just en-US.json?",
+      "context": "Translation requirements clarification",
+      "expected_behavior": "This is an informational question, not a validation request. Explains translation requirements: en-US.json is MINIMUM requirement, all 13 locale files should ideally be updated (en-US, de, fr, es, it, ja, ko, nl, pl, pt, zh_CN, zh_TW, ar_MA), can use English as fallback for non-English locales. Translation structure: {appName: {name: displayName, description: description}}. Does NOT run validation unless user specifically requests it."
+    },
+    {
+      "id": 12,
+      "prompt": "Validate fraud/signifyd-fraud/signifyd-fraud-v2.1.5.zip but I know the version in catalog.json is marked as deprecated. Is that a problem?",
+      "context": "Deprecated version validation",
+      "expected_behavior": "Runs normal validation on ZIP. Checks catalog.json and notes version 2.1.5 is marked deprecated in versions array. Deprecated status doesn't affect validation - it's metadata for existing versions. Validation checks current ZIP structure, manifest, SHA256, etc. If version is deprecated in catalog but user is resubmitting same version, that IS a problem (can't replace published versions). Reports validation results normally."
+    },
+    {
+      "id": 13,
+      "prompt": "Can you explain what architecture detection means and how it affects validation?",
+      "context": "Educational question about validation process",
+      "expected_behavior": "Explains architecture detection: checks ZIP for storefront-next/ and cartridges/ directories. Three types: UI-only (has storefront-next/, no cartridges/), Backend-only (has cartridges/, no storefront-next/), Fullstack (has both). Architecture determines which validations apply: UI-only validates React components, locales, target-config; Backend-only validates cartridges, hooks.json, impex XML; Fullstack validates both sets. Does NOT run actual validation."
     }
   ]
 }

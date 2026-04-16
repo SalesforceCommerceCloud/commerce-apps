@@ -17,7 +17,7 @@ Validate SFCC impex XML files to catch errors before import.
 Use proactively:
 - Before importing impex files to Business Manager
 - After generating or modifying any impex files
-- Before running `/validate-commerce-app` or `/submit-app-pr`
+- Before running `/validate-app` or `/submit-app`
 - When debugging import failures
 - As part of any impex workflow
 

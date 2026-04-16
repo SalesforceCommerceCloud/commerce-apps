@@ -1,0 +1,83 @@
+{
+  "skill_name": "submit-app",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My app is validated and ready. Let's submit it to the registry.",
+      "context": "User has packaged and validated app, ready for PR submission",
+      "expected_behavior": "Triggers submit-app skill. Checks gh CLI status with which gh && gh auth status. If authenticated, proceeds with automated PR creation. Checks git status to verify expected files (manifest.json, translations, ZIP, optionally catalog.json). Creates commit with 'Add <displayName> v<version>', creates branch add-<appName>-v<version>, pushes to remote, creates PR with gh pr create including full checklist template."
+    },
+    {
+      "id": 2,
+      "prompt": "How do I create a pull request for my avalara-tax v0.2.8? I've never used gh CLI before.",
+      "context": "User asking about PR creation, unfamiliar with gh CLI",
+      "expected_behavior": "Triggers submit-app workflow. Checks if gh CLI installed (which gh). If not installed, provides installation instructions (brew install gh for macOS, links for Linux/Windows). If installed but not authenticated, guides through gh auth login --hostname github.com --web. Alternatively, offers manual PR creation path with URL generation and template. Explains both automated and manual options."
+    },
+    {
+      "id": 3,
+      "prompt": "Time to open a PR for this payment app. Can you help? It's stripe-payments v1.0.0.",
+      "context": "Casual request for PR submission",
+      "expected_behavior": "Triggers submit-app. First runs /validate-app to ensure app is ready. Checks git status for expected files (commerce-apps-manifest/manifest.json, translations/en-US.json, payment/stripe-payments/stripe-payments-v1.0.0.zip). If extracted directories present, warns not to commit them. Creates commit, branch, pushes, creates PR with template including app details (stripe-payments, payment domain, v1.0.0)."
+    },
+    {
+      "id": 4,
+      "prompt": "I'm authenticated to gh CLI. My app ZIP is at tax/vertex-tax/vertex-tax-v1.5.0.zip and everything is committed. Create the PR.",
+      "context": "User authenticated, files ready",
+      "expected_behavior": "Since gh authenticated, uses Path A (automated PR creation). Gets current branch with git branch --show-current, executes gh pr create with title 'Add Vertex Tax v1.5.0', includes full PR body template with Commerce App Submission section, checklist (all items pre-checked), CI workflows description, testing section. Sets --base main and --head to current branch. Returns PR URL."
+    },
+    {
+      "id": 5,
+      "prompt": "gh CLI isn't working for me. Can you give me the manual PR template instead?",
+      "context": "User wants manual PR creation",
+      "expected_behavior": "Uses Path B (manual PR creation). Generates PR creation URL with REPO_URL/compare/$CURRENT_BRANCH?expand=1 using git commands. Provides complete PR title format and markdown template with all sections: App info, Changes checkboxes, Files Modified list, Description placeholder, full Checklist (all pre-checked), CI Workflows, Testing section, Submitter's Notes. Instructs user to customize with app details."
+    },
+    {
+      "id": 6,
+      "prompt": "The CI is failing on my PR - says SHA256 mismatch. How do I fix this and update the PR?",
+      "context": "User has CI failure and needs to update PR",
+      "expected_behavior": "Explains CI failure fix process. Provides fix for SHA256 mismatch: recompute with shasum -a 256 <zip>, update commerce-apps-manifest/manifest.json. Then guides through update: git add <changed-files>, git commit -m 'Address review feedback: fix SHA256 hash', git push origin <branch-name>. Explains CI will re-run automatically. References Common CI Failures table in skill."
+    },
+    {
+      "id": 7,
+      "prompt": "I need to submit an update for an existing app - avalara-tax v0.2.9 (was v0.2.8). What's the branch naming and commit message format?",
+      "context": "User updating existing app, needs naming conventions",
+      "expected_behavior": "Explains commit message format: 'Update Avalara Tax to v0.2.9' for updates (vs 'Add' for new apps). Branch name: update-avalara-tax-v0.2.9 (vs 'add-' for new apps). Walks through full process: commit with Update format, create branch with update- prefix, push, create PR. PR title also uses 'Update' format."
+    },
+    {
+      "id": 8,
+      "prompt": "What files should be in my commit before creating the PR? I don't want to accidentally commit something I shouldn't.",
+      "context": "User wants clarity on what to commit",
+      "expected_behavior": "Explains expected files in git status: Modified commerce-apps-manifest/manifest.json, Added <domain>/<appName>/<appName>-v<version>.zip, Modified commerce-apps-manifest/translations/en-US.json (minimum), Optional catalog.json for new apps. Lists what NOT to commit: extracted directories (commerce-*-app-v*/), node_modules, .DS_Store, old ZIP versions. Provides git add commands for correct files."
+    },
+    {
+      "id": 9,
+      "prompt": "My PR was approved but CI is still running. Can I merge it now or do I need to wait?",
+      "context": "User asking about merge timing",
+      "expected_behavior": "Explains Final Checklist: must wait for all CI checks passing (green checkmarks), code review approved (already done), no merge conflicts with main. CI must complete successfully before merge. References Step 7 (Monitor CI checks) - verify-zip.yml and update-catalog.yml must pass. Once all checks pass, ready to merge. Explains update-catalog.yml runs on merge to update registry catalog automatically."
+    },
+    {
+      "id": 10,
+      "prompt": "I want to submit a bug fix for version 1.0.1 of my app. The fix is small - just one line in the tax calculation hook. How should I name everything?",
+      "context": "Bug fix submission",
+      "expected_behavior": "Explains bug fix naming format: Commit message 'Fix <DisplayName> v1.0.1 - <brief description>' (e.g., 'Fix Avalara Tax v1.0.1 - correct rounding in tax calculation'), Branch name 'fix-<appName>-v1.0.1', PR title uses same 'Fix' format with description. Walks through process emphasizing descriptive fix description in commit/PR title."
+    },
+    {
+      "id": 11,
+      "prompt": "Do I need to run validation before submitting the PR or will CI handle that?",
+      "context": "Question about pre-submission validation",
+      "expected_behavior": "Emphasizes Step 1 requirement: MUST run /validate-app before submitting. CI will validate too, but catching issues early with /validate-app saves time and PR review cycles. Validation checks: files present, manifest updated, SHA256 matches, ZIP structure correct, no junk files, icons/translations correct, architecture-specific requirements. Fix all validation failures before creating PR. CI validation is final check, not substitute for pre-submission validation."
+    },
+    {
+      "id": 12,
+      "prompt": "I committed my app files but forgot to delete the old ZIP version (v0.2.7) before committing the new one (v0.2.8). Is that a problem?",
+      "context": "User committed old ZIP version",
+      "expected_behavior": "Yes, that's a problem. Repository should only contain latest ZIP version. Old ZIPs should be deleted BEFORE committing. Provides fix: git rm tax/avalara-tax/avalara-tax-v0.2.7.zip, git commit -m 'Remove old ZIP version', git push origin <branch>. Explains why: keeps repo clean, prevents confusion about which ZIP is current, reduces repository size. CI maintains historical versions, so old ZIPs not needed in repo."
+    },
+    {
+      "id": 13,
+      "prompt": "Can you explain the difference between the automated PR creation and manual PR creation? When would I use each?",
+      "context": "Educational question about PR creation methods",
+      "expected_behavior": "Explains two paths: Path A (Automated) uses gh CLI if installed and authenticated - automatically creates PR with full template, faster and less error-prone. Path B (Manual) for users without gh CLI or not authenticated - generates URL, provides template to paste manually. Use automated when possible (requires: gh CLI installed, authenticated to github.com). Use manual when: gh CLI not available, prefer not to install it, authentication issues, or prefer web UI. Both produce same PR, just different creation methods."
+    }
+  ]
+}
