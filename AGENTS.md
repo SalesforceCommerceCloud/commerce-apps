@@ -17,7 +17,7 @@ This is a **Commerce App Registry** for Salesforce Commerce Cloud B2C Commerce. 
 ## Directory Structure
 
 ```
-{domain}/{isv-name}/
+{domain}/{app-name}/
 ├── {app-name}-v{version}.zip    # COMMIT THIS - The packaged app
 ├── manifest.json                 # COMMIT THIS - App metadata + SHA256 hash
 └── catalog.json                  # COMMIT THIS - Version history (new apps only)
@@ -27,8 +27,8 @@ commerce-{app-name}-app-v{version}/  # Extracted directory (dev only)
 ```
 
 **Examples:**
-- `tax/avalara/avalara-tax-v0.2.8.zip`
-- `gift-cards/salesforce-gift-cards/salesforce-gift-cards-v0.0.1.zip`
+- `tax/avalara-tax/avalara-tax-v0.2.8.zip`
+- `address-verification/loqate-address-verification/loqate-address-verification-v1.0.1.zip`
 
 **Critical Rule:** Extracted app directories are for development only. Only ZIP, manifest.json, and catalog.json should be committed.
 
@@ -37,9 +37,8 @@ commerce-{app-name}-app-v{version}/  # Extracted directory (dev only)
 ### App Development & Packaging
 | Skill | When to Use | What It Does |
 |-------|-------------|--------------|
-| `/scaffold-commerce-app` | Starting a new app from scratch | Generates complete directory structure with templates |
-| `/generate-commerce-app` | Ready to package app for registry | Creates ZIP, updates manifest.json with SHA256 |
-| `/update-app-version` | Bumping version of existing app | Updates version, regenerates ZIP, computes new hash |
+| `/scaffold-app` | Starting a new app from scratch | Generates complete directory structure with templates |
+| `/package-app` | Ready to package app for registry | Creates ZIP, updates manifest.json with SHA256 |
 
 ### Impex Generation
 | Skill | When to Use | What It Does |
@@ -49,17 +48,15 @@ commerce-{app-name}-app-v{version}/  # Extracted directory (dev only)
 | `/generate-custom-object-impex` | Need data storage (cache, config, logs) | Creates custom object type definitions with storage config |
 | `/validate-impex` | Before importing or submitting | Validates XML syntax, structure, install/uninstall pairs |
 
-### Validation & Inspection
+### Validation
 | Skill | When to Use | What It Does |
 |-------|-------------|--------------|
-| `/validate-commerce-app` | Before submitting PR | Validates ZIP structure, manifest, SHA256, commerce-app.json |
-| `/extract-and-inspect` | Reviewing or debugging a ZIP | Extracts and inspects ZIP contents safely |
-| `/compare-app-versions` | Code review or changelog generation | Compares two versions to see what changed |
+| `/validate-app` | Before submitting PR | Validates ZIP structure, manifest, SHA256, commerce-app.json, impex, architecture |
 
 ### Submission
 | Skill | When to Use | What It Does |
 |-------|-------------|--------------|
-| `/submit-app-pr` | Ready to submit app to registry | Guides through PR creation with proper format and checklist |
+| `/submit-app` | Ready to submit app to registry | Guides through PR creation with proper format and checklist |
 
 ## Common Workflows
 
@@ -69,12 +66,12 @@ commerce-{app-name}-app-v{version}/  # Extracted directory (dev only)
 User: "I want to build a ratings and reviews app"
 
 Your response:
-1. Suggest `/scaffold-commerce-app`
+1. Suggest `/scaffold-app`
 2. Gather info: domain (ratings-and-reviews), ISV name, app details
 3. After scaffolding, guide them to build their app code
 4. Suggest `/generate-service-impex` for API integration
 5. Suggest `/generate-site-preferences-impex` for settings
-6. When ready: `/generate-commerce-app` → `/validate-commerce-app` → `/submit-app-pr`
+6. When ready: `/package-app` → `/validate-app` → `/submit-app`
 ```
 
 ### Workflow 2: Update Existing App
@@ -83,10 +80,10 @@ Your response:
 User: "I need to release version 1.0.1 of my app"
 
 Your response:
-1. Suggest `/update-app-version`
-2. Extract current version, update code, regenerate ZIP
-3. Suggest `/validate-commerce-app` before submitting
-4. Suggest `/submit-app-pr` when ready
+1. Suggest `/package-app` — it handles both new apps and version bumps
+2. It will detect the existing version and repackage appropriately
+3. Suggest `/validate-app` before submitting
+4. Suggest `/submit-app` when ready
 ```
 
 ### Workflow 3: Generate Impex Files
@@ -107,16 +104,15 @@ Your response:
 User: "Is my app ready to submit?"
 
 Your response:
-1. Run `/validate-commerce-app` - checks ZIP, manifest, structure
-2. Run `/validate-impex` - checks all XML files
-3. Review checklist from CONTRIBUTING.md
-4. If all pass, suggest `/submit-app-pr`
+1. Run `/validate-app` - comprehensive checks including ZIP, manifest, structure, impex
+2. Review checklist from CONTRIBUTING.md
+3. If all pass, suggest `/submit-app`
 ```
 
 ## Critical Rules & Conventions
 
 ### 1. Directory Structure
-- **ALWAYS** use `{domain}/{isv-name}/` structure
+- **ALWAYS** use `{domain}/{app-name}/` structure where `{app-name}` matches the `id` field in the root manifest
 - **NEVER** commit extracted directories (`commerce-*-app-v*/`)
 - Only commit: ZIP, manifest.json, catalog.json
 
@@ -158,7 +154,7 @@ Your response:
 
 ### 7. Icons (Optional)
 - Place icon files in `icons/` directory at CAP root
-- Name icons `{isv-name}.{ext}` (e.g., `avalara.png`)
+- Name icons `{isv-name}.{ext}` (e.g., `avalara.png`, `bazaarvoice.svg`)
 - Supported formats: PNG, SVG, JPG, JPEG
 - **Icon validation (by hash):**
   - ✅ Same icon as existing = PASS (reusing icon in new version)
@@ -173,7 +169,7 @@ Scenario 1: Avalara v0.2.8 with avalara.png (hash: abc123)
             Commerce-apps-manifest already has avalara.png (hash: abc123)
             Result: ✅ PASS - Same hash, no changes needed
 
-Scenario 2: New ISV v1.0.0 with newisv.svg (new ISV)
+Scenario 2: Bazaarvoice v1.0.0 with bazaarvoice.svg (new ISV)
             No existing icon in commerce-apps-manifest
             Result: ✅ PASS - First icon for ISV, will be added
 
@@ -189,11 +185,11 @@ Scenario 3: Avalara v0.3.0 with avalara.png (hash: xyz789)
 
 ### Starting Fresh
 - **User mentions:** "new app", "start building", "create app", "scaffold"
-- **Suggest:** `/scaffold-commerce-app`
+- **Suggest:** `/scaffold-app`
 
 ### Packaging
 - **User mentions:** "package", "create ZIP", "ready to submit", "build registry package"
-- **Suggest:** `/generate-commerce-app`
+- **Suggest:** `/package-app`
 
 ### Service Integration
 - **User mentions:** "API", "external service", "third-party", "integration", "webhook", "credentials"
@@ -209,23 +205,15 @@ Scenario 3: Avalara v0.3.0 with avalara.png (hash: xyz789)
 
 ### Validation
 - **User mentions:** "check", "validate", "verify", "ready?", "errors", "problems"
-- **Suggest:** `/validate-commerce-app` and/or `/validate-impex`
+- **Suggest:** `/validate-app` (includes impex validation) or `/validate-impex` for impex-only checks
 
 ### Version Updates
 - **User mentions:** "new version", "update version", "bump version", "release"
-- **Suggest:** `/update-app-version`
-
-### Inspection/Review
-- **User mentions:** "what's inside", "check ZIP", "review", "inspect"
-- **Suggest:** `/extract-and-inspect`
-
-### Comparison
-- **User mentions:** "what changed", "diff", "compare versions", "changelog"
-- **Suggest:** `/compare-app-versions`
+- **Suggest:** `/package-app`
 
 ### Submission
 - **User mentions:** "submit", "pull request", "PR", "contribute", "publish"
-- **Suggest:** `/submit-app-pr`
+- **Suggest:** `/submit-app`
 
 ## catalog.json Rules
 
@@ -274,28 +262,28 @@ Suggest deprecation when:
 
 ### ❌ Wrong Directory Structure
 ```
-# WRONG - using app name instead of ISV name
-tax/avalara-tax/avalara-tax-v0.2.8.zip
-
-# RIGHT
+# WRONG - using ISV name instead of app name
 tax/avalara/avalara-tax-v0.2.8.zip
 
+# RIGHT - directory matches app id in manifest
+tax/avalara-tax/avalara-tax-v0.2.8.zip
+
 # WRONG - using different domain naming
-giftCards/salesforce-gift-cards/salesforce-gift-cards-v0.0.1.zip
+ratingsAndReviews/bazaarvoice-reviews/ratings-reviews-v1.0.0.zip
 
 # RIGHT - domain uses hyphen-case
-gift-cards/salesforce-gift-cards/salesforce-gift-cards-v0.0.1.zip
+ratings-and-reviews/bazaarvoice-reviews/ratings-reviews-v1.0.0.zip
 ```
 
 ### ❌ Committing Extracted Directories
 ```
 # WRONG - DO NOT COMMIT
-tax/avalara/commerce-avalara-tax-app-v0.2.8/
+tax/avalara-tax/commerce-avalara-tax-app-v0.2.8/
 
 # RIGHT - Only commit these
-tax/avalara/avalara-tax-v0.2.8.zip
-tax/avalara/manifest.json
-tax/avalara/catalog.json
+tax/avalara-tax/avalara-tax-v0.2.8.zip
+tax/avalara-tax/manifest.json
+tax/avalara-tax/catalog.json
 ```
 
 ### ❌ Hardcoded Credentials
@@ -370,14 +358,14 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 #### Feature Domains (show under "Additional Setup" in Checkout Hub)
 | Domain | Description | Example Apps |
 |--------|-------------|--------------|
-| `gift-cards` | Gift card purchasing, redemption, and balance | Salesforce Gift Cards |
-| `ratings-and-reviews` | Product ratings and reviews | |
-| `loyalty` | Loyalty programs and rewards | |
-| `search` | Search and merchandising | |
-| `address-verification` | Address validation and standardization | |
-| `analytics` | Analytics and reporting | |
+| `gift-cards` | Gift card purchasing, redemption, and balance | Salesforce Gift Cards, Adyen Gift Cards |
+| `ratings-and-reviews` | Product ratings and reviews | Bazaarvoice, Yotpo, PowerReviews |
+| `loyalty` | Loyalty programs and rewards | LoyaltyLion, Smile.io |
+| `search` | Search and merchandising | Algolia, Elasticsearch |
+| `address-verification` | Address validation and standardization | Smarty, Google Address Validation |
+| `analytics` | Analytics and reporting | Google Analytics, Segment |
 | `approaching-discounts` | Approaching discount notifications | Salesforce Approaching Discounts |
-| `fraud` | Fraud detection and prevention | |
+| `fraud` | Fraud detection and prevention | Signifyd, Forter, Riskified |
 
 ### Common App Patterns
 | Type | What It Does | Typical Components |
@@ -416,22 +404,21 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 
 **Full App Development:**
 ```
-/scaffold-commerce-app
+/scaffold-app
   → Build app code
   → /generate-service-impex
   → /generate-site-preferences-impex
   → /generate-custom-object-impex (if needed)
-  → /validate-impex
-  → /generate-commerce-app
-  → /validate-commerce-app
-  → /submit-app-pr
+  → /package-app
+  → /validate-app
+  → /submit-app
 ```
 
 **Quick Update:**
 ```
-/update-app-version
-  → /validate-commerce-app
-  → /submit-app-pr
+/package-app
+  → /validate-app
+  → /submit-app
 ```
 
 **Add Configuration:**
@@ -439,24 +426,7 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 /generate-site-preferences-impex
   → /validate-impex
   → (rebuild app)
-  → /generate-commerce-app
-```
-
-**Debugging:**
-```
-/extract-and-inspect
-  → (identify issues)
-  → (fix issues)
-  → /generate-commerce-app
-  → /validate-commerce-app
-```
-
-**Review Process:**
-```
-/extract-and-inspect
-  → /compare-app-versions
-  → (review changes)
-  → Approve or request changes
+  → /package-app
 ```
 
 ## Validation Checklist
@@ -464,7 +434,7 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 Before suggesting `/submit-app-pr`, verify:
 
 **File Structure:**
-- [ ] Files at `{domain}/{isv-name}/` (correct path)
+- [ ] Files at `{domain}/{app-name}/` (correct path, `{app-name}` matches manifest `id`)
 - [ ] Only ZIP, manifest.json, catalog.json present
 - [ ] No extracted directories committed
 
@@ -494,7 +464,7 @@ Before suggesting `/submit-app-pr`, verify:
 ## Helping Developers Effectively
 
 ### 1. Be Proactive
-- When user starts building an app, suggest `/scaffold-commerce-app`
+- When user starts building an app, suggest `/scaffold-app`
 - When they mention services, suggest `/generate-service-impex`
 - Always suggest validation before submission
 
@@ -515,28 +485,28 @@ Before suggesting `/submit-app-pr`, verify:
 
 ### 5. Use the Right Tools
 - Don't manually parse XML when `/validate-impex` exists
-- Don't manually compute hashes when `/generate-commerce-app` does it
+- Don't manually compute hashes when `/package-app` does it
 - Don't manually write boilerplate when skills generate it
 
 ## Common Questions & Answers
 
 **Q: "How do I start a new ratings app?"**
-A: Use `/scaffold-commerce-app` and provide: domain=`ratings-and-reviews`, ISV name, app details. It generates the complete structure.
+A: Use `/scaffold-app` and provide: domain=`ratings-and-reviews`, ISV name, app details. It generates the complete structure.
 
 **Q: "How do I add API integration?"**
 A: Use `/generate-service-impex` - it creates both install and uninstall service configs with proper authentication, rate limiting, and circuit breakers.
 
 **Q: "My ZIP is ready, what's next?"**
-A: Run `/validate-commerce-app` to check everything, then `/submit-app-pr` to create the PR with proper formatting.
+A: Run `/validate-app` to check everything, then `/submit-app` to create the PR with proper formatting.
 
 **Q: "What files should I commit?"**
 A: Only 3 files: `{app-name}-v{version}.zip`, `manifest.json`, `catalog.json` (new apps only). Never commit extracted directories.
 
 **Q: "How do I update to a new version?"**
-A: Use `/update-app-version` - it handles extracting, updating version numbers, regenerating ZIP, and computing new hash.
+A: Use `/package-app` - it handles extracting, updating version numbers, regenerating ZIP, and computing new hash.
 
 **Q: "The CI is failing with SHA256 mismatch"**
-A: The hash in manifest.json doesn't match the ZIP. Run `/generate-commerce-app` to regenerate with correct hash.
+A: The hash in manifest.json doesn't match the ZIP. Run `/package-app` to regenerate with correct hash.
 
 **Q: "Can I modify catalog.json?"**
 A: Depends on what you're doing:
@@ -546,14 +516,14 @@ A: Depends on what you're doing:
 - Anything else: NO - CI manages it
 
 **Q: "Where does my app go in the registry?"**
-A: `{domain}/{isv-name}/` where domain is one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, or `fraud`. The domain uses hyphen-case and is specified directly in the manifest.
+A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, or `fraud`. The domain uses hyphen-case and is specified directly in the manifest.
 
 ## Key Files to Reference
 
 - **CONTRIBUTING.md** - Full submission requirements and guidelines
 - **README.md** - Repository overview and quick start
 - **.gitignore** - Already configured to exclude extracted directories
-- **tax/avalara/** - Reference implementation to study
+- **tax/avalara-tax/** - Reference implementation to study
 - **.claude/skills/** - All skill definitions and documentation
 
 ## Success Metrics
@@ -568,7 +538,7 @@ A successful AI assistant interaction:
 ## Remember
 
 - **Skills exist for a reason** - Use them instead of manual processes
-- **Structure matters** - `{domain}/{isv-name}/` is not optional
+- **Structure matters** - `{domain}/{app-name}/` is not optional
 - **Validation is critical** - Always validate before submission
 - **Security first** - No hardcoded credentials, ever
 - **Guide, don't just answer** - Help users through complete workflows

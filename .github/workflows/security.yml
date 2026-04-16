@@ -1,0 +1,68 @@
+name: Security Review
+
+permissions:
+  pull-requests: write  # Needed for leaving PR comments
+  contents: read
+
+on:
+  pull_request:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Extract Commerce App Packages
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          > /tmp/cap-roots.txt
+
+          # Collect changed ZIPs (same approach as verify-zip.yml)
+          : > /tmp/changed_zips.txt
+          while IFS= read -r -d '' f; do
+            [[ "$f" == *.zip ]] && printf '%s\n' "$f" >> /tmp/changed_zips.txt
+          done < <(git diff --name-only -z "$BASE_SHA" "$HEAD_SHA")
+
+          if [[ ! -s /tmp/changed_zips.txt ]]; then
+            echo "No .zip files changed in this PR."
+            exit 0
+          fi
+
+          echo "Changed ZIPs:"
+          cat /tmp/changed_zips.txt
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            tmpdir="$(mktemp -d)"
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            # Find the single root directory inside the ZIP
+            mapfile -t roots < <(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v '^__MACOSX$' | sort -u)
+            if [[ ${#roots[@]} -ne 1 ]]; then
+              echo "::warning::Could not determine CAP root for $zip_path, skipping"
+              rm -rf "$tmpdir"
+              continue
+            fi
+            cap_root="$tmpdir/${roots[0]}"
+
+            echo "Extracted $zip_path → $cap_root"
+            echo "$cap_root" >> /tmp/cap-roots.txt
+          done < /tmp/changed_zips.txt
+
+          echo "CAP roots:"
+          cat /tmp/cap-roots.txt
+
+      - name: Static Security Scan
+        run: |
+          while IFS= read -r dir; do
+            bash .github/scripts/security-scan.sh "$dir"
+          done < /tmp/cap-roots.txt

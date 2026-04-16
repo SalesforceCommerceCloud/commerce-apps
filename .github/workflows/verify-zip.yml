@@ -162,6 +162,55 @@ jobs:
               rm -rf "$tmpdir"
               exit 1
             fi
+
+            # Validate tasksList.json is valid JSON
+            if ! jq empty "$required_task_list" 2>/dev/null; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json is not valid JSON"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Must be a non-empty JSON array
+            if ! jq -e 'type == "array" and length > 0' "$required_task_list" >/dev/null 2>&1; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json must be a non-empty JSON array"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Validate each task object:
+            #   Required: name (non-empty string), description (non-empty string), taskNumber (string, sequential from "1")
+            #   Optional: link (string, may be empty)
+            validation_errors=$(jq -r '
+              [to_entries[] |
+               .key as $idx |
+               .value as $task |
+               (
+                 if ($task | type) != "object" then
+                   "Item at index \($idx): must be an object"
+                 elif ($task.name | type) != "string" or ($task.name | length) == 0 then
+                   "Item at index \($idx): \"name\" is required and must be a non-empty string"
+                 elif ($task.description | type) != "string" or ($task.description | length) == 0 then
+                   "Item at index \($idx): \"description\" is required and must be a non-empty string"
+                 elif ($task.taskNumber | type) != "string" or ($task.taskNumber | length) == 0 then
+                   "Item at index \($idx): \"taskNumber\" is required and must be a non-empty string"
+                 elif $task.taskNumber != ($idx + 1 | tostring) then
+                   "Item at index \($idx): \"taskNumber\" must be \"\($idx + 1)\" (got \"\($task.taskNumber)\")"
+                 elif ($task | has("link")) and (($task.link | type) != "string") then
+                   "Item at index \($idx): \"link\" must be a string when present"
+                 else
+                   empty
+                 end
+               )] | join("\n")
+            ' "$required_task_list" 2>/dev/null)
+
+            if [[ -n "$validation_errors" ]]; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json structure validation failed:"
+              echo "$validation_errors"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            echo "  ✓ tasksList.json is valid ($(jq 'length' "$required_task_list") task(s))"
             rm -rf "$tmpdir"
           done < changed_zips.txt
 
@@ -379,3 +428,35 @@ jobs:
             rm -rf "$tmpdir"
             trap - RETURN
           done < changed_zips.txt
+
+      - name: Step 7 - Security & quality scan
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            tmpdir="$(mktemp -d)"
+            trap 'rm -rf "$tmpdir"' RETURN
+
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            # Find the single root directory
+            mapfile -t roots < <(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v '^__MACOSX$' | sort -u)
+            if [[ ${#roots[@]} -ne 1 ]]; then
+              echo "::error file=$zip_path::Cannot determine CAP root for security scan"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+            cap_root="$tmpdir/${roots[0]}"
+
+            echo "Running security & quality scan on $zip_path ..."
+            bash ".github/scripts/security-scan.sh" "$cap_root"
+
+            rm -rf "$tmpdir"
+            trap - RETURN
+          done < changed_zips.txt
+

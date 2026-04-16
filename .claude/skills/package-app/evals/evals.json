@@ -1,19 +1,65 @@
 {
+  "skill_name": "package-app",
   "evals": [
     {
-      "prompt": "I'm done making changes to the avalara-tax app. How do I create the ZIP?",
-      "context": "User has modified extracted app directory and needs to package it",
-      "expected_behavior": "Should trigger package-app skill, locate extracted directory, and generate ZIP with proper structure"
+      "id": 1,
+      "prompt": "hey so i just finished building this new payment app for stripe integration. it's in payment/stripe-payments/ and the extracted directory is commerce-stripe-payments-app-v1.0.0/. i added an icon called stripe.png in the icons folder. can you package this thing up? publisher is Stripe Inc and description should be 'Accept credit card payments with Stripe'. oh and make sure the manifest gets the icon name right this time lol",
+      "expected_output": "Creates ZIP at payment/stripe-payments/stripe-payments-v1.0.0.zip with correct structure, updates commerce-apps-manifest/manifest.json with iconName='stripe.png' matching the actual icon file, computes SHA256 hash, adds translations to all locale files (at minimum en-US.json), validates folder structure is payment/stripe-payments/, runs security scan before packaging, and cleans up extracted directory after",
+      "files": []
     },
     {
-      "prompt": "Can you build the app package for me? I think it's ready to submit.",
-      "context": "User ready to package but using casual language",
-      "expected_behavior": "Should recognize 'build app package' as packaging request and trigger package-app workflow"
+      "id": 2,
+      "prompt": "I need to repackage the avalara-tax app because I fixed a bug in the tax calculation hook. The directory is tax/avalara-tax/commerce-avalara-tax-app-v1.2.3/ and I changed the icon to avalara-logo.png (was avalara.png before). This is version 1.2.3 and it already exists in catalog.json. What should I do?",
+      "expected_output": "Detects that version 1.2.3 already exists in catalog.json and STOPS packaging. Tells user they must bump to a new version (e.g., 1.2.4 or 1.3.0) and suggests using /update-app-version skill. Does NOT proceed with packaging until user provides new version number. Explains version cannot be replaced once published.",
+      "files": []
     },
     {
-      "prompt": "Generate the ZIP file for my ratings-reviews app version 1.0.2",
-      "context": "User explicitly requesting ZIP generation",
-      "expected_behavior": "Should trigger package-app, find extracted directory, create ZIP with correct naming, compute SHA256"
+      "id": 3,
+      "prompt": "ok my loyalty app is ready to go. it's sitting in loyalty/acme-inc/rewards-plus/ as commerce-rewards-plus-app-v0.1.0/. the app id in manifest.json is 'rewards-plus'. can u make the zip?",
+      "expected_output": "Identifies folder structure violation - app is at loyalty/acme-inc/rewards-plus/ but should be at loyalty/rewards-plus/ to match app id. Explains installation URL pattern requirement (github.com/{owner}/{repo}/{tag}/{domain}/{appName}/{zip}) and that extra nesting breaks installation. Recommends moving to correct location before packaging. Does NOT proceed with packaging until structure is fixed.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Package my shipping app at shipping/fedex-shipping/commerce-fedex-shipping-app-v2.0.0/. It's a backend-only app with cartridges and impex but no storefront-next. Version 2.0.0, FedEx Corp publisher, icon is fedex-logo.svg. Also this version hasn't been published yet - catalog.json shows 'INIT' for the latest.",
+      "expected_output": "Detects backend-only architecture (has cartridges/ and impex/, no storefront-next/). Since catalog.json shows INIT and version not in versions array, asks user if they want to: (1) replace v2.0.0 with changes, or (2) bump to new version for tracking. Waits for user choice. After choice, runs security scan, generates ZIP, updates manifest with iconName='fedex-logo.svg', adds translations, validates backend-specific requirements (impex/, cartridges/, hooks.json), cleans up extracted directory.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "time to package the new UI-only ratings widget. It's at ratings-and-reviews/yotpo-ratings/ as commerce-yotpo-ratings-app-v1.0.0/. Has storefront-next but no backend cartridges. Yotpo LLC is the publisher, url is https://www.yotpo.com/developers/, description 'Customer ratings and reviews powered by Yotpo'. Icon file is yotpo.png. This is a brand new app that doesn't exist in the registry yet.",
+      "expected_output": "Detects UI-only architecture (has storefront-next/, no cartridges/ or impex/). Since this is brand new app, proceeds without version check. Runs security scan, creates ZIP, validates UI-specific requirements (target-config.json, index.ts, all three locales en-US/en-GB/it-IT), updates root manifest with all fields including iconName='yotpo.png', adds translations to all locale files, creates new catalog.json with INIT values, deletes old ZIPs first, cleans up extracted directory.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "package the tax app in tax/vertex-tax/commerce-vertex-tax-app-v0.5.8/ please. Security scan better not find any issues this time - I fixed all the eval() calls and hardcoded API keys from last time. Publisher is Vertex Inc, https://developer.vertexsmb.com/",
+      "expected_output": "Runs security scan before packaging. If scan passes (no blocking findings), creates ZIP and proceeds. If scan still finds blocking issues (unlikely based on prompt context), STOPS and reports findings with file paths and line numbers. If only warnings, continues but reports them. Updates manifest, validates structure, adds translations, computes SHA256, cleans up. Shows user the scan results explicitly.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "I have this fullstack gift card app at gift-cards/giftcards-com/commerce-giftcards-com-app-v1.1.0/ that needs packaging. It has both storefront-next UI components AND backend cartridges with impex. The icon is at icons/giftcards-logo.png and that should go in the manifest as iconName. Publisher is Giftcards.com Inc.",
+      "expected_output": "Detects fullstack architecture (has BOTH storefront-next/ AND cartridges/ with impex/). Runs security scan. Creates ZIP validating BOTH UI requirements (target-config.json, locales, TypeScript structure) AND backend requirements (cartridges/site_cartridges/, package.json with hooks field, impex/install/, impex/uninstall/). Updates manifest with iconName='giftcards-logo.png', adds translations, validates folder structure matches gift-cards/giftcards-com/ pattern... WAIT - should be gift-cards/{appName}/ not gift-cards/giftcards-com/. Catches folder structure issue.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Can you help me understand what happens during app packaging? I want to know the order of steps and what validations run before the ZIP is created.",
+      "expected_output": "This is an informational question about the packaging process, not a request to package a specific app. Should explain the packaging workflow: collect inputs, check version/catalog, verify directory structure, detect architecture, update commerce-app.json, run security scan (critical pre-check), delete old ZIPs, generate new ZIP, compute SHA256, update root manifest and translations, optionally create catalog.json for new apps, clean up extracted directory. Does NOT actually package anything.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "The analytics app at analytics/google-analytics/commerce-google-analytics-app-v3.2.1/ is ready. Before packaging though - can you check if version 3.2.1 already exists in the catalog? I don't remember if I published this one already or not. If it exists I'll need to bump it.",
+      "expected_output": "Checks catalog.json in analytics/google-analytics/ directory. Looks at the 'versions' array for version 3.2.1. If found, reports that version exists and recommends using /update-app-version to bump to 3.2.2 or 3.3.0. If not found, asks if user wants to proceed with packaging v3.2.1. Does NOT automatically package - waits for user confirmation on version strategy.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "i extracted and modified this ZIP from the registry: fraud/signifyd-fraud-v2.1.5.zip. made changes to the hook code. now it's sitting as commerce-signifyd-fraud-app-v2.1.5/ in fraud/signifyd-fraud/. package it back up with the same version number - these are just bug fixes for the existing release.",
+      "expected_output": "Checks catalog.json for version 2.1.5. If version exists in catalog, explains that published versions cannot be replaced and user MUST bump to 2.1.6 or 2.2.0. Recommends using /update-app-version skill. Does NOT proceed with packaging using existing version number. If version somehow doesn't exist in catalog but ZIP existed, still recommends bumping for proper tracking and explains why reusing version numbers is problematic.",
+      "files": []
     }
   ]
 }

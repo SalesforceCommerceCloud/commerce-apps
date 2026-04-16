@@ -14,6 +14,12 @@
 - [ ] Documentation update
 - [ ] Other (please describe):
 
+## Architecture
+
+- [ ] UI-only (storefront-next only)
+- [ ] Backend-only (cartridges/impex only)
+- [ ] Fullstack (both UI and backend)
+
 ## Changes Made
 
 <!-- Describe what this PR includes -->
@@ -23,7 +29,10 @@
 ### Required Files
 - [ ] ZIP file name follows format: `{appName}-v{version}.zip`
 - [ ] ZIP contains single root folder: `commerce-{appName}-app-v{version}/`
-- [ ] `manifest.json` includes all required fields (name, displayName, domain, description, version, zip, sha256)
+- [ ] Root `manifest.json` includes all required fields (id, name, description, iconName, domain, version, zip, sha256)
+- [ ] App icon exists in ZIP at `commerce-{appName}-app-v{version}/icons/` (CI extracts automatically)
+- [ ] Icon filename in ZIP matches `iconName` field in root manifest
+- [ ] Translations added to `commerce-apps-manifest/translations/en-US.json` (minimum requirement)
 - [ ] `catalog.json` included for new apps only (with INIT values)
 - [ ] If updating existing app: Did NOT add new versions to `catalog.json` (CI handles this)
 - [ ] If deprecating a version: Added `"deprecated": true` to existing version in `catalog.json`
@@ -37,27 +46,21 @@
 ### ZIP Content Validation
 - [ ] No junk files (`.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files)
 - [ ] No registry path prefixes in ZIP (no `tax/`, `domain/`, etc.)
-- [ ] All required files present (commerce-app.json, README.md, tasksList.json, services.xml)
+- [ ] Required files present: `commerce-app.json`, `README.md`, `app-configuration/tasksList.json`
 - [ ] All referenced scripts/files exist
 - [ ] No absolute paths in code
 - [ ] No hardcoded credentials
 
-### Icons (Optional but Recommended)
-- [ ] Icon included in `icons/` directory at CAP root (if applicable)
-- [ ] Icon named `{isv-name}.{ext}` (e.g., `avalara.png`)
-- [ ] Icon format is PNG, SVG, JPG, or JPEG
-- [ ] Icon validated (CI will check for icon changes and warn if different from existing)
-
 ### Directory Structure
-- [ ] App follows structure: `{domain}/{isv-name}/`
-- [ ] Only ZIP, manifest.json, and catalog.json are committed
+- [ ] App located at `{domain}/{appName}/` where `{appName}` matches the "id" field in manifest
+- [ ] Only ZIP, root manifest.json, translations, and catalog.json (new apps) are committed
 - [ ] No extracted directories (`commerce-*-app-v*/`) committed
 - [ ] No system files (`.DS_Store`, `Thumbs.db`) committed
 
 ### Validation (if using Claude Code)
-- [ ] Ran `/validate-commerce-app` skill
+- [ ] Ran `/validate-app` skill
 - [ ] Ran `/validate-impex` skill (if app contains impex files)
-- [ ] All validation checks passed
+- [ ] Architecture-specific validations passed
 
 ### Impex Files (if applicable)
 - [ ] Service install file has matching uninstall file
@@ -94,7 +97,7 @@
 
 **By submitting this PR, I confirm that:**
 - I have read and followed the [CONTRIBUTING.md](../CONTRIBUTING.md) guidelines
-- My app follows the required directory structure: `{domain}/{isv-name}/`
-- I am only committing ZIP, manifest.json, and catalog.json (no extracted directories)
+- My app follows the required directory structure: `{domain}/{appName}/` where `{appName}` matches the manifest "id" field
+- I am only committing ZIP, manifest.json, translations, and catalog.json (no extracted directories)
 - All hardcoded credentials are placeholders, not production values
 - I have signed the Contributor License Agreement (CLA) if I am an external contributor
