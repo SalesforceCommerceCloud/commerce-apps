@@ -64,7 +64,7 @@ Check that the app entry in `commerce-apps-manifest/manifest.json` contains all 
 6. Verify zip filename matches the actual file
 7. Verify SHA256 matches computed hash
 
-## Step 5: Validate ZIP contents
+## Step 5: Validate ZIP contents and detect architecture
 
 Extract and inspect the ZIP structure:
 
@@ -80,12 +80,38 @@ Extract and inspect the ZIP structure:
    - [ ] No duplicate directory trees
    - [ ] commerce-app.json exists at root
 
-3. Verify required files are present:
+3. **Detect app architecture** by checking directory structure:
+   
+   ```bash
+   # Check for storefront-next directory
+   HAS_UI=$(unzip -l <zip-file> | grep -c "storefront-next/" || echo 0)
+   
+   # Check for cartridges directory
+   HAS_BACKEND=$(unzip -l <zip-file> | grep -c "cartridges/" || echo 0)
+   ```
+   
+   Determine architecture:
+   - **UI-only**: Has `storefront-next/`, NO `cartridges/`
+   - **Backend-only**: Has `cartridges/`, NO `storefront-next/`
+   - **Fullstack**: Has both `storefront-next/` AND `cartridges/`
+
+4. Verify required files based on architecture:
+   
+   **All apps:**
    - [ ] `commerce-app.json`
    - [ ] `README.md`
    - [ ] `app-configuration/tasksList.json`
-   - [ ] `cartridges/` directory with at least one cartridge
-   - [ ] `impex/install/services.xml`
+   
+   **UI-only OR Fullstack:**
+   - [ ] `storefront-next/src/extensions/<appName>/target-config.json`
+   - [ ] `storefront-next/src/extensions/<appName>/index.ts`
+   - [ ] `storefront-next/src/extensions/<appName>/locales/` with at least en-US
+   
+   **Backend-only OR Fullstack:**
+   - [ ] `cartridges/site_cartridges/` with at least one cartridge
+   - [ ] At least one cartridge contains `package.json` with `"hooks"` field
+   - [ ] `impex/install/` directory
+   - [ ] `impex/uninstall/` directory (for cleanup)
 
 ## Step 6: Validate commerce-app.json
 
@@ -107,7 +133,55 @@ Extract and read `commerce-<appName>-app-v<version>/commerce-app.json`:
 3. Verify domain matches
 4. Check that publisher fields are valid URLs
 
-## Step 7: Validate impex files
+## Step 7: Validate storefront files (UI-only and Fullstack apps only)
+
+**Skip this step if Backend-only architecture.**
+
+Extract and validate Storefront Next extension files:
+
+### Extension Structure Validation
+
+**target-config.json:**
+- [ ] File exists at `storefront-next/src/extensions/<appName>/target-config.json`
+- [ ] Contains `components` array with valid targetIds
+- [ ] Each component has `targetId`, `path`, and `order` fields
+- [ ] Paths point to existing .tsx files (check ZIP contents)
+- [ ] If providers used, `contextProviders` array present
+
+**index.ts barrel file:**
+- [ ] File exists at `storefront-next/src/extensions/<appName>/index.ts`
+- [ ] Exports all public components, hooks, and providers
+
+### TypeScript Files Validation
+
+Check all .ts/.tsx files in `storefront-next/src/extensions/<appName>/`:
+
+- [ ] All files use TypeScript (.ts or .tsx, not .js)
+- [ ] All files start with Apache 2.0 copyright header
+- [ ] All component files include `'use client'` directive (after copyright, before imports)
+- [ ] Components use default export
+- [ ] Use `import type` for TypeScript types (not mixed imports)
+
+### Localization Validation
+
+**Required locales:**
+- [ ] `locales/en-US/translations.json` exists
+- [ ] `locales/en-GB/translations.json` exists
+- [ ] `locales/it-IT/translations.json` exists
+- [ ] All three locales have identical key structures
+- [ ] Translation keys use camelCase (no underscores)
+
+### Component Quality Checks
+
+- [ ] No hardcoded English strings (must use `useTranslation()`)
+- [ ] No hardcoded Tailwind color classes (use `@theme` variables)
+- [ ] No console.log statements
+- [ ] No array indices as React keys
+- [ ] Components don't import from `react` and `import type` separately (use inline `type`)
+
+## Step 8: Validate impex files (Backend-only and Fullstack apps only)
+
+**Skip this step if UI-only architecture.**
 
 Extract the ZIP and validate all impex XML files for correctness:
 
@@ -180,7 +254,7 @@ Check for these common issues:
 
 If any impex validation fails, report specific issues with file paths and lines.
 
-## Step 8: Check for catalog.json
+## Step 9: Check for catalog.json
 
 - If this is an **existing app** (catalog.json already exists):
   - [ ] Do NOT modify catalog.json - CI will update it
@@ -198,31 +272,49 @@ If any impex validation fails, report specific issues with file paths and lines.
     }
     ```
 
-## Step 9: Run final PR checklist
+## Step 10: Run final PR checklist
 
 From CONTRIBUTING.md:
 
-**Package Structure:**
+**Package Structure (All architectures):**
 - [ ] ZIP file name follows format: `<appName>-v<version>.zip`
 - [ ] ZIP contains no junk files (.DS_Store, __MACOSX, etc.)
 - [ ] No extracted directories are committed
 - [ ] All file paths are relative to app root (no absolute paths)
+- [ ] Architecture detected correctly (UI-only, Backend-only, or Fullstack)
 
-**Manifest Validation:**
+**Manifest Validation (All architectures):**
 - [ ] Root manifest (commerce-apps-manifest/manifest.json) is updated
 - [ ] Root manifest entry has all required fields
 - [ ] version, zip, and sha256 in root manifest are correct
 - [ ] SHA256 hash matches the actual ZIP file
 - [ ] commerce-app.json version matches root manifest version
 - [ ] catalog.json is included for new apps only (with INIT values)
+- [ ] app-configuration/tasksList.json exists with merchant post-installation tasks
 
-**Impex Validation:**
+**UI Validation (UI-only and Fullstack only):**
+- [ ] target-config.json with valid targetIds
+- [ ] All .ts/.tsx files have Apache 2.0 copyright headers
+- [ ] All components have 'use client' directive
+- [ ] All three required locales present (en-US, en-GB, it-IT)
+- [ ] No hardcoded strings (uses useTranslation)
+- [ ] No console.log statements
+- [ ] No hardcoded Tailwind colors
+
+**Impex Validation (Backend-only and Fullstack only):**
 - [ ] All XML files are well-formed (pass xmllint validation)
 - [ ] Services have valid configuration and no hardcoded credentials
 - [ ] Install/uninstall services match exactly
 - [ ] Site preferences use camelCase and app-name prefixes
 - [ ] SITEID placeholder used (not actual site ID)
 - [ ] No sensitive data in impex files
+- [ ] Both install/ and uninstall/ directories present
+
+**Backend Validation (Backend-only and Fullstack only):**
+- [ ] At least one cartridge with package.json containing "hooks" field
+- [ ] hooks.json uses explicit script paths
+- [ ] Hook implementations use require() not importPackage()
+- [ ] Hook implementations always return dw.system.Status
 
 ## Report validation results
 

@@ -66,48 +66,89 @@ Gather from the user (or infer from context):
    - Always confirm version with user before generating ZIP
    - Never silently change version without explicit user approval
 
-## Step 3: Verify directory structure
+## Step 3: Verify directory structure and detect architecture
 
-The extracted app directory must be named `commerce-<appName>-app-v<version>/` and contain:
+The extracted app directory must be named `commerce-<appName>-app-v<version>/`.
 
+**Detect architecture type:**
+```bash
+cd <domain>/<isv-name>/
+
+# Check for storefront-next
+HAS_UI=$(find commerce-<appName>-app-v<version>/ -type d -name "storefront-next" | wc -l)
+
+# Check for cartridges
+HAS_BACKEND=$(find commerce-<appName>-app-v<version>/ -type d -name "cartridges" | wc -l)
+
+# Determine architecture
+if [ $HAS_UI -gt 0 ] && [ $HAS_BACKEND -eq 0 ]; then
+    echo "UI-only"
+elif [ $HAS_BACKEND -gt 0 ] && [ $HAS_UI -eq 0 ]; then
+    echo "Backend-only"
+elif [ $HAS_UI -gt 0 ] && [ $HAS_BACKEND -gt 0 ]; then
+    echo "Fullstack"
+fi
+```
+
+**Expected structure by architecture:**
+
+### All Architectures (Required)
 ```
 commerce-<appName>-app-v<version>/
-├── commerce-app.json                          # App identity & metadata
-├── README.md                                  # Documentation
+├── commerce-app.json              # App identity & metadata
+├── README.md                      # Documentation
 ├── app-configuration/
-│   └── tasksList.json                         # Post-install checklist
-├── cartridges/
-│   ├── site_cartridges/<cartridge_name>/
-│   │   ├── package.json                       # Hooks path, test scripts, devDeps
-│   │   ├── cartridge/scripts/
-│   │   │   ├── hooks.json                     # Hook name → script mappings
-│   │   │   ├── hooks/                         # calculate.js, commit.js, cancel.js
-│   │   │   ├── helpers/                       # Business logic
-│   │   │   └── services/                      # Service framework wrapper
-│   │   └── test/                              # Unit tests (mocks/ + unit/)
-│   └── bm_cartridges/<bm_cartridge_name>/     # BM extensions (can be empty)
-├── storefront-next/src/extensions/<app-name>/
-│   ├── target-config.json                     # Extension target mappings
-│   ├── components/                            # React components
-│   ├── context/                               # React context providers
-│   ├── hooks/                                 # Custom React hooks
-│   ├── locales/                               # i18n translation files
-│   ├── middlewares/                            # Middleware functions
-│   ├── providers/                             # Data/service providers
-│   ├── routes/                                # Route definitions
-│   ├── stores/                                # State management stores
-│   └── tests/                                 # Extension tests
-├── impex/
-│   ├── install/
-│   │   ├── services.xml                       # Service credential, profile, definition
-│   │   ├── meta/system-objecttype-extensions.xml  # Site preference definitions
-│   │   └── sites/SITEID/preferences.xml       # Default preference values
-│   └── uninstall/
-│       └── services.xml                       # Service deletion (mode="delete")
-└── icons/                                     # App icon (optional)
+│   └── tasksList.json             # Merchant post-install checklist
+└── icons/                         # App icon (recommended)
 ```
 
-Validate that every file referenced by the code actually exists and vice versa.
+### UI-only Architecture
+```
+commerce-<appName>-app-v<version>/
+├── (all base files above)
+└── storefront-next/src/extensions/<app-name>/
+    ├── target-config.json         # Extension target mappings
+    ├── index.ts                   # Barrel exports
+    ├── components/                # React components (.tsx)
+    ├── hooks/                     # Custom React hooks
+    ├── providers/                 # Context providers
+    ├── locales/                   # i18n (en-US, en-GB, it-IT)
+    └── tests/                     # Component tests
+```
+
+### Backend-only Architecture
+```
+commerce-<appName>-app-v<version>/
+├── (all base files above)
+├── cartridges/
+│   ├── site_cartridges/<cartridge_name>/
+│   │   ├── package.json           # Hooks path, test scripts
+│   │   ├── cartridge/scripts/
+│   │   │   ├── hooks.json         # Hook → script mappings
+│   │   │   ├── hooks/             # Hook implementations
+│   │   │   ├── helpers/           # Business logic
+│   │   │   └── services/          # Service wrappers
+│   │   └── test/                  # Unit tests
+│   └── bm_cartridges/<bm_name>/   # BM extensions (optional)
+└── impex/
+    ├── install/
+    │   ├── services.xml           # Service definitions
+    │   ├── meta/system-objecttype-extensions.xml  # Site prefs
+    │   └── sites/SITEID/preferences.xml
+    └── uninstall/
+        └── services.xml           # Service cleanup
+```
+
+### Fullstack Architecture
+```
+commerce-<appName>-app-v<version>/
+├── (all base files above)
+├── storefront-next/               # UI files (as in UI-only)
+├── cartridges/                    # Backend files (as in Backend-only)
+└── impex/                         # Backend config (as in Backend-only)
+```
+
+Validate that every file referenced by the code actually exists and architecture-specific directories are correct.
 
 ## Step 4: Update commerce-app.json
 
@@ -159,6 +200,10 @@ Verify the ZIP:
    - No `tax/` or other registry path prefixes leaking in
    - No `.DS_Store`, `__MACOSX`, or hidden files
    - No duplicate directory trees
+   - Architecture-specific directories present:
+     - UI-only: Has `storefront-next/`, NO `cartridges/` or `impex/`
+     - Backend-only: Has `cartridges/` and `impex/`, NO `storefront-next/`
+     - Fullstack: Has `storefront-next/`, `cartridges/`, AND `impex/`
 
 ## Step 7: Compute SHA256 hash
 
@@ -213,13 +258,27 @@ Valid domains: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`
 
 ## Step 10: Final validation checklist
 
+**All architectures:**
 - [ ] ZIP name matches `<appName>-v<version>.zip`
 - [ ] ZIP contains a single root folder `commerce-<appName>-app-v<version>/`
 - [ ] No junk files (`.DS_Store`, `__MACOSX`, hidden files)
 - [ ] `commerce-app.json` version matches the ZIP version
+- [ ] `app-configuration/tasksList.json` exists with merchant post-installation tasks
 - [ ] `commerce-apps-manifest/manifest.json` is updated with correct version and hash
 - [ ] `sha256` in root manifest matches the actual ZIP hash
 - [ ] `catalog.json` included only for brand new apps
+- [ ] Architecture detected correctly (UI-only, Backend-only, or Fullstack)
+
+**UI-only or Fullstack:**
+- [ ] `storefront-next/src/extensions/<app-name>/target-config.json` exists
+- [ ] `storefront-next/src/extensions/<app-name>/index.ts` exists
+- [ ] All three locale directories present: `locales/en-US/`, `locales/en-GB/`, `locales/it-IT/`
+
+**Backend-only or Fullstack:**
+- [ ] `cartridges/site_cartridges/<cartridge>/` exists with at least one cartridge
+- [ ] `cartridges/site_cartridges/<cartridge>/package.json` includes `"hooks"` field
+- [ ] `impex/install/` directory exists
+- [ ] `impex/uninstall/` directory exists for cleanup
 
 ## Step 11: Clean up extracted directory
 
