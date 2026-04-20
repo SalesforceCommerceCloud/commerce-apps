@@ -180,26 +180,82 @@ Skills follow the open [Agent Skills](https://agentskills.io/home) standard and 
 
 ### Quick Start
 
-Install via your IDE's plugin marketplace:
+Install via your IDE's plugin marketplace or manually copy skills into your IDE's skills directory.
+
+#### Claude Code
 
 ```bash
-# Claude Code
 claude plugin marketplace add SalesforceCommerceCloud/commerce-apps
 claude plugin install cap-dev --scope project
 ```
 
-```text
-# Copilot (VS Code)
-In VS Code, open the Command Palette (Cmd/Ctrl+Shift+P) and run:
-  Chat: Install Plugin from Source
-Then enter:
-  SalesforceCommerceCloud/commerce-apps
+Use `--scope user` instead to install globally across all projects.
+
+#### GitHub Copilot (VS Code)
+
+In VS Code, open the Command Palette (`Cmd/Ctrl+Shift+P`) and run:
+
+```
+Chat: Install Plugin from Source
 ```
 
+Then enter: `SalesforceCommerceCloud/commerce-apps`
+
+#### GitHub Copilot CLI
+
 ```bash
-# Copilot CLI
 copilot plugin marketplace add SalesforceCommerceCloud/commerce-apps
 copilot plugin install cap-dev@commerce-apps
+```
+
+#### Cursor
+
+Copy skills into your project or user directory:
+
+```bash
+cp -r .claude/skills/ .cursor/skills/
+```
+
+Or for global installation:
+
+```bash
+cp -r .claude/skills/ ~/.cursor/skills/
+```
+
+#### Windsurf
+
+```bash
+cp -r .claude/skills/ .windsurf/skills/
+```
+
+Or for global installation:
+
+```bash
+cp -r .claude/skills/ ~/.codeium/windsurf/skills/
+```
+
+#### Codex
+
+```bash
+cp -r .claude/skills/ .codex/skills/
+```
+
+Or for global installation:
+
+```bash
+cp -r .claude/skills/ ~/.config/codex/skills/
+```
+
+#### OpenCode
+
+```bash
+cp -r .claude/skills/ .opencode/skills/
+```
+
+Or for global installation:
+
+```bash
+cp -r .claude/skills/ ~/.config/opencode/skills/
 ```
 
 ### Available Skills
@@ -235,19 +291,6 @@ Or ask your agent naturally:
 "Generate service impex for a REST API integration"
 ```
 
-### Manual Installation
-
-For IDEs without marketplace support, copy the skills directory:
-
-| IDE | Project Path | User Path |
-|-----|--------------|-----------|
-| Cursor | `.cursor/skills/` | `~/.cursor/skills/` |
-| Windsurf | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
-| VS Code / Copilot | `.github/skills/` | `~/.copilot/skills/` |
-| Codex | `.codex/skills/` | `~/.config/codex/skills/` |
-| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` |
-
-Copy the skills from this repository's `.claude/skills/` directory into the appropriate path for your IDE.
 
 ## Contributing
 
