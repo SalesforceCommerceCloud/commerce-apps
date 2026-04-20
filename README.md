@@ -208,55 +208,18 @@ copilot plugin marketplace add SalesforceCommerceCloud/commerce-apps
 copilot plugin install cap-dev@commerce-apps
 ```
 
-#### Cursor
+#### Manual Installation
 
-Copy skills into your project or user directory:
+For IDEs without marketplace support, copy the skills directory:
 
-```bash
-cp -r .claude/skills/ .cursor/skills/
-```
+| IDE | Project Path | User Path |
+|-----|--------------|-----------|
+| Cursor | `.cursor/skills/` | `~/.cursor/skills/` |
+| Windsurf | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
+| Codex | `.codex/skills/` | `~/.config/codex/skills/` |
+| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` |
 
-Or for global installation:
-
-```bash
-cp -r .claude/skills/ ~/.cursor/skills/
-```
-
-#### Windsurf
-
-```bash
-cp -r .claude/skills/ .windsurf/skills/
-```
-
-Or for global installation:
-
-```bash
-cp -r .claude/skills/ ~/.codeium/windsurf/skills/
-```
-
-#### Codex
-
-```bash
-cp -r .claude/skills/ .codex/skills/
-```
-
-Or for global installation:
-
-```bash
-cp -r .claude/skills/ ~/.config/codex/skills/
-```
-
-#### OpenCode
-
-```bash
-cp -r .claude/skills/ .opencode/skills/
-```
-
-Or for global installation:
-
-```bash
-cp -r .claude/skills/ ~/.config/opencode/skills/
-```
+Copy the skills from this repository's `.claude/skills/` directory into the appropriate path for your IDE.
 
 ### Available Skills
 
