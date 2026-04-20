@@ -1,0 +1,22 @@
+{
+  "name": "commerce-apps",
+  "description": "Commerce Apps development skills for building, validating, and submitting Salesforce Commerce Cloud app packages.",
+  "version": "0.0.1",
+  "owner": {
+    "name": "Salesforce Agentforce Commerce",
+    "email": "clavery@salesforce.com"
+  },
+  "plugins": [
+    {
+      "name": "cap-dev",
+      "description": "Skills for scaffolding, packaging, validating, and submitting Commerce App Packages (CAPs) for Salesforce Commerce Cloud.",
+      "author": {
+        "name": "Salesforce"
+      },
+      "license": "Apache-2.0",
+      "source": "./.claude",
+      "category": "productivity",
+      "strict": false
+    }
+  ]
+}
