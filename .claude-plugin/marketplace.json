@@ -3,8 +3,7 @@
   "description": "Commerce Apps development skills for building, validating, and submitting Salesforce Commerce Cloud app packages.",
   "version": "0.0.1",
   "owner": {
-    "name": "Salesforce Agentforce Commerce",
-    "email": "clavery@salesforce.com"
+    "name": "Salesforce"
   },
   "plugins": [
     {
