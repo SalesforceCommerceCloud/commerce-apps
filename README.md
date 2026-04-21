@@ -30,35 +30,9 @@ Merchants install Commerce Apps through Business Manager with a click-to-install
 
 ## Quick Start
 
-### Using Claude Code Skills
+### Using Agent Skills
 
-If you're using Claude Code, we provide comprehensive skills to streamline development:
-
-**Start a new app:**
-```
-/scaffold-app
-```
-
-**Generate impex files:**
-```
-/generate-service-impex
-/generate-site-preferences-impex
-/generate-custom-object-impex
-```
-
-**Package and validate:**
-```
-/package-app
-/validate-app
-/validate-impex
-```
-
-**Submit to registry:**
-```
-/submit-app
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for complete skill documentation.
+If you're using Claude Code, Cursor, Copilot, or another IDE with plugin support, install the `cap-dev` plugin for skills that streamline the full development workflow — see [Agent Skills](#agent-skills) below.
 
 ### Manual Development
 
@@ -198,13 +172,96 @@ Commerce App frontend extensions target the Storefront Next stack:
 
 Backend adapters use the Commerce Cloud Script API (CommonJS, `require('dw/...')` modules).
 
+## Agent Skills
+
+Turn your coding agent into a Commerce Apps specialist. Skills give Claude Code, Cursor, GitHub Copilot, and Codex deep expertise in scaffolding, packaging, validating, and submitting Commerce App Packages.
+
+Skills follow the open [Agent Skills](https://agentskills.io/home) standard and work with [Claude Code](https://claude.ai/code), Cursor, GitHub Copilot, VS Code, Codex, and others.
+
+### Quick Start
+
+Install via your IDE's plugin marketplace or manually copy skills into your IDE's skills directory.
+
+#### Claude Code
+
+```bash
+claude plugin marketplace add SalesforceCommerceCloud/commerce-apps
+claude plugin install cap-dev --scope project
+```
+
+Use `--scope user` instead to install globally across all projects.
+
+#### GitHub Copilot (VS Code)
+
+In VS Code, open the Command Palette (`Cmd/Ctrl+Shift+P`) and run:
+
+```
+Chat: Install Plugin from Source
+```
+
+Then enter: `SalesforceCommerceCloud/commerce-apps`
+
+#### GitHub Copilot CLI
+
+```bash
+copilot plugin marketplace add SalesforceCommerceCloud/commerce-apps
+copilot plugin install cap-dev@commerce-apps
+```
+
+#### Manual Installation
+
+For IDEs without marketplace support, copy the skills directory:
+
+| IDE | Project Path | User Path |
+|-----|--------------|-----------|
+| Cursor | `.cursor/skills/` | `~/.cursor/skills/` |
+| Windsurf | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
+| Codex | `.codex/skills/` | `~/.config/codex/skills/` |
+| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` |
+
+Copy the skills from this repository's `.claude/skills/` directory into the appropriate path for your IDE.
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `scaffold-app` | Generate complete app structure (UI-only, Backend-only, or Fullstack) |
+| `package-app` | Package app into registry-ready ZIP (handles new apps and version bumps) |
+| `generate-service-impex` | Generate service credentials, profiles, and definitions |
+| `generate-site-preferences-impex` | Generate custom site preference configurations |
+| `generate-custom-object-impex` | Generate custom object type definitions |
+| `validate-impex` | Validate impex XML syntax, structure, and common errors |
+| `validate-app` | Comprehensive pre-submission validation (structure, manifest, SHA256, impex) |
+| `submit-app` | Guided PR submission with automated GitHub CLI integration |
+
+### Usage
+
+Once installed, skills are available as slash commands in your IDE:
+
+```
+/scaffold-app        → Start a new Commerce App
+/package-app         → Package for submission
+/validate-app        → Run full validation suite
+/submit-app          → Submit PR to registry
+```
+
+Or ask your agent naturally:
+
+```
+"Create a new tax app called my-tax"
+"Package the my-tax app for submission"
+"Validate my app before I submit"
+"Generate service impex for a REST API integration"
+```
+
+
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for complete submission requirements and Claude Code skills documentation.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete submission requirements.
 
 ### Publishing Workflow
 
-**Using Claude Code (Recommended):**
+**Using Agent Skills (Recommended):**
 
 1. **Scaffold new app:** `/scaffold-app`
 2. **Build your app code** (cartridges, extensions, etc.)
@@ -250,26 +307,6 @@ Only commit these files to the repository:
 - IDE files (`.vscode/`, `.idea/`)
 
 The repository `.gitignore` is configured to exclude extracted directories and system files.
-
-### Claude Code Skills
-
-This repository includes comprehensive skills for Commerce App development:
-
-**App Development:**
-- `/scaffold-app` - Generate complete app structure (UI-only, Backend-only, or Fullstack)
-- `/package-app` - Package app into registry-ready ZIP (handles both new apps and version bumps)
-
-**Impex Generation:**
-- `/generate-service-impex` - Service credentials, profiles, definitions
-- `/generate-site-preferences-impex` - Custom site preferences
-- `/generate-custom-object-impex` - Custom object types
-- `/validate-impex` - Validate all impex files
-
-**Validation:**
-- `/validate-app` - Comprehensive architecture-aware validation (structure, manifest, impex, icons, translations)
-
-**Submission:**
-- `/submit-app` - Guide through PR submission process with automated GitHub CLI integration
 
 ### External Contributors
 
