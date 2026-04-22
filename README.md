@@ -224,8 +224,8 @@ Then in Codex, run `/plugins`, select the "Commerce Apps" marketplace, and insta
 The [B2C CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/) can install skills to any supported IDE:
 
 ```bash
-# Interactive — choose IDE and skills
-npx @salesforce/b2c-cli setup skills cap-dev
+# Interactive — choose skillset, IDE, and skills
+npx @salesforce/b2c-cli setup skills
 
 # Non-interactive — install to a specific IDE
 npx @salesforce/b2c-cli setup skills cap-dev --ide cursor
