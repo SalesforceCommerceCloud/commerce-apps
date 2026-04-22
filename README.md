@@ -232,9 +232,6 @@ npx @salesforce/b2c-cli setup skills cap-dev --ide cursor
 
 # Install globally (user scope)
 npx @salesforce/b2c-cli setup skills cap-dev --ide cursor --global
-
-# Install specific skills only
-npx @salesforce/b2c-cli setup skills cap-dev --skill validate-app --skill package-app --ide cursor
 ```
 
 #### Manual Installation
