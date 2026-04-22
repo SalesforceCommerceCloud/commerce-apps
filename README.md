@@ -178,6 +178,9 @@ Turn your coding agent into a Commerce Apps specialist. Skills give Claude Code,
 
 Skills follow the open [Agent Skills](https://agentskills.io/home) standard and work with [Claude Code](https://claude.ai/code), Cursor, GitHub Copilot, VS Code, Codex, and others.
 
+> [!TIP]
+> For B2C Commerce development and operations skills, also install the **B2C Developer Tooling** plugins. See the [B2C DX documentation](https://salesforcecommercecloud.github.io/b2c-developer-tooling/) for installation instructions.
+
 ### Quick Start
 
 Install via your IDE's plugin marketplace or manually copy skills into your IDE's skills directory.
