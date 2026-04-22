@@ -178,6 +178,9 @@ Turn your coding agent into a Commerce Apps specialist. Skills give Claude Code,
 
 Skills follow the open [Agent Skills](https://agentskills.io/home) standard and work with [Claude Code](https://claude.ai/code), Cursor, GitHub Copilot, VS Code, Codex, and others.
 
+> [!TIP]
+> For B2C Commerce development and operations skills, also install the **B2C Developer Tooling** plugins. See the [B2C DX documentation](https://salesforcecommercecloud.github.io/b2c-developer-tooling/) for installation instructions.
+
 ### Quick Start
 
 Install via your IDE's plugin marketplace or manually copy skills into your IDE's skills directory.
@@ -206,6 +209,29 @@ Then enter: `SalesforceCommerceCloud/commerce-apps`
 ```bash
 copilot plugin marketplace add SalesforceCommerceCloud/commerce-apps
 copilot plugin install cap-dev@commerce-apps
+```
+
+#### Codex
+
+```bash
+codex plugin marketplace add SalesforceCommerceCloud/commerce-apps
+```
+
+Then in Codex, run `/plugins`, select the "Commerce Apps" marketplace, and install the `cap-dev` plugin.
+
+#### B2C CLI
+
+The [B2C CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/) can install skills to any supported IDE:
+
+```bash
+# Interactive — choose skillset, IDE, and skills
+npx @salesforce/b2c-cli setup skills
+
+# Non-interactive — install to a specific IDE
+npx @salesforce/b2c-cli setup skills cap-dev --ide cursor
+
+# Install globally (user scope)
+npx @salesforce/b2c-cli setup skills cap-dev --ide cursor --global
 ```
 
 #### Manual Installation

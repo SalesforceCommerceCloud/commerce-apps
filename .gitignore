@@ -61,11 +61,13 @@ $RECYCLE.BIN/
 # Keep the .gitignore file itself!
 !.gitignore
 
-# Keep Claude Code, Cursor, and plugin marketplace directories
+# Keep Claude Code, Cursor, Codex, and plugin marketplace directories
 !.claude/
 !.claude/**
 !.claude-plugin/
 !.claude-plugin/**
+!.agents/
+!.agents/**
 !.cursor/
 !.cursor/**
 

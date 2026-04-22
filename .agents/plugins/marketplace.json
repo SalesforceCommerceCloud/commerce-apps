@@ -1,0 +1,20 @@
+{
+  "name": "commerce-apps",
+  "interface": {
+    "displayName": "Commerce App Development"
+  },
+  "plugins": [
+    {
+      "name": "cap-dev",
+      "source": {
+        "source": "local",
+        "path": "./.claude"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
