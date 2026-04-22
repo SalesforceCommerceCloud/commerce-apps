@@ -1,0 +1,37 @@
+{
+  "name": "cap-dev",
+  "version": "0.0.1",
+  "description": "Skills for scaffolding, packaging, validating, and submitting Commerce App Packages (CAPs) for Salesforce Commerce Cloud.",
+  "author": {
+    "name": "Salesforce"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/commerce-apps",
+  "repository": "https://github.com/SalesforceCommerceCloud/commerce-apps",
+  "license": "Apache-2.0",
+  "keywords": [
+    "salesforce",
+    "commerce-cloud",
+    "commerce-apps",
+    "cap",
+    "storefront-next"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Commerce App Development",
+    "shortDescription": "Build, validate, and submit Commerce App Packages for Salesforce Commerce Cloud.",
+    "longDescription": "Skills for the full Commerce App Package (CAP) development lifecycle — scaffold new apps, generate impex configurations, package into registry-ready ZIPs, validate structure and manifests, and submit pull requests.",
+    "developerName": "Salesforce",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "brandColor": "#0D9DDA",
+    "websiteURL": "https://github.com/SalesforceCommerceCloud/commerce-apps",
+    "defaultPrompt": [
+      "Scaffold a new tax app",
+      "Generate service impex for a REST API integration",
+      "Package my app for submission",
+      "Validate my app before submitting"
+    ]
+  }
+}
