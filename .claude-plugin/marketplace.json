@@ -1,7 +1,7 @@
 {
   "name": "commerce-apps",
   "description": "Commerce Apps development skills for building, validating, and submitting Salesforce Commerce Cloud app packages.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "owner": {
     "name": "Salesforce"
   },

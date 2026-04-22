@@ -1,6 +1,6 @@
 {
   "name": "cap-dev",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Skills for scaffolding, packaging, validating, and submitting Commerce App Packages (CAPs) for Salesforce Commerce Cloud.",
   "author": {
     "name": "Salesforce"
