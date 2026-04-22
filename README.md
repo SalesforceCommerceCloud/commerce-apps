@@ -208,6 +208,14 @@ copilot plugin marketplace add SalesforceCommerceCloud/commerce-apps
 copilot plugin install cap-dev@commerce-apps
 ```
 
+#### Codex
+
+```bash
+codex plugin marketplace add SalesforceCommerceCloud/commerce-apps
+```
+
+Then in Codex, run `/plugins`, select the "Commerce Apps" marketplace, and install the `cap-dev` plugin.
+
 #### Manual Installation
 
 For IDEs without marketplace support, copy the skills directory:
