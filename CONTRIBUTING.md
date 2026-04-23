@@ -1,6 +1,6 @@
 # Contributing to Commerce App Registry
 
-Please follow the guidelines below when submitting new or updated commerce app versions to ensure consistency and smooth reviews.
+For full documentation on designing, building, testing, and submitting Commerce apps, see the [developer guide](https://dpkoal18ck1fm.cloudfront.net/docs/commerce/b2c-commerce/guide/index.html).
 
 ---
 
