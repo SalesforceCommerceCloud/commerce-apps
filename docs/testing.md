@@ -1,6 +1,6 @@
 # Testing Commerce Apps
 
-This guide explains how to test your Commerce App locally before submitting to the registry.
+This guide explains how to test your Commerce App locally before submitting to the registry. For full documentation on designing, building, testing, and submitting Commerce apps, see the [developer guide](https://dpkoal18ck1fm.cloudfront.net/docs/commerce/b2c-commerce/guide/index.html).
 
 ---
 
