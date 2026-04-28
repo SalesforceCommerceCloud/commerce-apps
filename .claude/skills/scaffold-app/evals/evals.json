@@ -151,7 +151,7 @@
       "id": 3,
       "eval_name": "fullstack-loyalty-program",
       "prompt": "We need a complete loyalty rewards program - PointsPlus from LoyaltyMax. Full stack: backend for calculating points during checkout and calling their API, plus frontend components to show point balance in the header (right before the cart icon) and redemption options on the cart page. App: pointsplus-loyalty, v1.0.0, cartridge: int_loyaltymax_points, service: loyaltymax.points.api, loyalty domain. Publisher: LoyaltyMax at https://loyaltymax.com.",
-      "expected_output": "Should create fullstack structure with both storefront-next (with target-config.json using targetId) AND cartridges/impex. UI should use TypeScript, i18n, proper tests, and useConfig() with PUBLIC__ prefix. Target config should target 'header.before.cart' slot.",
+      "expected_output": "Should create fullstack structure with both storefront-next (with target-config.json using targetId) AND cartridges/impex. UI should use TypeScript, i18n, proper tests, and useConfig() with PUBLIC__ prefix. Target config should target 'sfcc.header.before.cart' slot.",
       "files": [],
       "assertions": [
         {
@@ -715,7 +715,7 @@
       "id": 16,
       "eval_name": "multi-locale-and-eslint-compliance",
       "prompt": "Build a UI-only wishlist feature - HeartList from WishCo, v1.0.0. Display a heart icon on product cards that users can click to save items. I need it to work in English (US and UK) and Italian since we're expanding to Europe. Make sure the code follows all the quality standards and best practices. Publisher: WishCo at https://wishco.io. Show the wishlist icon in the header before the cart icon.",
-      "expected_output": "Should create UI-only app with all three locales (en-US, en-GB, it-IT) and follow ESLint rules (single quotes, import type, no hardcoded colors, no console statements). Target config should use header.before.cart slot.",
+      "expected_output": "Should create UI-only app with all three locales (en-US, en-GB, it-IT) and follow ESLint rules (single quotes, import type, no hardcoded colors, no console statements). Target config should use sfcc.header.before.cart slot.",
       "files": [],
       "assertions": [
         {
@@ -803,8 +803,8 @@
           "description": "JSX closing > on same line as last prop (Prettier: bracketSameLine: true)"
         },
         {
-          "name": "target-config.json uses header.before.cart",
-          "description": "Uses correct targetId from Complete Target ID Reference"
+          "name": "target-config.json uses sfcc.header.before.cart",
+          "description": "Uses correct targetId with sfcc. prefix from Complete Target ID Reference"
         }
       ]
     }

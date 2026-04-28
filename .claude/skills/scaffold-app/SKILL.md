@@ -57,11 +57,11 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 **Folder Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. Installation URL: `https://raw.githubusercontent.com/{owner}/{repo}/{tag}/{domain}/{appName}/{zipFileName}`
 
 **UI-only and Fullstack also need:**
-- **Target IDs:** Commerce apps typically span multiple UI targets (e.g., checkout flow + order summary + header). Ask which targets the app needs rather than assuming single-component usage. Common patterns:
-  - Tax/shipping: `checkout.shippingOptions`, `checkout.orderSummary`, `orderSummary.tax.after`
-  - Payment: `checkout.payment`, `checkout.payment.paymentMethods`, `checkout.placeOrder.before`
-  - Loyalty: `header.before.cart`, `checkout.orderSummary`, `orderSummary.adjustments.after`
-  - Reviews: `pdp.after.addToCart`, header/footer links
+- **Target IDs:** All target IDs use the `sfcc.` prefix. Commerce apps typically span multiple UI targets (e.g., checkout flow + order summary + header). Ask which targets the app needs rather than assuming single-component usage. Common patterns:
+  - Tax/shipping: `sfcc.checkout.shippingOptions`, `sfcc.checkout.orderSummary`, `sfcc.orderSummary.tax`
+  - Payment: `sfcc.checkout.payment`, `sfcc.checkout.payment.paymentMethods`, `sfcc.checkout.placeOrder.before`
+  - Loyalty: `sfcc.header.before.cart`, `sfcc.checkout.orderSummary`, `sfcc.orderSummary.adjustments`
+  - Reviews: `sfcc.pdp.reviews.summary`, `sfcc.pdp.reviews.list`, `sfcc.pdp.reviews.form`, `sfcc.productCard.reviews.rating`
 
 **Backend-only and Fullstack also need:**
 - Cartridge name (convention: `int_<vendor>_<appname>`, max 50 characters)

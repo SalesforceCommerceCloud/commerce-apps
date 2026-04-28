@@ -12,7 +12,7 @@ Complete templates for the extension system. All files must use TypeScript (.ts/
 {
     "components": [
         {
-            "targetId": "header.before.cart",
+            "targetId": "sfcc.header.before.cart",
             "path": "extensions/{{appName}}/components/{{ComponentName}}.tsx",
             "order": 0
         }
@@ -27,16 +27,17 @@ Complete templates for the extension system. All files must use TypeScript (.ts/
 ```
 
 **Key fields:**
-- `targetId`: UI target slot where component should be inserted (see "Finding Valid Target IDs" below)
+- `targetId`: UI target slot where component should be inserted — must include the `sfcc.` prefix (see "Complete Target ID Reference" below)
 - `path`: Relative path from `src/` to the component file
 - `order`: Insertion order when multiple components target the same slot (lower = earlier)
 - `contextProviders`: Application-root level providers (injected after ComposeProviders)
+- `devOnly`: (optional) Set to `true` to exclude extension from production builds
 
 **⚠️ IMPORTANT:** Use `target-config.json` (not `plugin-config.json`) and `targetId` (not `pluginId`)
 
 ## Finding Valid Target IDs
 
-To find valid target slots in the codebase:
+All target IDs use the `sfcc.` prefix. To find valid target slots in the codebase:
 
 ```bash
 # Search for UITarget component usage
@@ -44,17 +45,9 @@ grep -r "UITarget" src/ --include="*.tsx" --include="*.ts"
 
 # Look for existing target-config.json files
 find . -name "target-config.json" -exec cat {} \;
-
-# Check extension README for documented targets
-cat src/extensions/README.md
 ```
 
-**Common valid targets (verify in your codebase):**
-- `header.before.cart` - Before cart icon in header
-- `header.after.userActions` - After user action buttons
-- `product.details.after` - After product details section
-
-**Always verify target IDs exist** before using them. Non-existent targets will cause components to never render.
+See the "Complete Target ID Reference" section below for the full list. **Always verify target IDs exist** before using them. Non-existent targets will cause components to never render.
 
 ## Index Barrel File
 
@@ -787,107 +780,192 @@ export default {
 
 ## Complete Target ID Reference
 
-Target slots where components can be inserted. **Always verify these exist in your version** using grep.
+All target IDs use the `sfcc.` prefix. Target slots where components can be inserted. **Always verify these exist in your version** using grep. Targets without children are INSERTION points (self-closing `<UITarget />`); targets with children are WRAPPER points that wrap default content.
 
-### Header
-- `header.before.cart` - Insert content before the cart icon in the header toolbar
+### Header & Navigation
+- `sfcc.header.before.cart` - Insert content before the cart icon in the header toolbar
+- `sfcc.header.bnpl.banner` - Insert BNPL banner below header
+- `sfcc.header.search.input` - (WRAPPER) Replace the search input component
 
 ### Footer
-- `footer.customersupport.start` - Insert links at the top of the Customer Support column
-- `footer.customersupport.end` - Insert links at the bottom of the Customer Support column
-- `footer.account.start` - Insert links at the top of the Account column
-- `footer.account.end` - Insert links at the bottom of the Account column
-- `footer.ourcompany.start` - Insert links at the top of the Our Company column
-- `footer.ourcompany.end` - Insert links at the bottom of the Our Company column
+- `sfcc.footer.customersupport.start` - Insert links at the top of the Customer Support column
+- `sfcc.footer.customersupport.end` - Insert links at the bottom of the Customer Support column
+- `sfcc.footer.account.start` - Insert links at the top of the Account column
+- `sfcc.footer.account.end` - Insert links at the bottom of the Account column
+- `sfcc.footer.ourcompany.start` - Insert links at the top of the Our Company column
+- `sfcc.footer.ourcompany.end` - Insert links at the bottom of the Our Company column
 
 ### PDP (Product Detail Page)
-- `pdp.after.addToCart` - Content below the Add to Cart button (default: Buy Now Pay Later)
+- `sfcc.pdp.products.gallery` - (WRAPPER) Replace the product image gallery
+- `sfcc.pdp.products.visualization` - Insert product visualization (e.g., 3D viewer)
+- `sfcc.pdp.reviews.rating` - (WRAPPER) Replace the product rating display
+- `sfcc.pdp.reviews.summary` - (WRAPPER) Replace the reviews summary section
+- `sfcc.pdp.reviews.list` - (WRAPPER) Replace the review cards list
+- `sfcc.pdp.reviews.form` - (WRAPPER) Replace the write-a-review form
+- `sfcc.pdp.reviews.qna` - Insert Q&A section
+- `sfcc.pdp.after.addToCart` - (WRAPPER) Content below the Add to Cart button
+- `sfcc.pdp.bnpl.message` - Insert BNPL messaging
+- `sfcc.pdp.tax.productMessage` - Insert tax messaging on product page
+- `sfcc.pdp.loyalty.points` - Insert loyalty points display
+- `sfcc.pdp.shipping.deliveryEstimate` - (WRAPPER) Replace delivery estimate display
+- `sfcc.pdp.payments.expressCheckout` - (WRAPPER) Replace express checkout on PDP
+- `sfcc.pdp.agent.productHelper` - Insert AI product helper
+
+### PLP (Product List Page)
+- `sfcc.plp.search.results` - (WRAPPER) Replace the search results grid
+- `sfcc.plp.search.summary` - Insert search summary content
+- `sfcc.plp.search.filters` - (WRAPPER) Replace the search filters/refinements
+- `sfcc.plp.agent.categoryHelper` - Insert AI category helper
+- `sfcc.plp.shipping.deliveryEstimate` - Insert delivery estimate on product tiles
+
+### Product Card
+- `sfcc.productCard.reviews.rating` - Insert star rating on product cards
+- `sfcc.productCard.loyalty.points` - Insert loyalty points on product cards
+- `sfcc.productCard.bnpl.message` - Insert BNPL message on product cards
+
+### Cart
+- `sfcc.cart.loyalty.pointsEarned` - Insert loyalty points earned display
+- `sfcc.cart.giftCards.apply` - Insert gift card apply form
+- `sfcc.cart.tax.lineItemMessage` - Insert tax message per line item
+- `sfcc.cart.identity.verification` - Insert identity verification
+- `sfcc.cart.payments.expressCheckout` - Insert express checkout buttons
+- `sfcc.cart.shipping.deliveryEstimate` - Insert shipping delivery estimate
+- `sfcc.cart.bnpl.message` - Insert BNPL messaging in cart
+
+### Mini Cart
+- `sfcc.miniCart.payments.expressCheckout` - Insert express checkout in mini cart
+- `sfcc.miniCart.bnpl.message` - Insert BNPL message in mini cart
+- `sfcc.miniCart.shipping.deliveryEstimate` - Insert delivery estimate in mini cart
+- `sfcc.miniCart.tax.lineItemMessage` - Insert tax message in mini cart
+
+### Quick Add
+- `sfcc.quickAdd.payments.expressCheckout` - (WRAPPER) Replace express checkout in quick add
 
 ### Checkout — Page Layout
-- `checkout.page.before` - Content before the entire checkout page
-- `checkout.page.after` - Content after the entire checkout page
-- `checkout.mainContent.before` - Content before the main checkout column
-- `checkout.mainContent.after` - Content after the main checkout column
+- `sfcc.checkout.page.before` - Content before the entire checkout page
+- `sfcc.checkout.page.after` - Content after the entire checkout page
+- `sfcc.checkout.mainContent.before` - Content before the main checkout column
+- `sfcc.checkout.mainContent.after` - Content after the main checkout column
 
 ### Checkout — Express Payments
-- `checkout.expressPayments.header.before` - Content before the express payments section header
-- `checkout.expressPayments.before` - Content before express payments (inside Suspense)
-- `checkout.expressPayments` - Replace the express payments component
-- `checkout.expressPayments.after` - Content after express payments
+- `sfcc.checkout.expressPayments.header.before` - Content before the express payments section header
+- `sfcc.checkout.expressPayments.before` - Content before express payments (inside Suspense)
+- `sfcc.checkout.expressPayments` - (WRAPPER) Replace the express payments component
+- `sfcc.checkout.expressPayments.after` - Content after express payments
 
 ### Checkout — Contact Info
-- `checkout.contactInfo.header.before` - Content before the contact info section header
-- `checkout.contactInfo.before` - Content before contact info (inside Suspense)
-- `checkout.contactInfo` - Replace the contact info component
-- `checkout.contactInfo.after` - Content after contact info
+- `sfcc.checkout.contactInfo.header.before` - Content before the contact info section header
+- `sfcc.checkout.contactInfo.before` - Content before contact info (inside Suspense)
+- `sfcc.checkout.contactInfo` - (WRAPPER) Replace the contact info component
+- `sfcc.checkout.contactInfo.after` - Content after contact info
 
 ### Checkout — Shipping Address
-- `checkout.shippingAddress.header.before` - Content before the shipping address section header
-- `checkout.shippingAddress.before` - Content before the shipping address form
-- `checkout.shippingAddress` - Replace the shipping address component
-- `checkout.shippingAddress.after` - Content after the shipping address form
-- `checkout.shippingAddress.autocomplete` - Replace the address autocomplete dropdown
+- `sfcc.checkout.shippingAddress.header.before` - Content before the shipping address section header
+- `sfcc.checkout.shippingAddress.before` - Content before the shipping address form
+- `sfcc.checkout.shippingAddress` - (WRAPPER) Replace the shipping address component
+- `sfcc.checkout.shippingAddress.after` - Content after the shipping address form
+- `sfcc.checkout.shippingAddress.autocomplete` - (WRAPPER) Replace the address autocomplete dropdown
 
 ### Checkout — Shipping Options
-- `checkout.shippingOptions.header.before` - Content before the shipping options section header
-- `checkout.shippingOptions.before` - Content before shipping options
-- `checkout.shippingOptions` - Replace the shipping options component
-- `checkout.shippingOptions.after` - Content after shipping options
+- `sfcc.checkout.shippingOptions.header.before` - Content before the shipping options section header
+- `sfcc.checkout.shippingOptions.before` - Content before shipping options
+- `sfcc.checkout.shippingOptions` - (WRAPPER) Replace the shipping options component
+- `sfcc.checkout.shippingOptions.after` - Content after shipping options
 
 ### Checkout — Payment
-- `checkout.payment.header.before` - Content before the payment section header
-- `checkout.payment.before` - Content before the payment component
-- `checkout.payment` - Replace the entire payment component
-- `checkout.payment.after` - Content after the payment component
-- `checkout.payment.paymentMethods.before` - Content before payment method options
-- `checkout.payment.paymentMethods` - Replace payment method selection (saved cards + CC form)
-- `checkout.payment.paymentMethods.after` - Content after payment method options
-- `checkout.payment.billingAddress.before` - Content before the billing address form
-- `checkout.payment.billingAddress` - Replace the billing address form
-- `checkout.payment.billingAddress.after` - Content after the billing address form
-- `checkout.payment.billingAddress.autocomplete` - Replace the billing address autocomplete dropdown
+- `sfcc.checkout.payment.header.before` - Content before the payment section header
+- `sfcc.checkout.payment.before` - Content before the payment component
+- `sfcc.checkout.payment` - (WRAPPER) Replace the entire payment component
+- `sfcc.checkout.payment.after` - Content after the payment component
+- `sfcc.checkout.payment.paymentMethods.before` - Content before payment method options
+- `sfcc.checkout.payment.paymentMethods` - (WRAPPER) Replace payment method selection (saved cards + CC form)
+- `sfcc.checkout.payment.paymentMethods.after` - Content after payment method options
+- `sfcc.checkout.payment.billingAddress.before` - Content before the billing address form
+- `sfcc.checkout.payment.billingAddress` - (WRAPPER) Replace the billing address form
+- `sfcc.checkout.payment.billingAddress.after` - Content after the billing address form
+- `sfcc.checkout.payment.billingAddress.autocomplete` - (WRAPPER) Replace the billing address autocomplete dropdown
 
 ### Checkout — Account Creation & Place Order
-- `checkout.createAccount.before` - Content before guest account creation
-- `checkout.createAccount` - Replace the guest account creation component
-- `checkout.createAccount.after` - Content after guest account creation
-- `checkout.placeOrder.before` - Content before the place order button
-- `checkout.placeOrder` - Replace the place order form/button
-- `checkout.placeOrder.after` - Content after the place order button
+- `sfcc.checkout.createAccount.before` - Content before guest account creation
+- `sfcc.checkout.createAccount` - (WRAPPER) Replace the guest account creation component
+- `sfcc.checkout.createAccount.after` - Content after guest account creation
+- `sfcc.checkout.placeOrder.before` - Content before the place order button
+- `sfcc.checkout.placeOrder` - (WRAPPER) Replace the place order form/button
+- `sfcc.checkout.placeOrder.after` - Content after the place order button
 
 ### Checkout — Sidebar
-- `checkout.sidebar.before` - Content before the sidebar column
-- `checkout.sidebar.after` - Content after the sidebar column
-- `checkout.orderSummary.before` - Content before the order summary card
-- `checkout.orderSummary` - Replace the order summary component
-- `checkout.orderSummary.after` - Content after the order summary card
-- `checkout.myCart.before` - Content before the cart items accordion
-- `checkout.myCart` - Replace the cart items component
-- `checkout.myCart.after` - Content after the cart items accordion
-- `checkout.myCart.header.before` - Content before the "My Cart" accordion header
+- `sfcc.checkout.sidebar.before` - Content before the sidebar column
+- `sfcc.checkout.sidebar.after` - Content after the sidebar column
+- `sfcc.checkout.orderSummary.before` - Content before the order summary card
+- `sfcc.checkout.orderSummary` - (WRAPPER) Replace the order summary component
+- `sfcc.checkout.orderSummary.after` - Content after the order summary card
+- `sfcc.checkout.myCart.before` - Content before the cart items accordion
+- `sfcc.checkout.myCart` - (WRAPPER) Replace the cart items component
+- `sfcc.checkout.myCart.after` - Content after the cart items accordion
+- `sfcc.checkout.myCart.header.before` - Content before the "My Cart" accordion header
 
 ### Order Summary (line items)
-- `orderSummary.subtotal.before` - Content before the subtotal row
-- `orderSummary.subtotal` - Replace the subtotal row
-- `orderSummary.subtotal.after` - Content after the subtotal row
-- `orderSummary.adjustments.before` - Content before price adjustment rows
-- `orderSummary.adjustments` - Replace price adjustment rows
-- `orderSummary.adjustments.after` - Content after price adjustment rows
-- `orderSummary.shipping.before` - Content before the shipping cost row
-- `orderSummary.shipping` - Replace the shipping cost row
-- `orderSummary.shipping.after` - Content after the shipping cost row
-- `orderSummary.tax.before` - Content before the tax row
-- `orderSummary.tax` - Replace the tax row
-- `orderSummary.tax.after` - Content after the tax row
-- `orderSummary.promoCode.before` - Content before the promo code form
-- `orderSummary.promoCode` - Replace the promo code form
-- `orderSummary.promoCode.after` - Content after the promo code form
-- `orderSummary.total.before` - Content before the order total row
-- `orderSummary.total` - Replace the order total row
-- `orderSummary.total.after` - Content after the order total row
+- `sfcc.orderSummary.subtotal.before` - Content before the subtotal row
+- `sfcc.orderSummary.subtotal` - (WRAPPER) Replace the subtotal row
+- `sfcc.orderSummary.subtotal.after` - Content after the subtotal row
+- `sfcc.orderSummary.giftCards.applied` - Insert applied gift cards display
+- `sfcc.orderSummary.adjustments.before` - Content before price adjustment rows
+- `sfcc.orderSummary.adjustments` - (WRAPPER) Replace price adjustment rows
+- `sfcc.orderSummary.adjustments.after` - Content after price adjustment rows
+- `sfcc.orderSummary.shipping.before` - Content before the shipping cost row
+- `sfcc.orderSummary.shipping` - (WRAPPER) Replace the shipping cost row
+- `sfcc.orderSummary.shipping.after` - Content after the shipping cost row
+- `sfcc.orderSummary.tax.before` - Content before the tax row
+- `sfcc.orderSummary.tax` - (WRAPPER) Replace the tax row
+- `sfcc.orderSummary.tax.line` - (WRAPPER) Replace individual tax line items
+- `sfcc.orderSummary.tax.after` - Content after the tax row
+- `sfcc.orderSummary.promoCode.before` - Content before the promo code form
+- `sfcc.orderSummary.promoCode` - (WRAPPER) Replace the promo code form
+- `sfcc.orderSummary.promoCode.after` - Content after the promo code form
+- `sfcc.orderSummary.total.before` - Content before the order total row
+- `sfcc.orderSummary.total` - (WRAPPER) Replace the order total row
+- `sfcc.orderSummary.total.after` - Content after the order total row
 
 ### My Cart
-- `myCart.header.before` - Content before the My Cart accordion header
+- `sfcc.myCart.header.before` - Content before the My Cart accordion header
+
+### My Account
+- `sfcc.myAccount.address.autocomplete` - (WRAPPER) Replace address autocomplete in account
+- `sfcc.myAccount.address.validation` - Insert address validation in account
+- `sfcc.myAccount.identity.verification` - Insert identity verification
+- `sfcc.myAccount.orders.tracking` - Insert order tracking
+- `sfcc.myAccount.payments.addMethod` - (WRAPPER) Replace add payment method form
+- `sfcc.myAccount.gdpr.dataRequest` - Insert GDPR data request
+- `sfcc.myAccount.gdpr.deleteAccount` - Insert GDPR account deletion
+- `sfcc.myAccount.loyalty.summary` - Insert loyalty summary on account overview
+- `sfcc.myAccount.reviews.pending` - Insert pending reviews on account overview
+- `sfcc.myAccount.orderDetails.review` - Insert review link on order details
+- `sfcc.myAccount.orderDetails.tracking` - Insert tracking on order details
+- `sfcc.myAccount.orderDetails.tax` - (WRAPPER) Replace tax display on order details
+- `sfcc.myAccount.orderDetails.returns` - Insert returns on order details
+- `sfcc.myAccount.orderDetails.cancel` - Insert cancel order on order details
+- `sfcc.myAccount.orderDetails.support` - Insert support on order details
+- `sfcc.myAccountPaymentMethods.giftCards.manage` - Insert gift card management
+- `sfcc.accountPaymentOptions.payments.savedPaymentMethods` - (WRAPPER) Replace saved payment methods
+
+### User Registration
+- `sfcc.userRegistration.consent.marketing` - Insert marketing consent checkbox
+- `sfcc.userRegistration.consent.tos` - Insert terms of service checkbox
+- `sfcc.userRegistration.identity.verification` - Insert identity verification
+- `sfcc.userRegistration.loyalty.enrollment` - Insert loyalty enrollment option
+- `sfcc.userRegistration.address.autocomplete` - Insert address autocomplete
+- `sfcc.userRegistration.address.validation` - Insert address validation
+
+### Email Signup
+- `sfcc.emailSignUp.consent.marketing` - (WRAPPER) Replace marketing consent in email signup
+- `sfcc.emailSignUp.consent.tos` - Insert terms of service in email signup
+
+### Order Confirmation
+- `sfcc.orderConfirmation.tax.summary` - (WRAPPER) Replace tax summary on order confirmation
+- `sfcc.orderConfirmation.shipping.tracking` - Insert shipping tracking on order confirmation
+
+### Global
+- `sfcc.global.cookies.banner` - (WRAPPER) Replace the cookie consent banner
 
 ## Example: Complete Extension
 
@@ -923,7 +1001,7 @@ storefront-next/src/extensions/product-reviews/
 {
     "components": [
         {
-            "targetId": "product.details.after",
+            "targetId": "sfcc.pdp.reviews.summary",
             "path": "extensions/product-reviews/components/ProductReviews.tsx",
             "order": 0
         }
