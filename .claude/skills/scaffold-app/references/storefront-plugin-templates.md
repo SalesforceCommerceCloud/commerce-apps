@@ -22,6 +22,13 @@ Complete templates for the extension system. All files must use TypeScript (.ts/
             "path": "extensions/{{appName}}/providers/{{AppName}}Provider.tsx",
             "order": 0
         }
+    ],
+    "actionHooks": [
+        {
+            "hookId": "sfcc.checkout.fraud.afterSubmitContactInfo",
+            "handler": "extensions/{{appName}}/hooks/{{hookName}}.server.ts",
+            "order": 0
+        }
     ]
 }
 ```
@@ -31,6 +38,7 @@ Complete templates for the extension system. All files must use TypeScript (.ts/
 - `path`: Relative path from `src/` to the component file
 - `order`: Insertion order when multiple components target the same slot (lower = earlier)
 - `contextProviders`: Application-root level providers (injected after ComposeProviders)
+- `actionHooks`: Server-side handlers that run during storefront actions (see "Action Hook Handler" below)
 - `devOnly`: (optional) Set to `true` to exclude extension from production builds
 
 **⚠️ IMPORTANT:** Use `target-config.json` (not `plugin-config.json`) and `targetId` (not `pluginId`)
@@ -259,6 +267,115 @@ export function use{{AppName}}Context(): {{AppName}}ContextType {
 - Use `import type` for TypeScript types to avoid Vite ESM/CJS interop issues
 - Use `useConfig<AppConfig>()` with TypeScript type for type-safe configuration access
 - Access config with direct property access: `appConfig.extension?.{{appName}}?.key || defaultValue`
+
+## Injecting External SDK Scripts
+
+Context providers can render `<script src="...">` tags to load external vendor SDKs (fraud beacons, analytics, payment libraries). React 19 automatically hoists these to `<head>` and deduplicates by `src`.
+
+**File:** `storefront-next/src/extensions/{{appName}}/providers/{{AppName}}Provider.tsx`
+
+```typescript
+'use client';
+import { useEffect, type ReactNode, type ReactElement } from 'react';
+import { useLocation } from 'react-router';
+import { useConfig } from '@salesforce/storefront-next-runtime/config';
+
+interface AppConfig {
+    extension?: {
+        {{appName}}?: {
+            siteId: string;
+            enabled: boolean;
+        };
+    };
+}
+
+export default function {{AppName}}Provider({ children }: { children: ReactNode }): ReactElement {
+    const appConfig = useConfig<AppConfig>();
+    const siteId = appConfig.extension?.{{appName}}?.siteId ?? '';
+    const enabled = appConfig.extension?.{{appName}}?.enabled !== false;
+    const location = useLocation();
+
+    useEffect(() => {
+        if (!enabled || !siteId) return;
+        // Re-notify vendor SDK on SPA navigation.
+        // Replace with your vendor's page-notify API.
+        const win = window as Window & { vendorSdk?: { notifyPageView?: () => void } };
+        win.vendorSdk?.notifyPageView?.();
+    }, [enabled, siteId, location.pathname]);
+
+    return (
+        <>
+            {enabled && siteId && (
+                <script src={`https://cdn.example.com/sdk.js?id=${siteId}`} async />
+            )}
+            {children}
+        </>
+    );
+}
+```
+
+**Key points:**
+- Use `async` for non-blocking SDKs (analytics, widgets). Omit `async` for SDKs that must load synchronously (fraud beacons).
+- Use `useLocation()` from `react-router` to detect SPA navigation and re-trigger vendor SDK logic.
+- For checkout-scoped SDKs (payment processors), use a `component` at `sfcc.checkout.page.before` instead of a global `contextProvider`.
+- Inline `<script>` blocks (code, not `src`) are NOT hoisted by React 19 — use `useEffect` for `window` object initialization.
+
+## Action Hook Handler
+
+**File:** `storefront-next/src/extensions/{{appName}}/hooks/{{hookName}}.server.ts`
+
+Action hooks run server-side logic at specific points in the storefront flow. They are declared in `target-config.json` under `actionHooks` and execute in waterfall order with a 5-second timeout per handler.
+
+**Available hook IDs:**
+
+| Hook ID | Blocking | Purpose |
+| :------ | :------- | :------ |
+| `sfcc.checkout.fraud.afterSubmitContactInfo` | No | Fraud/identity checks after contact info submission |
+| `sfcc.checkout.addressVerification.afterSubmitShippingAddress` | No | Address validation and standardization |
+| `sfcc.checkout.shipping.afterMethodsFetch` | No | Enrich or filter shipping methods |
+| `sfcc.checkout.shipping.afterMethodSelect` | No | Post-processing after shipping method selection |
+| `sfcc.checkout.payments.afterSubmitPayment` | No | Post-payment processing (tokenization) |
+| `sfcc.checkout.fraud.beforePlace` | **Yes** | Final fraud gate — can block order creation |
+| `sfcc.checkout.payments.beforePlaceOrder` | **Yes** | Payment authorization gate — can block order creation |
+| `sfcc.checkout.payments.afterPlaceOrder` | No | Post-order processing (payment capture) |
+
+**Blocking** hooks abort the action on any failure. **Non-blocking** hooks log errors and continue. Throwing `ActionHookError` always aborts with a user-facing error.
+
+```typescript
+import type { ActionHookContext } from '@/targets/action-hook.server';
+import { ActionHookError } from '@/targets/action-hook.server';
+
+export default async function {{hookName}}(
+    context: ActionHookContext,
+): Promise<ActionHookContext | void> {
+    const { data, actionContext } = context;
+
+    const response = await fetch('https://api.example.com/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: data.shippingAddress }),
+    });
+    const result = await response.json();
+
+    if (!result.valid) {
+        throw new ActionHookError(
+            'Please check your information and try again.',
+            'sfcc.checkout.addressVerification.afterSubmitShippingAddress',
+            'shippingAddress',
+        );
+    }
+
+    // Return modified context for downstream handlers, or void to pass through unchanged.
+    return { ...context, data: { ...data, shippingAddress: result.standardizedAddress } };
+}
+```
+
+**Key points:**
+- Handler MUST be default export
+- `ActionHookContext` contains `data` (step-specific) and `actionContext` (React Router action context)
+- `ActionHookError(message, hookId, step)` returns a 400 response; `step` controls where the error displays
+- Return modified context to pass data downstream, or `void` to pass through unchanged
+- 5-second timeout per handler — keep external calls fast
 
 ## Custom Hook
 
@@ -1041,6 +1158,12 @@ storefront-next/src/extensions/product-reviews/
 ### Configuration
 - [ ] Configuration uses `useConfig()` from `@salesforce/storefront-next-runtime/config`
 - [ ] Environment variables use PUBLIC__ prefix with double underscores (e.g., PUBLIC__app__extension__{{appName}}__key)
+
+### Action Hooks
+- [ ] Action hook handlers are default exports in `.server.ts` files
+- [ ] Handlers registered in target-config.json under `actionHooks` with `hookId`, `handler`, `order`
+- [ ] Handlers use `ActionHookError` for user-facing errors (not raw `throw`)
+- [ ] External service calls complete within 5-second timeout
 
 ### Testing & Documentation
 - [ ] Tests included for all components (.test.tsx)
