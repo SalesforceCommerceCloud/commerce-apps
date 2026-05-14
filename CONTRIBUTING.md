@@ -142,6 +142,20 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 
 > **Note:** For new versions of an existing app, you must at minimum update the `version`, `zip`, and `sha256` fields.
 
+#### Optional Fields
+
+- `storefrontSupport` - (Object) Declares storefront version compatibility. If absent, no version gating is applied at install time.
+  - `sfnext` - (Object) Storefront Next compatibility
+    - `minVersion` - (String) Minimum SFNext version the app requires (semver format: `X.Y.Z` or `X.Y.Z-prerelease`)
+    - `maxVersion` - (String, optional) Maximum SFNext version the app supports, inclusive (semver format: `X.Y.Z` or `X.Y.Z-prerelease`). Use this to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on).
+  - `sfra` - (Object) SFRA compatibility
+    - `minVersion` - (String) Minimum SFRA version the app requires (semver format: `X.Y.Z` or `X.Y.Z-prerelease`)
+    - `maxVersion` - (String, optional) Maximum SFRA version the app supports, inclusive (semver format: `X.Y.Z` or `X.Y.Z-prerelease`).
+
+An app may declare support for one or both storefront types. If the `storefrontSupport` field is absent or a specific storefront key is omitted, no version gating is applied for that storefront. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
+
+When present, the `storefrontSupport` field in the root manifest must match the `storefrontSupport` field in the app's `commerce-app.json` inside the ZIP.
+
 #### Computing `sha256`
 
 The `sha256` value must match the ZIP you are submitting. On **macOS**, you can generate it with:
@@ -170,7 +184,10 @@ On **Linux**, the equivalent is usually `sha256sum /path/to/zip`.
       "provider": "thirdParty",
       "version": "1.0.0",
       "zip": "avalara-tax-v1.0.0.zip",
-      "sha256": "492fb0bc3aa5c762c0209bd22375e14ed2af8f672b679d6105232a37fe726a4f"
+      "sha256": "492fb0bc3aa5c762c0209bd22375e14ed2af8f672b679d6105232a37fe726a4f",
+      "storefrontSupport": {
+        "sfnext": { "minVersion": "1.0.0" }
+      }
     }
   ]
 }
@@ -305,11 +322,14 @@ The `commerce-app.json` file inside your ZIP must match the root manifest entry:
     "url": "https://developer.avalara.com/",
     "support": "https://developer.avalara.com/"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "storefrontSupport": {        // Optional - include only if declaring version requirements
+    "sfnext": { "minVersion": "1.0.0" }
+  }
 }
 ```
 
-**Critical:** The `version` field in `commerce-app.json` **must** match the `version` in the root manifest (`commerce-apps-manifest/manifest.json`).
+**Critical:** The `version` field in `commerce-app.json` **must** match the `version` in the root manifest (`commerce-apps-manifest/manifest.json`). If `storefrontSupport` is present in the root manifest, it must also be present with matching values in `commerce-app.json`.
 
 ---
 

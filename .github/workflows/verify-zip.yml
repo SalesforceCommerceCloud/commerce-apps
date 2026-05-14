@@ -460,3 +460,88 @@ jobs:
             trap - RETURN
           done < changed_zips.txt
 
+      - name: Step 8 - Validate storefrontSupport fields in manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          source ".github/scripts/root-manifest-utils.sh"
+          manifest_path="commerce-apps-manifest/manifest.json"
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            zip_file="$(basename "$zip_path")"
+            entry="$(get_manifest_entry_for_zip "$zip_file" "$manifest_path")"
+
+            tmpdir="$(mktemp -d)"
+            unzip -q "$zip_path" -d "$tmpdir"
+            commerce_app="$(find "$tmpdir" -name 'commerce-app.json' -print -quit)"
+
+            manifest_has="$(jq -r 'has("storefrontSupport")' <<< "$entry")"
+            cap_has="false"
+            if [[ -n "$commerce_app" && -f "$commerce_app" ]]; then
+              cap_has="$(jq -r 'has("storefrontSupport")' "$commerce_app")"
+            fi
+
+            # Both absent: no gating declared, nothing to validate.
+            if [[ "$manifest_has" != "true" && "$cap_has" != "true" ]]; then
+              echo "No storefrontSupport for $zip_file - OK (optional)"
+              rm -rf "$tmpdir"
+              continue
+            fi
+
+            # Asymmetric presence is a mismatch in either direction.
+            if [[ "$manifest_has" != "$cap_has" ]]; then
+              echo "::error file=$manifest_path::storefrontSupport presence mismatch for $zip_file: manifest=$manifest_has, commerce-app.json=$cap_has"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Reject unknown keys inside storefrontSupport (only sfnext and sfra allowed)
+            unknown_keys="$(jq -r '.storefrontSupport | keys[] | select(. != "sfnext" and . != "sfra")' <<< "$entry" 2>/dev/null || true)"
+            if [[ -n "$unknown_keys" ]]; then
+              echo "::error file=$manifest_path::Unknown keys in storefrontSupport for $zip_file: $unknown_keys"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Reject unknown sub-keys inside sfnext / sfra (only minVersion and maxVersion allowed)
+            # and validate semver for any present min/max values.
+            for storefront in sfnext sfra; do
+              if [[ "$(jq -r --arg s "$storefront" '.storefrontSupport | has($s)' <<< "$entry")" == "true" ]]; then
+                bad_subkeys="$(jq -r --arg s "$storefront" '.storefrontSupport[$s] | keys[] | select(. != "minVersion" and . != "maxVersion")' <<< "$entry" 2>/dev/null || true)"
+                if [[ -n "$bad_subkeys" ]]; then
+                  echo "::error file=$manifest_path::Unknown keys in storefrontSupport.$storefront for $zip_file: $bad_subkeys"
+                  rm -rf "$tmpdir"
+                  exit 1
+                fi
+              fi
+              for field in minVersion maxVersion; do
+                val="$(jq -r --arg s "$storefront" --arg f "$field" '.storefrontSupport[$s][$f] // empty' <<< "$entry")"
+                if [[ -n "$val" ]]; then
+                  validate_semver "$val" "storefrontSupport.$storefront.$field" "$manifest_path"
+                  echo "  ✓ $storefront.$field=$val (valid semver)"
+                fi
+              done
+            done
+
+            # Cross-validate every storefrontSupport min/max value between manifest and commerce-app.json.
+            for storefront in sfnext sfra; do
+              for field in minVersion maxVersion; do
+                cap_val="$(jq -r --arg s "$storefront" --arg f "$field" '.storefrontSupport[$s][$f] // empty' "$commerce_app")"
+                manifest_val="$(jq -r --arg s "$storefront" --arg f "$field" '.storefrontSupport[$s][$f] // empty' <<< "$entry")"
+
+                if [[ "$cap_val" != "$manifest_val" ]]; then
+                  echo "::error file=$manifest_path::storefrontSupport.$storefront.$field mismatch for $zip_file: manifest='$manifest_val', commerce-app.json='$cap_val'"
+                  rm -rf "$tmpdir"
+                  exit 1
+                fi
+              done
+            done
+
+            rm -rf "$tmpdir"
+            echo "SUCCESS - storefrontSupport validated for $zip_file"
+          done < changed_zips.txt
+

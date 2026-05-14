@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# Validates that a string is semver (major.minor.patch with optional pre-release suffix; no build metadata).
+validate_semver() {
+  local value="${1:?semver string is required}"
+  local field_name="${2:-version}"
+  local file="${3:-}"
+
+  if [[ ! "$value" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$ ]]; then
+    echo "::error file=$file::\"$field_name\" is not valid semver (expected X.Y.Z or X.Y.Z-prerelease): $value"
+    return 1
+  fi
+}
+
 # Validates manifest readability, JSON shape, and duplicate zip entries.
 validate_manifest() {
   local manifest_path="${1:?manifest path is required}"

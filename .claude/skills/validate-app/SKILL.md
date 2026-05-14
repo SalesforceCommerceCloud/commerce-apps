@@ -54,6 +54,14 @@ Check `commerce-apps-manifest/manifest.json` has all required fields:
 - `zip` - matches actual filename
 - `sha256` - matches computed hash
 
+Optional fields (validate if present):
+- `storefrontSupport.sfnext.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfnext.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfra.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfra.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
+- Only `sfnext` and `sfra` keys allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` allowed inside each
+- `storefrontSupport` must be present in **both** the root manifest and `commerce-app.json` with matching values
+
 ## Step 5: Validate ZIP contents
 
 ```bash
@@ -91,6 +99,13 @@ Required fields:
 - `publisher.name`, `publisher.url`, `publisher.support`
 
 Version must match root manifest version.
+
+Optional fields (validate if present):
+- `storefrontSupport.sfnext.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfnext.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfra.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
+- `storefrontSupport.sfra.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
+- Values must match the corresponding fields in the root manifest entry
 
 ## Step 8: Validate storefront files (UI-only/Fullstack)
 

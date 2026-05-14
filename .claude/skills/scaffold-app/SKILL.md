@@ -52,6 +52,12 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 - Version (typically 1.0.0)
 - Description (one sentence)
 - Publisher name and URL
+- Minimum SFNext version (optional - semver `X.Y.Z` or `X.Y.Z-prerelease`, if the app requires a minimum Storefront Next version)
+- Maximum SFNext version (optional - semver, inclusive; only set if you've confirmed an incompatibility — e.g., a known-breaking future major release)
+- Minimum SFRA version (optional - semver `X.Y.Z` or `X.Y.Z-prerelease`, if the app requires a minimum SFRA version)
+- Maximum SFRA version (optional - semver, inclusive; same guidance as above)
+
+> When provided, add `storefrontSupport` to both `commerce-app.json` (inside the ZIP) and the root manifest entry. Values must match. Each storefront key (`sfnext`, `sfra`) accepts `minVersion` (required when the key is present) and an optional `maxVersion`.
 - Additional context (optional - docs, requirements, API details)
 
 **Folder Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. Installation URL: `https://raw.githubusercontent.com/{owner}/{repo}/{tag}/{domain}/{appName}/{zipFileName}`
