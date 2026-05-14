@@ -1,0 +1,42 @@
+name: Test CI Scripts
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/scripts/**'
+
+jobs:
+  test-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require test file for new scripts
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for script in $(git diff --name-only --diff-filter=A "$BASE_SHA"..."$HEAD_SHA" -- '.github/scripts/*.sh'); do
+            base="$(basename "$script")"
+            case "$base" in
+              test-*|run-all-tests.sh) continue ;;
+            esac
+            name="${base%.sh}"
+            if [[ ! -f ".github/scripts/test-${name}.sh" ]]; then
+              missing+=("$script -> .github/scripts/test-${name}.sh")
+            fi
+          done
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "::error::New scripts added without a matching test file:"
+            printf '  %s\n' "${missing[@]}"
+            exit 1
+          fi
+
+      - name: Run script tests
+        run: ./.github/scripts/run-all-tests.sh

@@ -24,6 +24,10 @@ Build a registry-ready Commerce App Package (CAP) ZIP from an app directory.
 | Description | Short description | Yes |
 | Publisher name | `Avalara` | Yes |
 | Publisher URL | `https://developer.avalara.com/` | Yes |
+| SFNext min version | `1.0.0` | No |
+| SFNext max version | `2.0.0` | No |
+| SFRA min version | `7.0.0` | No |
+| SFRA max version | `8.0.0` | No |
 
 **Valid domains:** `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
 
@@ -63,9 +67,14 @@ Ensure version matches throughout:
     "url": "<publisherUrl>",
     "support": "<publisherUrl>"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "storefrontSupport": {
+    "sfnext": { "minVersion": "<sfnextMinVersion>", "maxVersion": "<sfnextMaxVersion>" }
+  }
 }
 ```
+
+> **Note:** `storefrontSupport` is optional. Include only if the app declares a minimum storefront version. Omit the entire object if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); omit it for "no upper bound." When present, the values here must match the root manifest entry exactly.
 
 ## Step 4: Run validation
 
@@ -123,9 +132,14 @@ Update `commerce-apps-manifest/manifest.json`:
   "provider": "thirdParty",
   "version": "<version>",
   "zip": "<appName>-v<version>.zip",
-  "sha256": "<computed_hash>"
+  "sha256": "<computed_hash>",
+  "storefrontSupport": {
+    "sfnext": { "minVersion": "<sfnextMinVersion>", "maxVersion": "<sfnextMaxVersion>" }
+  }
 }
 ```
+
+> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." Values must match the corresponding fields in `commerce-app.json` exactly.
 
 **Icon:** Must match filename in ZIP's `icons/` directory. CI extracts automatically.
 
