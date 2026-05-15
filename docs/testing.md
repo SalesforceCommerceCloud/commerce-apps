@@ -2,7 +2,7 @@
 
 This guide explains how to test your Commerce App locally before submitting to the registry. For full documentation on designing, building, testing, and submitting Commerce apps, see the [developer guide](https://dpkoal18ck1fm.cloudfront.net/docs/commerce/b2c-commerce/guide/index.html).
 
-The recommended workflow uses the [`b2c` CLI](#tooling) — it covers cartridge upload, impex import, CAP install/uninstall, log inspection, and metadata validation against the SFCC XSDs in a single tool. If you're using a coding agent, the [`cap-dev` agent skills](#agent-skills-optional) shipped in this repository help with the packaging and submission steps (impex codegen, registry-specific validation, PR automation).
+The recommended workflow uses the [`b2c` CLI](#tooling) — it covers cartridge upload, impex import, CAP install/uninstall, log inspection, and metadata validation against the SFCC XSDs in a single tool. If you're using a coding agent, the [`cap-dev` agent skills](#agent-skills-optional) shipped in this repository add scaffolding, impex codegen, registry-specific validation, and PR automation on top.
 
 ---
 
@@ -81,16 +81,16 @@ Key commands referenced in this guide:
 
 ### Agent Skills (optional)
 
-If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), this repository ships the `cap-dev` plugin — a set of skills focused on the packaging and submission steps:
+If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), this repository ships the `cap-dev` plugin:
 
 - `scaffold-app` — generates a new app directory from templates (UI-only / backend-only / fullstack)
 - `generate-service-impex`, `generate-site-preferences-impex`, `generate-custom-object-impex` — generate impex XML from prompts
 - `validate-impex` — checks impex XML for syntax, namespaces, install/uninstall pairing, ID conventions, and hardcoded credentials
-- `validate-app` — runs registry-specific checks (SHA256 against `commerce-apps-manifest/manifest.json`, manifest fields, icon hash, translations, security scan) — complements rather than replaces `b2c cap validate`
+- `validate-app` — registry-specific checks: SHA256 against `commerce-apps-manifest/manifest.json`, manifest fields, icon hash, translations, security scan
 - `package-app` — builds the ZIP and updates the registry manifest entry
 - `submit-app` — opens the registry PR with the correct template via `gh`
 
-The skills don't cover the sandbox testing loop — for that, use the `b2c` CLI commands shown throughout this guide (`b2c cap install`, `b2c logs tail`, `b2c code watch`, etc.). See the [Agent Skills section in the README](../README.md#agent-skills) for installation.
+See the [Agent Skills section in the README](../README.md#agent-skills) for installation.
 
 ---
 
@@ -143,7 +143,7 @@ shasum -a 256 tax/my-app/my-app-v1.0.0.zip  # update manifest.json sha256 to mat
 #    Open a PR per CONTRIBUTING.md — commit only the ZIP, manifest.json, and (new apps) catalog.json
 ```
 
-> **Agent-driven equivalent:** with the `cap-dev` skills installed, the codegen and submission steps have shortcuts — `/validate-impex` and `/validate-app` for steps 2 and 4 (the latter adds registry-specific checks like SHA256 and translation verification), `/package-app` for step 4 (also updates the registry manifest entry), and `/submit-app` for step 5. The CLI commands above remain the canonical reference for the sandbox-testing portion of step 3.
+> **Agent-driven shortcuts:** with the `cap-dev` skills installed, `/validate-impex` and `/validate-app` cover steps 2 and 4 (the latter adds registry-specific checks like SHA256 and translation verification), `/package-app` builds the ZIP and updates the manifest entry, and `/submit-app` opens the PR.
 
 ### Complete Testing Checklist
 
