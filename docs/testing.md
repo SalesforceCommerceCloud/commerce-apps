@@ -2,7 +2,7 @@
 
 This guide explains how to test your Commerce App locally before submitting to the registry. For full documentation on designing, building, testing, and submitting Commerce apps, see the [developer guide](https://dpkoal18ck1fm.cloudfront.net/docs/commerce/b2c-commerce/guide/index.html).
 
-The recommended workflow uses the [`b2c` CLI](#tooling) together with the Claude Code skills shipped in this repository. These automate the manual steps (cartridge upload, impex import, CAP install/uninstall, log inspection) that previously required UX Studio, Business Manager, or `xmllint` invocations by hand.
+The recommended workflow uses the [`b2c` CLI](#tooling) — it covers cartridge upload, impex import, CAP install/uninstall, log inspection, and metadata validation against the SFCC XSDs in a single tool. If you're using a coding agent, the [`cap-dev` agent skills](#agent-skills-optional) shipped in this repository wrap the same workflow.
 
 ---
 
@@ -33,13 +33,13 @@ The recommended workflow uses the [`b2c` CLI](#tooling) together with the Claude
 
 ### B2C DX VS Code Extension (recommended IDE)
 
-The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) is the recommended replacement for Prophet and UX Studio for app development. It runs the same `b2c` CLI under the hood, so any auth or plugin you've configured for the CLI applies in the editor as well.
+The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) provides an integrated development experience on top of the same `b2c` CLI. It picks up the same `dw.json` configuration, so configuring once works for both.
 
 Most useful for app development:
 
-- **Cartridge upload + watch** — edit locally, changes sync to the active code version automatically. Replaces `dwupload` / Prophet auto-upload.
-- **B2C Script Debugger** — set breakpoints in cartridge controllers, jobs, hooks, and Custom SCAPI API scripts; step through, watch variables, drop log points. Essential for debugging tax/shipping/payment hooks.
-- **CAP-aware tooling** — the extension uses the same CAP commands documented here (`cap validate`, `cap install`, `cap list`, etc.) and surfaces them in the UI.
+- **Cartridge upload + watch** — edit locally, changes sync to the active code version on save.
+- **B2C Script Debugger** — set breakpoints in cartridge controllers, jobs, hooks, and Custom SCAPI API scripts; step through, watch variables, drop log points.
+- **CAP-aware tooling** — surfaces `cap validate`, `cap install`, `cap list`, etc. in the UI.
 - **WebDAV browser** — open and edit `Impex/`, `Logs/`, and catalog files like local files.
 - **SCAPI API Explorer** — try Shopper and Admin APIs from a built-in Swagger UI with auth handled.
 - **Log tailing** — stream `error-*.log`, `warn-*.log`, and custom logs into a VS Code output channel.
@@ -79,49 +79,78 @@ Key commands referenced in this guide:
 
 > **Safety:** Set `SFCC_SAFETY_LEVEL=NO_DELETE` (or `READ_ONLY`) in shared/CI environments to block destructive operations. See the [Safety Mode docs](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/safety).
 
-### Agent Skills
+### Agent Skills (optional)
 
-This repository ships the `cap-dev` plugin — a set of agent skills that automate the registry workflow (`scaffold-app`, `generate-*-impex`, `validate-impex`, `package-app`, `validate-app`, `submit-app`). See the [Agent Skills section in the README](../README.md#agent-skills) for installation and the full skill list.
+If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), this repository ships the `cap-dev` plugin — a set of agent skills that wrap the workflow steps below (`scaffold-app`, `generate-*-impex`, `validate-impex`, `package-app`, `validate-app`, `submit-app`). See the [Agent Skills section in the README](../README.md#agent-skills) for installation and the full skill list.
 
-Once installed, this guide refers to skills by their slash-command form (`/validate-impex`, `/validate-app`, `/package-app`, etc.). They layer on top of the `b2c` CLI — `/validate-app` adds the registry-specific checks (manifest entry, SHA256 against `commerce-apps-manifest/manifest.json`, icon hash policy) on top of `b2c cap validate`.
+Each step in this guide can be performed with the `b2c` CLI directly. Where a skill is a useful shortcut (e.g., `/validate-app` adds the registry-specific SHA256/manifest/icon checks on top of `b2c cap validate`), it's called out inline.
 
 ---
 
 ## Testing Workflow
 
 ```
-1. Develop  →  2. Validate impex  →  3. Package  →  4. Install on sandbox  →  5. Test  →  6. Validate ZIP  →  7. Submit
+1. Develop  →  2. Test Locally  →  3. Test in Sandbox  →  4. Validate  →  5. Submit
 ```
 
-The recommended loop for an existing app directory `tax/my-app/commerce-my-app-app-v1.0.0/`:
+For an app directory `tax/my-app/commerce-my-app-app-v1.0.0/`, run these commands in order:
 
 ```bash
-# 1. Validate impex while editing
-/validate-impex
+# 1. Develop — edit cartridges, impex, storefront-next/
 
-# 2. Package and validate the CAP
-b2c cap validate tax/my-app/commerce-my-app-app-v1.0.0
-b2c cap package  tax/my-app/commerce-my-app-app-v1.0.0 --output tax/my-app/
+# 2. Test locally
+#    Validate impex XML against the SFCC schemas
+xmllint --schema "$(b2c docs schema metadata --path)" \
+  impex/install/meta/system-objecttype-extensions.xml --noout
+xmllint --schema "$(b2c docs schema services --path)" impex/install/services.xml --noout
 
-# 3. Install on a sandbox site
-b2c cap install tax/my-app/commerce-my-app-app-v1.0.0.zip --site-id RefArch
+#    Run cartridge unit tests if present
+( cd cartridges/site_cartridges/int_myapp && npm install && npm test )
 
-# 4. Watch logs in another terminal
+#    Validate the CAP structure
+b2c cap validate ./commerce-my-app-app-v1.0.0
+
+# 3. Test in sandbox
+#    Install the CAP — this imports impex, deploys cartridges, registers the feature
+b2c cap install ./commerce-my-app-app-v1.0.0 --site-id RefArch
+
+#    Tail logs (run in a second terminal while exercising the storefront)
 b2c logs tail --filter customerror --filter error
 
-# 5. Iterate on cartridge code without re-installing the CAP
+#    Iterate on cartridge code without re-installing the CAP
 b2c code watch ./commerce-my-app-app-v1.0.0/cartridges
 
-# 6. Inspect installed feature state and post-install tasks
-b2c cap list --site-id RefArch
+#    Verify post-install tasks and complete them in Business Manager
 b2c cap tasks my-app --site-id RefArch
 
-# 7. Tear down before re-installing (or before testing the uninstall path)
+#    Confirm uninstall works cleanly
 b2c cap uninstall my-app --site-id RefArch
+b2c cap list --site-id RefArch  # confirm gone
 
-# 8. Final pre-submission validation
-/validate-app
+# 4. Validate the registry package
+b2c cap package ./commerce-my-app-app-v1.0.0 --output tax/my-app/
+b2c cap validate tax/my-app/my-app-v1.0.0.zip
+shasum -a 256 tax/my-app/my-app-v1.0.0.zip  # update manifest.json sha256 to match
+
+# 5. Submit
+#    Open a PR per CONTRIBUTING.md — commit only the ZIP, manifest.json, and (new apps) catalog.json
 ```
+
+> **Agent-driven equivalent:** with the `cap-dev` skills installed, steps 2 and 4 collapse to `/validate-impex`, `/validate-app`, and `/package-app`, and step 5 to `/submit-app`. The CLI commands above remain the canonical reference.
+
+### Complete Testing Checklist
+
+- [ ] Cartridges upload successfully (CAP install completes without errors)
+- [ ] Impex files import without errors (check `b2c job log sfcc-install-commerce-app --failed`)
+- [ ] Services authenticate and respond
+- [ ] Hooks execute correctly
+- [ ] UI components render properly (Storefront Next apps)
+- [ ] Site preferences are configurable in Business Manager
+- [ ] Custom objects store/retrieve data
+- [ ] No errors in `b2c logs get --since 1h --level ERROR`
+- [ ] Performance is acceptable
+- [ ] Uninstall path cleans up everything
+- [ ] `b2c cap validate` passes on the final ZIP
 
 ---
 
@@ -154,18 +183,20 @@ b2c cap validate ./commerce-my-app-app-v1.0.0 --json
 
 ### Registry-level validation
 
-`/validate-app` adds checks that only apply when submitting to this registry:
+In addition to `b2c cap validate`, the registry has a few rules that aren't enforced by the install job:
 
 - ZIP at the correct `{domain}/{appName}/` path
-- SHA256 in `commerce-apps-manifest/manifest.json` matches the actual hash
+- SHA256 in `commerce-apps-manifest/manifest.json` matches the actual hash (`shasum -a 256 <zip>`)
 - `manifest.json` has all required fields (`id`, `name`, `iconName`, `domain`, `type=app`, `provider=thirdParty`, `version`, `zip`, `sha256`)
 - `storefrontSupport` (if present) has matching values in root `manifest.json` **and** `commerce-app.json`
 - No junk files in the ZIP (`.DS_Store`, `__MACOSX/*`, hidden files)
 - Single root folder named `commerce-{appName}-app-v{version}/`
 
+The `cap-dev` plugin's `/validate-app` skill bundles all of these checks if you're using a coding agent.
+
 ### Impex validation
 
-`/validate-impex` (also runs as part of `/validate-app`) handles XML:
+Beyond `b2c cap validate`, validate the XML directly:
 
 - Well-formed XML for every file under `impex/`
 - Correct SFCC namespaces (`http://www.demandware.com/xml/impex/services/2015-07-01`, etc.)
@@ -175,7 +206,7 @@ b2c cap validate ./commerce-my-app-app-v1.0.0 --json
 - `SITEID` placeholder used in `preferences.xml` (not a real site ID)
 - No hardcoded production credentials
 
-For deeper validation against the official SFCC XSD schemas, the `b2c` CLI ships them — pair `b2c docs schema --path` with `xmllint --schema`:
+The `b2c` CLI bundles the SFCC XSD schemas — pair `b2c docs schema --path` with `xmllint --schema`:
 
 ```bash
 # List bundled schemas
@@ -280,15 +311,13 @@ b2c code deploy -c int_myapp -c plugin_myapp_storefront
 
 ### Live-reload during development
 
-The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) provides the most ergonomic option — open the cartridge folder, connect to your sandbox, and changes upload automatically as you save (the modern replacement for Prophet's auto-upload).
-
-For a CLI equivalent:
-
 ```bash
 b2c code watch ./commerce-my-app-app-v1.0.0/cartridges
 ```
 
 Press `Ctrl+C` to stop. File adds/changes are batched and uploaded; deletions are removed from the server.
+
+The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) provides the same behavior integrated into the editor — open the cartridge folder, connect to your sandbox, and changes upload on save.
 
 ### Verify cartridge path
 
@@ -330,10 +359,10 @@ npm test
 ### Recommended development loop
 
 ```bash
-# 1. Validate impex syntax + structure first
-/validate-impex
+# 1. Validate impex XML well-formedness
+find impex/ -name "*.xml" -exec xmllint --noout {} \;
 
-# 2. Validate against the SFCC XSDs (optional but catches most schema errors)
+# 2. Validate against the SFCC XSDs (catches most schema errors)
 xmllint --schema "$(b2c docs schema metadata --path)" \
   impex/install/meta/system-objecttype-extensions.xml --noout
 xmllint --schema "$(b2c docs schema services --path)" impex/install/services.xml --noout
@@ -638,7 +667,7 @@ Suggested targets:
 
 Administration → Operations → Services → Service Monitoring shows averages and per-call timing. Optimize by:
 
-- Caching responses in a custom object (use `/generate-custom-object-impex` for the type definition)
+- Caching responses in a custom object
 - Reducing payload size
 - Tightening timeouts so failures fail fast
 - Confirming the circuit breaker thresholds on the service profile
@@ -659,12 +688,12 @@ Verify TTL by waiting past the configured window and confirming a fresh service 
 
 ## Pre-Submission Checklist
 
-Before opening the PR (use `/submit-app` to drive this):
+Before opening the PR:
 
 **Validation:**
-- [ ] `/validate-impex` passes
-- [ ] `b2c cap validate <path>` passes
-- [ ] `/validate-app` passes (covers manifest, SHA256, structure, security)
+- [ ] All impex XML is well-formed and validates against the SFCC XSDs (`xmllint --schema "$(b2c docs schema <name> --path)" ...`)
+- [ ] `b2c cap validate <zip>` passes
+- [ ] SHA256 in `manifest.json` matches the ZIP (`shasum -a 256 <zip>`)
 
 **Files committed:**
 - [ ] `{domain}/{appName}/{appName}-v{version}.zip`
@@ -704,11 +733,11 @@ Before opening the PR (use `/submit-app` to drive this):
 Run `b2c cap validate` to see the specific rule violation. Most commonly: missing `commerce-app.json` field, invalid semver, missing `tasksList.json`, or pipeline files left in cartridges.
 
 ### Impex import errors
-- Run `/validate-impex` first
+- Validate against the SFCC XSDs: `xmllint --schema "$(b2c docs schema metadata --path)" <file> --noout`
 - Check for unescaped `&` or `<` in XML (`&amp;` / `&lt;`)
 - Confirm namespaces match the SFCC schema (e.g., `services/2015-07-01`)
-- Replace `SITEID` with the actual site ID only via `preferences.xml` substitution — never commit a real site ID
-- Get the failing job's log: `b2c job log sfcc-site-archive-import --failed`
+- `SITEID` placeholder in `preferences.xml` should be substituted at install time — never commit a real site ID
+- Get the failing job's log: `b2c job log sfcc-install-commerce-app --failed`
 
 ### Service call fails
 - Verify credentials are sandbox/test values, not production
@@ -729,17 +758,17 @@ Run `b2c cap validate` to see the specific rule violation. Most commonly: missin
 - Test the component in isolation (Storybook) to rule out target/data issues
 
 ### SHA256 mismatch on PR
-The hash in `manifest.json` doesn't match the ZIP. Run `/package-app` (or recompute manually with `shasum -a 256`) and commit the updated manifest.
+The hash in `manifest.json` doesn't match the ZIP. Recompute with `shasum -a 256 <zip>` and update `manifest.json`.
 
 ---
 
 ## Best Practices
 
-- **Test as you build.** Validate impex on every change with `/validate-impex`. Tail logs in a side terminal during development.
+- **Test as you build.** Validate impex against the SFCC XSDs on every change. Tail logs in a side terminal during development.
 - **Use a dedicated sandbox.** Don't share with someone else's in-progress work, and never test on production.
 - **Test the uninstall path.** A clean uninstall is a release requirement, not an afterthought.
-- **Automate validation.** Wire `b2c cap validate` and the impex validator into CI for app repos that live outside this registry.
-- **Keep credentials out of the repo.** Use `.envrc`, direnv, or your shell profile for `SFCC_*` variables — never commit them.
+- **Automate validation.** Wire `b2c cap validate` and `xmllint --schema` checks into CI for app repos that live outside this registry.
+- **Keep credentials out of the repo.** Configure `dw.json` outside the project (or `.gitignore` it) — never commit credentials.
 
 ---
 
@@ -751,5 +780,5 @@ The hash in `manifest.json` doesn't match the ZIP. Run `/package-app` (or recomp
    - [SFCC Documentation](https://developer.salesforce.com/docs/commerce/b2c-commerce)
    - [CONTRIBUTING.md](../CONTRIBUTING.md)
    - [AGENTS.md](../AGENTS.md) — guidance for AI assistants in this repo
-3. **Validation skills:** `/validate-app`, `/validate-impex`
-4. **Reference app:** `tax/avalara-tax/` — a working CAP with cartridges, hooks, impex, and unit tests
+3. **Reference app:** `tax/avalara-tax/` — a working CAP with cartridges, hooks, impex, and unit tests
+4. **Agent skills:** see the [Agent Skills section in the README](../README.md#agent-skills) if you'd like an agent to drive validation/packaging/submission
