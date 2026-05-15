@@ -144,6 +144,39 @@ See `references/impex-validation.md` for detailed rules:
 }
 ```
 
+## Step 10b: Validate adminComponents.json (optional)
+
+If the CAP includes `app-configuration/adminComponents.json`, verify it matches the schema CI enforces:
+
+```bash
+unzip -p <zip> "*/app-configuration/adminComponents.json" 2>/dev/null | jq .
+```
+
+Required:
+- File is valid JSON and a top-level object.
+- The `configuration` key, when present, must be an array.
+- Every entry in `configuration` has a non-empty string `type`.
+- For entries with `type == "storefrontComponentVisibility"`:
+  - `attributes` is a non-empty array.
+  - Each attribute has a non-empty string `id` (the `sfcc.*` UI target identifier the merchant can toggle), a non-empty string `label` (rendered next to the toggle in BM), and a boolean `defaultValue`.
+
+Example:
+
+```json
+{
+  "configuration": [
+    {
+      "type": "storefrontComponentVisibility",
+      "attributes": [
+        { "id": "sfcc.checkout.shippingAddress.after", "label": "Show on Checkout", "defaultValue": true }
+      ]
+    }
+  ]
+}
+```
+
+Skip this step if the file isn't present — `adminComponents.json` is optional.
+
 ## Step 11: Validate translations
 
 ```bash
