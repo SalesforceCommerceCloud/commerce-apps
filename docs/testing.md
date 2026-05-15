@@ -31,6 +31,22 @@ The recommended workflow uses the [`b2c` CLI](#tooling) together with the Claude
 - A WebDAV access key (Account Manager → Profile → Application access keys → WebDAV)
 - An OCAPI/Account Manager API client with the permissions required by the commands you plan to run (see the [Authentication Guide](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/authentication))
 
+### B2C DX VS Code Extension (recommended IDE)
+
+The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) is the recommended replacement for Prophet and UX Studio for app development. It runs the same `b2c` CLI under the hood, so any auth or plugin you've configured for the CLI applies in the editor as well.
+
+Most useful for app development:
+
+- **Cartridge upload + watch** — edit locally, changes sync to the active code version automatically. Replaces `dwupload` / Prophet auto-upload.
+- **B2C Script Debugger** — set breakpoints in cartridge controllers, jobs, hooks, and Custom SCAPI API scripts; step through, watch variables, drop log points. Essential for debugging tax/shipping/payment hooks.
+- **CAP-aware tooling** — the extension uses the same CAP commands documented here (`cap validate`, `cap install`, `cap list`, etc.) and surfaces them in the UI.
+- **WebDAV browser** — open and edit `Impex/`, `Logs/`, and catalog files like local files.
+- **SCAPI API Explorer** — try Shopper and Admin APIs from a built-in Swagger UI with auth handled.
+- **Log tailing** — stream `error-*.log`, `warn-*.log`, and custom logs into a VS Code output channel.
+- **Sandbox Realm Explorer** — start/stop/clone/delete on-demand sandboxes from a tree view.
+
+Install per the [extension installation docs](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/installation). The extension is a developer preview — file issues at the [b2c-developer-tooling repo](https://github.com/SalesforceCommerceCloud/b2c-developer-tooling).
+
 ### `b2c` CLI
 
 The [`b2c` CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/cli/) is the primary tool for testing apps against a sandbox. Install it once and authenticate via environment variables.
@@ -280,6 +296,10 @@ b2c code deploy -c int_myapp -c plugin_myapp_storefront
 
 ### Live-reload during development
 
+The [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/) provides the most ergonomic option — open the cartridge folder, connect to your sandbox, and changes upload automatically as you save (the modern replacement for Prophet's auto-upload).
+
+For a CLI equivalent:
+
 ```bash
 b2c code watch ./commerce-my-app-app-v1.0.0/cartridges
 ```
@@ -304,6 +324,8 @@ Trigger the hook (e.g., add to cart for tax calc) and watch logs:
 ```bash
 b2c logs tail --filter customerror --filter customwarn --filter custominfo --search myapp
 ```
+
+For interactive debugging — stepping through hook execution, inspecting `basket`/`order` state, watching variables — use the **B2C Script Debugger** in the [VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/). It supports breakpoints, log points, and step-through for cartridge controllers, jobs, hooks, and Custom SCAPI API scripts.
 
 ### Run unit tests
 
