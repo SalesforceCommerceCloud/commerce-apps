@@ -85,7 +85,7 @@ If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), thi
 
 - `scaffold-app` — generates a new app directory from templates (UI-only / backend-only / fullstack)
 - `generate-service-impex`, `generate-site-preferences-impex`, `generate-custom-object-impex` — generate impex XML from prompts
-- `validate-impex` — checks impex XML for syntax, namespaces, install/uninstall pairing, ID conventions, and hardcoded credentials
+- `validate-impex` — checks impex XML for syntax, namespaces, install/uninstall pairing, ID conventions, and hardcoded credentials; pair with `b2c docs schema --path` + `xmllint --schema` (see [Impex validation](#impex-validation)) for XSD validation against the bundled SFCC schemas
 - `validate-app` — registry-specific checks: SHA256 against `commerce-apps-manifest/manifest.json`, manifest fields, icon hash, translations, security scan
 - `package-app` — builds the ZIP and updates the registry manifest entry
 - `submit-app` — opens the registry PR with the correct template via `gh`
