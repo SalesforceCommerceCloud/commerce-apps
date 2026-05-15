@@ -81,14 +81,14 @@ Key commands referenced in this guide:
 
 ### Agent Skills (optional)
 
-If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), this repository ships the `cap-dev` plugin:
+If you're using a coding agent (Claude Code, Cursor, GitHub Copilot, Codex), this repository ships the `cap-dev` plugin. Each skill gives the agent the context to perform a specific part of the workflow:
 
-- `scaffold-app` — generates a new app directory from templates (UI-only / backend-only / fullstack)
-- `generate-service-impex`, `generate-site-preferences-impex`, `generate-custom-object-impex` — generate impex XML from prompts
-- `validate-impex` — checks impex XML for syntax, namespaces, install/uninstall pairing, ID conventions, and hardcoded credentials; pair with `b2c docs schema --path` + `xmllint --schema` (see [Impex validation](#impex-validation)) for XSD validation against the bundled SFCC schemas
-- `validate-app` — registry-specific checks: SHA256 against `commerce-apps-manifest/manifest.json`, manifest fields, icon hash, translations, security scan
-- `package-app` — builds the ZIP and updates the registry manifest entry
-- `submit-app` — opens the registry PR with the correct template via `gh`
+- `scaffold-app` — guidance for generating a new app directory (UI-only / backend-only / fullstack), including the templates and conventions
+- `generate-service-impex`, `generate-site-preferences-impex`, `generate-custom-object-impex` — guidance for producing impex XML, covering schema, namespaces, IDs, and install/uninstall pairing
+- `validate-impex` — guidance for impex validation, covering syntax, namespaces, install/uninstall pairing, ID conventions, hardcoded credentials, and XSD validation against the bundled SFCC schemas via `b2c docs schema --path`
+- `validate-app` — guidance for registry-specific validation: SHA256 against `commerce-apps-manifest/manifest.json`, manifest fields, icon hash, translations, security scan
+- `package-app` — guidance for building the ZIP and updating the registry manifest entry
+- `submit-app` — guidance for opening the registry PR with the correct template
 
 See the [Agent Skills section in the README](../README.md#agent-skills) for installation.
 
