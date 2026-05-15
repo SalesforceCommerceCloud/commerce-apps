@@ -51,7 +51,7 @@ find impex/ -name "*.xml" -exec xmllint --noout {} \;
 
 ### XSD schema validation (preferred)
 
-If the `b2c` CLI is available, validate against the bundled SFCC XSD schemas — this catches namespace, structural, and type errors that plain well-formedness misses:
+Validate against the bundled SFCC XSD schemas — this catches namespace, structural, and type errors that plain well-formedness misses. The `b2c` CLI ships the schemas; use `npx @salesforce/b2c-cli` if it's not installed globally.
 
 ```bash
 # List bundled schemas
@@ -70,8 +70,6 @@ xmllint --schema "$(b2c docs schema services --path)" impex/uninstall/services.x
 # Validate preferences
 xmllint --schema "$(b2c docs schema preferences --path)" impex/install/preferences.xml --noout
 ```
-
-If `b2c` is not installed globally, use `npx @salesforce/b2c-cli docs schema ...` instead.
 
 ## Step 3: Validate services.xml
 

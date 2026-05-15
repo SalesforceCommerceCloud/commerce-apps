@@ -213,7 +213,7 @@ Beyond `b2c cap validate`, validate the XML directly:
 - `SITEID` placeholder used in `preferences.xml` (not a real site ID)
 - No hardcoded production credentials
 
-The `b2c` CLI bundles the SFCC XSD schemas — pair `b2c docs schema --path` with `xmllint --schema`:
+The `b2c` CLI bundles the SFCC XSD schemas — pair `b2c docs schema --path` with `xmllint --schema`. If `b2c` isn't installed globally, swap in `npx @salesforce/b2c-cli` anywhere `b2c` appears:
 
 ```bash
 # List bundled schemas
