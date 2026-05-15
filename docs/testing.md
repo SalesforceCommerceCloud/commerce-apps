@@ -49,21 +49,18 @@ Install per the [extension installation docs](https://salesforcecommercecloud.gi
 
 ### `b2c` CLI
 
-The [`b2c` CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/cli/) is the primary tool for testing apps against a sandbox. Install it once and authenticate via environment variables.
+The [`b2c` CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/cli/) is the primary tool for testing apps against a sandbox. Install it once and configure your sandbox connection.
 
 ```bash
 # Install
 npm install -g @salesforce/b2c-cli
 # or use without install: npx @salesforce/b2c-cli ...
 
-# Configure once per shell (or use a .envrc / direnv)
-export SFCC_SERVER=my-sandbox.demandware.net
-export SFCC_USERNAME=my-bm-user
-export SFCC_PASSWORD=my-webdav-access-key
-export SFCC_CLIENT_ID=my-client
-export SFCC_CLIENT_SECRET=my-secret
-export SFCC_CODE_VERSION=version1
+# Configure interactively — writes a dw.json
+b2c setup instance
 ```
+
+The idiomatic configuration is a `dw.json` file at the project root (or any parent directory). The same file is picked up by the [B2C DX VS Code extension](https://salesforcecommercecloud.github.io/b2c-developer-tooling/vscode-extension/), so configuring once works for both. CLI flags and `SFCC_*` environment variables are also supported. See the [Configuration guide](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/configuration) for the full schema, multi-instance setups, and the precedence rules.
 
 Key commands referenced in this guide:
 
