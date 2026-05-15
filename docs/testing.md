@@ -82,24 +82,11 @@ Key commands referenced in this guide:
 
 > **Safety:** Set `SFCC_SAFETY_LEVEL=NO_DELETE` (or `READ_ONLY`) in shared/CI environments to block destructive operations. See the [Safety Mode docs](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/safety).
 
-### Claude Code Skills
+### Agent Skills
 
-This repository ships skills that automate the registry workflow. Invoke them by name from Claude Code:
+This repository ships the `cap-dev` plugin — a set of agent skills that automate the registry workflow (`scaffold-app`, `generate-*-impex`, `validate-impex`, `package-app`, `validate-app`, `submit-app`). See the [Agent Skills section in the README](../README.md#agent-skills) for installation and the full skill list.
 
-| Skill | Use when |
-|-------|----------|
-| `/scaffold-app` | Starting a new app — generates the directory structure and templates |
-| `/generate-service-impex` | Creating service credential / profile / definition impex (install + uninstall) |
-| `/generate-site-preferences-impex` | Adding merchant-configurable site preferences |
-| `/generate-custom-object-impex` | Adding custom object types for storage/caching |
-| `/validate-impex` | Validating impex XML syntax, namespaces, and install/uninstall pairing |
-| `/package-app` | Packaging a directory into a registry-ready ZIP and updating SHA256 in `manifest.json` |
-| `/validate-app` | Pre-submission validation — ZIP structure, manifest, hash, impex, security |
-| `/submit-app` | Opening the registry PR with the correct format and checklist |
-
-The skills layer on top of the `b2c` CLI — both `b2c cap validate` and `/validate-app` are appropriate, but `/validate-app` adds the registry-specific checks (manifest entry, SHA256 against `commerce-apps-manifest/manifest.json`, icon hash policy, etc.).
-
-> **Tip:** B2C platform skills (`b2c-code`, `b2c-logs`, `b2c-sandbox`, `b2c-job`, etc.) are also available if installed via `b2c setup install-skills`. They wrap the corresponding CLI commands for agent-driven workflows.
+Once installed, this guide refers to skills by their slash-command form (`/validate-impex`, `/validate-app`, `/package-app`, etc.). They layer on top of the `b2c` CLI — `/validate-app` adds the registry-specific checks (manifest entry, SHA256 against `commerce-apps-manifest/manifest.json`, icon hash policy) on top of `b2c cap validate`.
 
 ---
 
