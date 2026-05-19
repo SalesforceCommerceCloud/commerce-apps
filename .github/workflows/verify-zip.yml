@@ -211,6 +211,20 @@ jobs:
             fi
 
             echo "  ✓ tasksList.json is valid ($(jq 'length' "$required_task_list") task(s))"
+
+            # Validate optional app-configuration/adminComponents.json.
+            # See .github/scripts/validate-admin-components.sh for schema.
+            admin_components="$root/app-configuration/adminComponents.json"
+            if [[ -f "$admin_components" ]]; then
+              if ! admin_output="$(bash ".github/scripts/validate-admin-components.sh" "$admin_components" 2>&1)"; then
+                echo "::error file=$zip_path::app-configuration/adminComponents.json validation failed:"
+                printf '%s\n' "$admin_output"
+                rm -rf "$tmpdir"
+                exit 1
+              fi
+              echo "  ✓ $admin_output"
+            fi
+
             rm -rf "$tmpdir"
           done < changed_zips.txt
 
