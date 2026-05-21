@@ -8,24 +8,9 @@ Run before packaging any app to catch security issues early.
 bash .github/scripts/security-scan.sh <domain>/<appName>/commerce-<appName>-app-v<version>/
 ```
 
-## Blocking findings (exit code 1)
+## Rule reference
 
-**Must fix before packaging:**
-- Dynamic code evaluation constructs — code injection sinks
-- Hardcoded secrets or credentials (API keys, AWS keys, GitHub PATs, Slack tokens, private keys)
-- Hook scripts referenced in hooks.json that don't exist on disk
-- Missing uninstall/services.xml or missing mode="delete" attributes
-- Unsafe HTML manipulation — XSS risk
-
-## Warning findings (review recommended)
-
-**Should fix but non-blocking:**
-- Console logging in cartridge code — use dw.system.Logger instead
-- HTTPClient without explicit timeout configuration
-- Service profile XML missing timeout-millis element
-- Hook scripts without try/catch error handling
-- Non-cryptographic random number generation
-- Inline Authorization headers instead of service framework
+See [security-rules.md](../../shared/security-rules.md) for the complete list of blocking and warning checks.
 
 ## Response to findings
 

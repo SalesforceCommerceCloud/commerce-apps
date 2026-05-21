@@ -126,6 +126,7 @@ Your response:
 - Semantic versioning: `major.minor.patch`
 - Version in `commerce-app.json` MUST match `manifest.json`
 - SHA256 in `manifest.json` MUST match actual ZIP hash
+- **When you modify any file inside a `commerce-{app-name}-app-v*/` directory, you MUST re-package the ZIP and update the SHA256 hash in `manifest.json` before finishing.** Do not wait for the user to ask — the ZIP is stale as soon as a source file changes.
 - Do NOT add new versions to `catalog.json` when updating (CI handles it)
 - You MAY add `"deprecated": true` to existing versions in `catalog.json`
 
@@ -134,6 +135,13 @@ Your response:
 - Use placeholders for API keys/secrets
 - Use `<password>` type for sensitive site preferences
 - Mark sensitive data clearly in documentation
+- NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`) in packages
+- NO direct `HTTPClient` usage — must use service framework
+- NO `innerHTML`/`outerHTML` assignment, `insertAdjacentHTML`, or document write methods
+- NO `setTimeout`/`setInterval` in hook scripts
+- NO unbounded loops (`while(true)` / `for(;;)`) without break/return
+- NO ISML `<isprint>` with `encoding="off"`
+- ALL apps with services MUST have rate limiting AND circuit breaker enabled on service profiles
 
 ### 5. Impex Rules
 - Service install files MUST have matching uninstall files
@@ -146,6 +154,7 @@ Your response:
 - Single root folder: `commerce-{app-name}-app-v{version}/`
 - NO junk files: `.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files
 - NO `node_modules`, `.git`, IDE files
+- NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`)
 - Optional: `icons/` directory with ISV icon(s)
 - Use exclusions when creating ZIP:
   ```bash
@@ -470,6 +479,12 @@ Before suggesting `/submit-app-pr`, verify:
 - [ ] No sensitive data in XML
 - [ ] Passwords use `<password>` type
 - [ ] API keys are placeholders
+- [ ] No direct HTTPClient usage (use service framework)
+- [ ] No secret files in package (.env, .key, .pem, .p12, .pfx, .jks)
+- [ ] No eval/innerHTML/outerHTML/insertAdjacentHTML/document write
+- [ ] Hook scripts have try/catch, export expected functions, no setTimeout/setInterval
+- [ ] No unbounded loops without exit conditions
+- [ ] All service profiles have rate-limit-enabled=true AND circuit-breaker-enabled=true (or cb-enabled=true)
 
 ## Helping Developers Effectively
 

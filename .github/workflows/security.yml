@@ -1,7 +1,6 @@
 name: Security Review
 
 permissions:
-  pull-requests: write  # Needed for leaving PR comments
   contents: read
 
 on:
@@ -66,3 +65,4 @@ jobs:
           while IFS= read -r dir; do
             bash .github/scripts/security-scan.sh "$dir"
           done < /tmp/cap-roots.txt
+
