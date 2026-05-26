@@ -178,7 +178,9 @@ jobs:
             fi
 
             # Validate each task object:
-            #   Required: name (non-empty string), description (non-empty string), taskNumber (string, sequential from "1")
+            #   Required: taskKey (snake_case identifier, unique per file),
+            #             name (non-empty string), description (non-empty string),
+            #             taskNumber (string, sequential from "1")
             #   Optional: link (string, may be empty)
             validation_errors=$(jq -r '
               [to_entries[] |
@@ -187,6 +189,10 @@ jobs:
                (
                  if ($task | type) != "object" then
                    "Item at index \($idx): must be an object"
+                 elif ($task.taskKey | type) != "string" or ($task.taskKey | length) == 0 then
+                   "Item at index \($idx): \"taskKey\" is required and must be a non-empty string"
+                 elif ($task.taskKey | test("^[a-z][a-z0-9_]*$")) | not then
+                   "Item at index \($idx): \"taskKey\" must match ^[a-z][a-z0-9_]*$ (snake_case, got \"\($task.taskKey)\")"
                  elif ($task.name | type) != "string" or ($task.name | length) == 0 then
                    "Item at index \($idx): \"name\" is required and must be a non-empty string"
                  elif ($task.description | type) != "string" or ($task.description | length) == 0 then
@@ -206,6 +212,14 @@ jobs:
             if [[ -n "$validation_errors" ]]; then
               echo "::error file=$zip_path::app-configuration/tasksList.json structure validation failed:"
               echo "$validation_errors"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # taskKey uniqueness check (separate pass — easier to read than folding into the per-task validator)
+            duplicate_keys=$(jq -r '[.[].taskKey] | group_by(.) | map(select(length > 1) | .[0]) | join(", ")' "$required_task_list" 2>/dev/null)
+            if [[ -n "$duplicate_keys" ]]; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json has duplicate taskKey values: $duplicate_keys"
               rm -rf "$tmpdir"
               exit 1
             fi
@@ -557,5 +571,228 @@ jobs:
 
             rm -rf "$tmpdir"
             echo "SUCCESS - storefrontSupport validated for $zip_file"
+          done < changed_zips.txt
+
+      - name: Step 9 - Validate app-configuration/translations/
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Set of supported BM locales — must match the table in CONTRIBUTING.md
+          # under "Localizing app-shipped strings > Supported locales".
+          supported_locales=("ar_MA" "de" "en-US" "es" "fr" "it" "ja" "ko" "nl" "pl" "pt" "zh_CN" "zh_TW")
+
+          [[ -s changed_zips.txt ]] || exit 0
+
+          while IFS= read -r zip_path; do
+            [[ -f "$zip_path" ]] || continue
+
+            tmpdir="$(mktemp -d)"
+            unzip -q "$zip_path" -d "$tmpdir"
+
+            root="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d -not -name '__MACOSX' -print -quit)"
+            translations_dir="$root/app-configuration/translations"
+
+            # Translations directory is optional. If absent, nothing to do.
+            if [[ ! -d "$translations_dir" ]]; then
+              echo "No app-configuration/translations/ for $(basename "$zip_path") - OK (optional)"
+              rm -rf "$tmpdir"
+              continue
+            fi
+
+            # en-US.json is required when the directory exists.
+            default_locale="$translations_dir/en-US.json"
+            if [[ ! -f "$default_locale" ]]; then
+              echo "::error file=$zip_path::app-configuration/translations/ exists but en-US.json is missing"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Every locale file must be valid JSON with the expected shape:
+            #   {
+            #     "tasks": { "<taskKey>": { "name": "...", "description": "..." }, ... },
+            #     "adminComponents": {                              (optional)
+            #       "<componentKey>": {
+            #         "attributes": { "<id>": { "label": "..." }, ... }
+            #       }, ...
+            #     }
+            #   }
+            shape_errors=""
+            while IFS= read -r locale_file; do
+              if ! jq empty "$locale_file" 2>/dev/null; then
+                shape_errors+=$'\n'"$(basename "$locale_file"): not valid JSON"
+                continue
+              fi
+              if ! jq -e '.tasks | type == "object"' "$locale_file" >/dev/null 2>&1; then
+                shape_errors+=$'\n'"$(basename "$locale_file"): missing or non-object \"tasks\" key"
+                continue
+              fi
+              # Each task entry must have non-empty name and description strings.
+              bad_entries=$(jq -r '
+                .tasks
+                | to_entries
+                | map(select(
+                    (.value | type) != "object"
+                    or (.value.name | type) != "string" or (.value.name | length) == 0
+                    or (.value.description | type) != "string" or (.value.description | length) == 0
+                  ) | .key)
+                | join(", ")
+              ' "$locale_file" 2>/dev/null)
+              if [[ -n "$bad_entries" ]]; then
+                shape_errors+=$'\n'"$(basename "$locale_file"): tasks with missing/invalid name or description: $bad_entries"
+              fi
+              # adminComponents namespace is optional. When present, validate shape.
+              if jq -e 'has("adminComponents")' "$locale_file" >/dev/null 2>&1; then
+                if ! jq -e '.adminComponents | type == "object"' "$locale_file" >/dev/null 2>&1; then
+                  shape_errors+=$'\n'"$(basename "$locale_file"): \"adminComponents\" must be an object"
+                  continue
+                fi
+                bad_admin=$(jq -r '
+                  .adminComponents
+                  | to_entries
+                  | map(
+                      .key as $ck |
+                      (.value | (
+                        if type != "object" then "\($ck): must be an object"
+                        elif has("attributes") | not then "\($ck): missing \"attributes\""
+                        elif (.attributes | type) != "object" then "\($ck): \"attributes\" must be an object"
+                        else
+                          (.attributes | to_entries | map(
+                            select(
+                              (.value | type) != "object"
+                              or (.value.label | type) != "string"
+                              or (.value.label | length) == 0
+                            ) | "\($ck).attributes.\(.key): \"label\" missing or invalid"
+                          ) | join("; "))
+                        end
+                      ))
+                    )
+                  | map(select(. != null and . != ""))
+                  | join("; ")
+                ' "$locale_file" 2>/dev/null)
+                if [[ -n "$bad_admin" ]]; then
+                  shape_errors+=$'\n'"$(basename "$locale_file"): adminComponents shape invalid: $bad_admin"
+                fi
+              fi
+            done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json')
+
+            if [[ -n "$shape_errors" ]]; then
+              echo "::error file=$zip_path::app-configuration/translations/ shape validation failed:$shape_errors"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Locale filenames must be in the supported set.
+            unsupported_locales=""
+            while IFS= read -r locale_file; do
+              fname="$(basename "$locale_file" .json)"
+              ok=false
+              for supported in "${supported_locales[@]}"; do
+                [[ "$fname" == "$supported" ]] && ok=true && break
+              done
+              [[ "$ok" == "false" ]] && unsupported_locales+="$fname "
+            done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json')
+
+            if [[ -n "$unsupported_locales" ]]; then
+              echo "::error file=$zip_path::Unsupported locale file(s) in app-configuration/translations/: $unsupported_locales(supported: ${supported_locales[*]})"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Build the canonical key set from en-US.json.
+            en_keys_sorted=$(jq -r '.tasks | keys_unsorted | sort | join(",")' "$default_locale")
+
+            # Every taskKey in tasksList.json must be present in en-US.json.
+            tasks_list="$root/app-configuration/tasksList.json"
+            missing_in_en=$(jq -r --argjson en "$(jq '.tasks | keys' "$default_locale")" \
+              '[.[] | .taskKey] - $en | join(", ")' "$tasks_list" 2>/dev/null)
+            if [[ -n "$missing_in_en" ]]; then
+              echo "::error file=$zip_path::tasksList.json references taskKey(s) not present in translations/en-US.json: $missing_in_en"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Every non-default locale file must reference exactly the same task keys as en-US.json.
+            while IFS= read -r locale_file; do
+              [[ "$locale_file" == "$default_locale" ]] && continue
+              locale_keys_sorted=$(jq -r '.tasks | keys_unsorted | sort | join(",")' "$locale_file")
+              if [[ "$locale_keys_sorted" != "$en_keys_sorted" ]]; then
+                # Compute set differences for a clearer error message.
+                extra_in_locale=$(jq -r --argjson en "$(jq '.tasks | keys' "$default_locale")" \
+                  '(.tasks | keys) - $en | join(", ")' "$locale_file")
+                missing_in_locale=$(jq -r --argjson locale "$(jq '.tasks | keys' "$locale_file")" \
+                  '(.tasks | keys) - $locale | join(", ")' "$default_locale")
+                msg="$(basename "$locale_file") tasks key parity mismatch with en-US.json"
+                [[ -n "$missing_in_locale" ]] && msg+=" — missing: $missing_in_locale"
+                [[ -n "$extra_in_locale" ]] && msg+=" — extra: $extra_in_locale"
+                echo "::error file=$zip_path::$msg"
+                rm -rf "$tmpdir"
+                exit 1
+              fi
+            done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json')
+
+            # adminComponents coverage + parity (only when adminComponents.json is shipped).
+            admin_components="$root/app-configuration/adminComponents.json"
+            if [[ -f "$admin_components" ]]; then
+              # Build the canonical (componentKey, attribute id) pairs from adminComponents.json
+              # configuration[]. Only configuration[] entries are required to declare componentKey
+              # in the current schema. Pairs are flattened to "componentKey/attribute_id" for set comparison.
+              cap_pairs_sorted=$(jq -r '
+                [.configuration // []
+                  | .[]
+                  | select(has("componentKey") and (.attributes | type) == "array")
+                  | .componentKey as $ck
+                  | .attributes[]
+                  | "\($ck)/\(.id)"]
+                | sort | join(",")
+              ' "$admin_components")
+
+              # Helper: flatten a locale file's adminComponents tree into the same pair shape.
+              flatten_admin() {
+                local file="$1"
+                jq -r '
+                  (.adminComponents // {})
+                  | to_entries
+                  | map(.key as $ck | (.value.attributes // {}) | keys | map("\($ck)/\(.)"))
+                  | flatten | sort | join(",")
+                ' "$file"
+              }
+
+              # Coverage: every CAP pair must exist in en-US.json's adminComponents.
+              en_admin_pairs=$(flatten_admin "$default_locale")
+              missing_in_en_admin=$(comm -23 \
+                <(printf '%s\n' "$cap_pairs_sorted" | tr ',' '\n' | grep -v '^$') \
+                <(printf '%s\n' "$en_admin_pairs" | tr ',' '\n' | grep -v '^$') | tr '\n' ',' | sed 's/,$//')
+              if [[ -n "$missing_in_en_admin" ]]; then
+                echo "::error file=$zip_path::adminComponents.json references componentKey/attribute pair(s) not present in translations/en-US.json: $missing_in_en_admin"
+                rm -rf "$tmpdir"
+                exit 1
+              fi
+
+              # Parity: every non-default locale's adminComponents pair set must equal en-US's.
+              while IFS= read -r locale_file; do
+                [[ "$locale_file" == "$default_locale" ]] && continue
+                locale_admin_pairs=$(flatten_admin "$locale_file")
+                if [[ "$locale_admin_pairs" != "$en_admin_pairs" ]]; then
+                  extra=$(comm -23 \
+                    <(printf '%s\n' "$locale_admin_pairs" | tr ',' '\n' | grep -v '^$') \
+                    <(printf '%s\n' "$en_admin_pairs" | tr ',' '\n' | grep -v '^$') | tr '\n' ',' | sed 's/,$//')
+                  missing=$(comm -23 \
+                    <(printf '%s\n' "$en_admin_pairs" | tr ',' '\n' | grep -v '^$') \
+                    <(printf '%s\n' "$locale_admin_pairs" | tr ',' '\n' | grep -v '^$') | tr '\n' ',' | sed 's/,$//')
+                  msg="$(basename "$locale_file") adminComponents key parity mismatch with en-US.json"
+                  [[ -n "$missing" ]] && msg+=" — missing: $missing"
+                  [[ -n "$extra" ]] && msg+=" — extra: $extra"
+                  echo "::error file=$zip_path::$msg"
+                  rm -rf "$tmpdir"
+                  exit 1
+                fi
+              done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json')
+            fi
+
+            locale_count=$(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')
+            echo "  ✓ translations/ validated ($locale_count locale file(s))"
+
+            rm -rf "$tmpdir"
           done < changed_zips.txt
 

@@ -286,12 +286,16 @@ At minimum, your app directory must contain:
 
 - **`commerce-app.json`** - App metadata (id, name, version, domain, publisher)
 - **`README.md`** - Installation and configuration documentation
-- **`app-configuration/tasksList.json`** - Post-install checklist
+- **`app-configuration/tasksList.json`** - Post-install checklist. Every entry **must** declare a unique non-empty `taskKey` (snake_case identifier matching `^[a-z][a-z0-9_]*$`); see [Localizing app-shipped strings](#localizing-app-shipped-strings).
 - **`cartridges/`** - At least one site or BM cartridge
 - **`impex/install/services.xml`** - Service definitions
 - **`impex/uninstall/services.xml`** - Cleanup instructions
 
 ### Optional Files
+
+- **`app-configuration/adminComponents.json`** — Admin-rendered components such as `storefrontComponentVisibility` toggle rows. When present, every entry in `configuration[]` **must** declare a unique non-empty `componentKey` (snake_case identifier matching `^[a-z][a-z0-9_]*$`); see [Localizing app-shipped strings](#localizing-app-shipped-strings).
+
+- **`app-configuration/translations/`** — Localized strings for `tasksList.json` and (when shipped) `adminComponents.json`. See [Localizing app-shipped strings](#localizing-app-shipped-strings).
 
 - **`icons/`** - App/ISV icon for display in the registry
   - Place icon files (PNG, SVG, JPG, or JPEG) in the `icons/` directory at the root of your CAP
@@ -330,6 +334,158 @@ The `commerce-app.json` file inside your ZIP must match the root manifest entry:
 ```
 
 **Critical:** The `version` field in `commerce-app.json` **must** match the `version` in the root manifest (`commerce-apps-manifest/manifest.json`). If `storefrontSupport` is present in the root manifest, it must also be present with matching values in `commerce-app.json`.
+
+---
+
+## Localizing app-shipped strings
+
+Two app-configuration files contribute strings to Business Manager:
+
+- `app-configuration/tasksList.json` — the "Complete your setup" checklist shown after install.
+- `app-configuration/adminComponents.json` (optional) — admin-rendered components such as `storefrontComponentVisibility` toggle rows.
+
+By default the strings ship in English. Apps may also ship locale files under `app-configuration/translations/` so BM renders them in the user's language. Translatable fields are marked below per artifact.
+
+### `taskKey` is required on every task
+
+Every entry in `tasksList.json` must declare a unique non-empty `taskKey`:
+
+```json
+// app-configuration/tasksList.json
+[
+  {
+    "taskKey": "verify_service_credentials",
+    "name": "Verify Avalara Service Credentials",
+    "description": "Confirm the Avalara service credentials are configured correctly...",
+    "link": "/on/demandware.store/...",
+    "taskNumber": "2"
+  }
+]
+```
+
+Rules:
+- `taskKey` matches `^[a-z][a-z0-9_]*$` (snake_case).
+- `taskKey` values must be unique within a single `tasksList.json`.
+- A `taskKey`, once shipped, is the stable identifier for that task across versions — translation files reference it. Avoid renaming.
+
+The `name` and `description` fields stay in `tasksList.json` and serve as the literal-English fallback. `link`, `taskNumber`, and `taskKey` are not translated.
+
+### `componentKey` is required on every admin component
+
+If your app ships an `app-configuration/adminComponents.json`, every entry must declare a unique non-empty `componentKey`:
+
+```json
+// app-configuration/adminComponents.json
+{
+  "configuration": [
+    {
+      "componentKey": "loqate_component_visibility",
+      "type": "storefrontComponentVisibility",
+      "header": "Component Visibility",
+      "description": "Control where the Loqate address verification component appears on the storefront.",
+      "attributes": [
+        { "id": "sfcc.checkout.shippingAddress.after", "label": "Show on Checkout", "defaultValue": true }
+      ]
+    }
+  ]
+}
+```
+
+Rules:
+- `componentKey` matches `^[a-z][a-z0-9_]*$` (snake_case).
+- `componentKey` values must be unique across the file (the namespace is flat in translation files).
+- A `componentKey`, once shipped, is the stable identifier across versions. Avoid renaming.
+
+What is and isn't translatable on admin components (per design):
+- **Translatable:** `attributes[].label`.
+- **Not translatable:** attribute `id` and `defaultValue`.
+
+The literal English `label` on each attribute stays in `adminComponents.json` and serves as the fallback.
+
+### `app-configuration/translations/<locale>.json`
+
+If your app ships any translated strings, add a `translations/` directory:
+
+```
+commerce-{appName}-app-v{version}/
+└── app-configuration/
+    ├── tasksList.json
+    ├── adminComponents.json     (optional)
+    └── translations/
+        ├── en-US.json           # required if translations/ exists
+        ├── de.json
+        ├── ja.json
+        └── ...
+```
+
+Each locale file uses two reserved top-level namespaces — `tasks` and `adminComponents` — keyed by `taskKey` and `componentKey` respectively. Include the namespace only if the corresponding artifact is present.
+
+```json
+// app-configuration/translations/de.json
+{
+  "tasks": {
+    "verify_service_credentials": {
+      "name": "Avalara-Dienstanmeldedaten überprüfen",
+      "description": "Bestätigen Sie, dass die Avalara-Dienstanmeldedaten korrekt konfiguriert sind."
+    }
+  },
+  "adminComponents": {
+    "loqate_component_visibility": {
+      "attributes": {
+        "sfcc.checkout.shippingAddress.after": { "label": "Beim Checkout anzeigen" }
+      }
+    }
+  }
+}
+```
+
+Rules:
+- The top-level `tasks` and `adminComponents` keys are reserved by the registry. Do not introduce sibling keys without coordinating with the registry team — future namespaces will follow the same reserved pattern.
+- Translatable fields per task: `name`, `description` (both required, non-empty, in every locale file that lists the task).
+- Translatable fields per admin component: `attributes.<id>.label` (required, non-empty, for every (componentKey, attribute id) pair listed in the locale file).
+- Locale filenames must use the BCP-47 tag of a [supported BM locale](#supported-locales) (`en-US.json`, `de.json`, `fr.json`, …).
+- `en-US.json` is **required** when `translations/` exists. It defines the canonical key set every other locale file must match exactly — no extra keys, no missing keys, in either namespace.
+- The English text in `en-US.json` and the literal English in `tasksList.json` / `adminComponents.json` must stay in sync. If a string changes, update both.
+
+### Fallback chain
+
+At render time the BM client requests a locale; the registry resolves each translatable string in this order:
+
+1. `translations/<requested-locale>.json`
+2. `translations/en-US.json`
+3. literal English from the source artifact:
+   - tasks → `name` / `description` on the task itself in `tasksList.json`
+   - admin component attribute labels → `label` on the attribute in `adminComponents.json`
+
+Result: an app that omits `translations/` entirely keeps rendering literal English in every locale (existing behavior). An app that ships only `en-US.json` renders the same strings in every locale, but is wired up to add more locales later without further code changes.
+
+### Locale rollout
+
+`en-US` is required at submission when `translations/` is present. Additional locales are optional and can be added incrementally as your localization team produces them — there is no requirement to ship all supported locales at once.
+
+> **Heads up:** translation files are bundled inside the CAP zip and merged into the persisted task list at install time. Adding or updating translations after the fact requires shipping a new app version and having merchants upgrade — there is no out-of-band path for the registry to push translation updates to an already-installed app. Plan to include `en-US.json` (at minimum) in any version that introduces translatable strings, even if other locales come later.
+
+### Supported locales
+
+Locale filenames are validated against the set of locales supported by Business Manager. The currently supported set is:
+
+| Locale | Filename |
+|:--|:--|
+| Arabic (Morocco) | `ar_MA.json` |
+| German | `de.json` |
+| English (United States) | `en-US.json` |
+| Spanish | `es.json` |
+| French | `fr.json` |
+| Italian | `it.json` |
+| Japanese | `ja.json` |
+| Korean | `ko.json` |
+| Dutch | `nl.json` |
+| Polish | `pl.json` |
+| Portuguese | `pt.json` |
+| Chinese (Simplified) | `zh_CN.json` |
+| Chinese (Traditional) | `zh_TW.json` |
+
+CI will reject locale files whose filenames are outside this set.
 
 ---
 
@@ -464,6 +620,14 @@ Before submitting your PR, please verify:
 - [ ] All referenced scripts/files exist
 - [ ] No absolute paths in code
 - [ ] No hardcoded credentials
+
+### Localization
+- [ ] Every entry in `tasksList.json` declares a unique non-empty `taskKey` matching `^[a-z][a-z0-9_]*$`
+- [ ] If `adminComponents.json` is shipped, every entry declares a unique non-empty `componentKey` matching `^[a-z][a-z0-9_]*$`
+- [ ] If `app-configuration/translations/` exists, `en-US.json` is present and lists every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
+- [ ] Every non-default locale file lists exactly the same keys as `en-US.json` (no extras, no missing) in both `tasks` and `adminComponents` namespaces
+- [ ] All locale filenames are in the [supported locale set](#supported-locales) and use BCP-47 tags
+- [ ] English text in `en-US.json` matches the literal English in `tasksList.json` and `adminComponents.json`
 
 ### Domain and Naming
 - [ ] App follows structure: `{domain}/{isv-name}/`
