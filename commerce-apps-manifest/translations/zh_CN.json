@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "自定义支付",
         "description": "通过提供您自己的 API 来配置自定义支付集成。"
+    },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Loads Noibu session monitoring script on every storefront page"
     }
 }

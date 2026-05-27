@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "Aangepaste betaling",
         "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
+    },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Loads Noibu session monitoring script on every storefront page"
     }
 }
