@@ -13,11 +13,7 @@
 #   - Top-level keys "connectionDetails" and "configuration" are both
 #     optional. When present, each must be an array.
 #   - Every entry in either array must be an object with a non-empty string
-#     "type". Other fields are not validated for connectionDetails entries.
-#   - Every entry in configuration[] must additionally declare a non-empty
-#     string "componentKey" matching ^[a-z][a-z0-9_]*$. componentKey values
-#     must be unique within configuration[] (the namespace is flat in
-#     translation files).
+#     "type". Other fields are not validated.
 #   - Configuration entries with type == "storefrontComponentVisibility"
 #     must declare attributes[] (non-empty array). Each attribute must be
 #     an object with a non-empty string "id", non-empty string "label",
@@ -59,26 +55,15 @@ errors="$(jq -r '
       "\($section)[\($idx)]: must be an object"
     elif (.type | type) != "string" or (.type | length) == 0 then
       "\($section)[\($idx)]: \"type\" is required and must be a non-empty string"
-    else
-      ([
-        # componentKey is required on configuration[] entries only.
-        (if $section == "configuration" then
-           if (.componentKey | type) != "string" or (.componentKey | length) == 0 then
-             "\($section)[\($idx)]: \"componentKey\" is required and must be a non-empty string"
-           elif (.componentKey | test("^[a-z][a-z0-9_]*$")) | not then
-             "\($section)[\($idx)]: \"componentKey\" must match ^[a-z][a-z0-9_]*$ (snake_case, got \"\(.componentKey)\")"
-           else empty end
-         else empty end),
-        # storefrontComponentVisibility requires a non-empty attributes array.
-        (if $section == "configuration" and .type == "storefrontComponentVisibility" then
-           if (.attributes | type) != "array" or (.attributes | length) == 0 then
-             "\($section)[\($idx)]: storefrontComponentVisibility requires non-empty \"attributes\" array"
-           else
-             ([.attributes | to_entries[] as $e | ($e.value | validate_attribute($idx; $e.key))] | join("\n") | select(length > 0))
-           end
-         else empty end)
-      ] | map(select(. != null and . != "")) | join("\n") | select(length > 0))
-    end;
+    elif $section == "configuration" and .type == "storefrontComponentVisibility" then
+      (
+        if (.attributes | type) != "array" or (.attributes | length) == 0 then
+          "\($section)[\($idx)]: storefrontComponentVisibility requires non-empty \"attributes\" array"
+        else
+          ([.attributes | to_entries[] as $e | ($e.value | validate_attribute($idx; $e.key))] | join("\n") | select(length > 0))
+        end
+      )
+    else empty end;
 
   def validate_section($section):
     if has($section) then
@@ -99,16 +84,6 @@ errors="$(jq -r '
 if [[ -n "$errors" ]]; then
   echo "adminComponents.json structure validation failed:" >&2
   printf '%s\n' "$errors" >&2
-  exit 1
-fi
-
-# componentKey uniqueness check (within configuration[]).
-duplicate_keys="$(jq -r '
-  [(.configuration // [])[] | select(has("componentKey")) | .componentKey]
-  | group_by(.) | map(select(length > 1) | .[0]) | join(", ")
-' "$file" 2>/dev/null)"
-if [[ -n "$duplicate_keys" ]]; then
-  echo "adminComponents.json has duplicate componentKey values in configuration[]: $duplicate_keys" >&2
   exit 1
 fi
 

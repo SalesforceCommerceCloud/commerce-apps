@@ -71,7 +71,6 @@ assert_passes "canonical full shape (connectionDetails + storefrontComponentVisi
   ],
   "configuration": [
     {
-      "componentKey": "component_visibility",
       "type": "storefrontComponentVisibility",
       "header": "Component Visibility",
       "description": "Control where the component appears on the storefront.",
@@ -92,12 +91,11 @@ assert_passes "only connectionDetails present" '{
 }'
 
 assert_passes "only configuration present, non-SCV type" '{
-  "configuration": [{ "componentKey": "future_widget", "type": "someFutureType" }]
+  "configuration": [{ "type": "someFutureType" }]
 }'
 
 assert_passes "configuration with valid storefrontComponentVisibility" '{
   "configuration": [{
-    "componentKey": "component_visibility",
     "type": "storefrontComponentVisibility",
     "attributes": [
       { "id": "sfcc.checkout.shippingAddress.after", "label": "Show on Checkout", "defaultValue": true }
@@ -141,62 +139,39 @@ assert_rejects "entry without type is rejected" \
   'connectionDetails[0]: "type" is required'
 
 assert_rejects "entry with empty type is rejected" \
-  '{"configuration":[{"componentKey":"x","type":""}]}' \
+  '{"configuration":[{"type":""}]}' \
   'configuration[0]: "type" is required'
 
 assert_rejects "entry that is not an object is rejected" \
   '{"configuration":["nope"]}' \
   'configuration[0]: must be an object'
 
-assert_rejects "configuration entry missing componentKey is rejected" \
-  '{"configuration":[{"type":"someType"}]}' \
-  'configuration[0]: "componentKey" is required'
-
-assert_rejects "configuration entry with empty componentKey is rejected" \
-  '{"configuration":[{"componentKey":"","type":"someType"}]}' \
-  'configuration[0]: "componentKey" is required'
-
-assert_rejects "componentKey with invalid format (camelCase) is rejected" \
-  '{"configuration":[{"componentKey":"badCase","type":"someType"}]}' \
-  'configuration[0]: "componentKey" must match'
-
-assert_rejects "componentKey with leading digit is rejected" \
-  '{"configuration":[{"componentKey":"1bad","type":"someType"}]}' \
-  'configuration[0]: "componentKey" must match'
-
-assert_rejects "duplicate componentKey is rejected" \
-  '{"configuration":[
-     {"componentKey":"dup","type":"a"},
-     {"componentKey":"dup","type":"b"}
-   ]}' \
-  'duplicate componentKey values'
-
 assert_rejects "SCV without attributes is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility"}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility"}]}' \
   'requires non-empty "attributes" array'
 
 assert_rejects "SCV with empty attributes is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility","attributes":[]}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility","attributes":[]}]}' \
   'requires non-empty "attributes" array'
 
 assert_rejects "SCV attribute missing id is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility","attributes":[{"label":"x","defaultValue":true}]}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility","attributes":[{"label":"x","defaultValue":true}]}]}' \
   'attributes[0]: "id" is required'
 
 assert_rejects "SCV attribute with empty label is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"","defaultValue":true}]}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"","defaultValue":true}]}]}' \
   'attributes[0]: "label" is required'
 
 assert_rejects "SCV attribute with non-boolean defaultValue is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b","defaultValue":"true"}]}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b","defaultValue":"true"}]}]}' \
   'attributes[0]: "defaultValue" is required and must be a boolean'
 
 assert_rejects "SCV attribute missing defaultValue is rejected" \
-  '{"configuration":[{"componentKey":"x","type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b"}]}]}' \
+  '{"configuration":[{"type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b"}]}]}' \
   'attributes[0]: "defaultValue" is required'
 
 assert_rejects "error indices reflect real positions" \
-  '{"configuration":[{"componentKey":"a","type":"healthCheck"},{"componentKey":"b","type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b","defaultValue":true},{"id":"","label":"x","defaultValue":true}]}]}' \
+  '{"configuration":[{"type":"healthCheck"},{"type":"storefrontComponentVisibility","attributes":[{"id":"a","label":"b","defaultValue":true},{"id":"","label":"x","defaultValue":true}]}]}' \
   'configuration[1].attributes[1]: "id" is required'
 
 echo ""

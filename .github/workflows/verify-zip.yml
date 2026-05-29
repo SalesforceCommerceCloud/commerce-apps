@@ -163,14 +163,54 @@ jobs:
               exit 1
             fi
 
-            # See .github/scripts/validate-tasks-list.sh for schema.
-            if ! tasks_output="$(bash ".github/scripts/validate-tasks-list.sh" "$required_task_list" 2>&1)"; then
-              echo "::error file=$zip_path::app-configuration/tasksList.json validation failed:"
-              printf '%s\n' "$tasks_output"
+            # Validate tasksList.json is valid JSON
+            if ! jq empty "$required_task_list" 2>/dev/null; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json is not valid JSON"
               rm -rf "$tmpdir"
               exit 1
             fi
-            echo "  ✓ $tasks_output"
+
+            # Must be a non-empty JSON array
+            if ! jq -e 'type == "array" and length > 0' "$required_task_list" >/dev/null 2>&1; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json must be a non-empty JSON array"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            # Validate each task object:
+            #   Required: name (non-empty string), description (non-empty string), taskNumber (string, sequential from "1")
+            #   Optional: link (string, may be empty)
+            validation_errors=$(jq -r '
+              [to_entries[] |
+               .key as $idx |
+               .value as $task |
+               (
+                 if ($task | type) != "object" then
+                   "Item at index \($idx): must be an object"
+                 elif ($task.name | type) != "string" or ($task.name | length) == 0 then
+                   "Item at index \($idx): \"name\" is required and must be a non-empty string"
+                 elif ($task.description | type) != "string" or ($task.description | length) == 0 then
+                   "Item at index \($idx): \"description\" is required and must be a non-empty string"
+                 elif ($task.taskNumber | type) != "string" or ($task.taskNumber | length) == 0 then
+                   "Item at index \($idx): \"taskNumber\" is required and must be a non-empty string"
+                 elif $task.taskNumber != ($idx + 1 | tostring) then
+                   "Item at index \($idx): \"taskNumber\" must be \"\($idx + 1)\" (got \"\($task.taskNumber)\")"
+                 elif ($task | has("link")) and (($task.link | type) != "string") then
+                   "Item at index \($idx): \"link\" must be a string when present"
+                 else
+                   empty
+                 end
+               )] | join("\n")
+            ' "$required_task_list" 2>/dev/null)
+
+            if [[ -n "$validation_errors" ]]; then
+              echo "::error file=$zip_path::app-configuration/tasksList.json structure validation failed:"
+              echo "$validation_errors"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+
+            echo "  ✓ tasksList.json is valid ($(jq 'length' "$required_task_list") task(s))"
 
             # Validate optional app-configuration/adminComponents.json.
             # See .github/scripts/validate-admin-components.sh for schema.
@@ -517,32 +557,5 @@ jobs:
 
             rm -rf "$tmpdir"
             echo "SUCCESS - storefrontSupport validated for $zip_file"
-          done < changed_zips.txt
-
-      - name: Step 9 - Validate app-configuration/translations/
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          [[ -s changed_zips.txt ]] || exit 0
-
-          while IFS= read -r zip_path; do
-            [[ -f "$zip_path" ]] || continue
-
-            tmpdir="$(mktemp -d)"
-            unzip -q "$zip_path" -d "$tmpdir"
-
-            root="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d -not -name '__MACOSX' -print -quit)"
-
-            # See .github/scripts/validate-translations.sh for schema.
-            if ! translations_output="$(bash ".github/scripts/validate-translations.sh" "$root" 2>&1)"; then
-              echo "::error file=$zip_path::app-configuration/translations/ validation failed:"
-              printf '%s\n' "$translations_output"
-              rm -rf "$tmpdir"
-              exit 1
-            fi
-            echo "  ✓ $translations_output"
-
-            rm -rf "$tmpdir"
           done < changed_zips.txt
 
