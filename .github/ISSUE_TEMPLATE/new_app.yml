@@ -75,6 +75,33 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: translations-shipped
+    attributes:
+      label: Localization at submission
+      description: |
+        Does this submission include translated strings (for `tasksList.json` and/or `adminComponents.json`) under `app-configuration/translations/`?
+        See the [Localizing app-shipped strings](https://github.com/salesforce/commerce-apps/blob/main/CONTRIBUTING.md#localizing-app-shipped-strings) section of CONTRIBUTING.md.
+
+        **Heads up:** translations are bundled into the CAP zip and merged at install time — adding or updating them later requires shipping a new app version and having merchants upgrade. There is no out-of-band path to push translation updates to already-installed apps.
+      options:
+        - "No translations — English only (literal text in tasksList.json / adminComponents.json)"
+        - "en-US only — wired up for translations, additional locales coming later"
+        - "en-US plus one or more additional locales"
+    validations:
+      required: true
+
+  - type: input
+    id: translations-locales
+    attributes:
+      label: Locales included
+      description: |
+        If you ship locale files, list the BCP-47 tags here (e.g., `en-US, de, ja`).
+        Leave blank if no translations are shipped.
+      placeholder: en-US, de, ja
+    validations:
+      required: false
+
   - type: input
     id: publisher-url
     attributes:
@@ -103,6 +130,14 @@ body:
         - label: I am NOT committing extracted directories (only ZIP, manifest.json, catalog.json)
           required: true
         - label: The ZIP contains no junk files (.DS_Store, __MACOSX, hidden files)
+          required: true
+        - label: Every entry in `tasksList.json` declares a unique non-empty `taskKey` (snake_case)
+          required: true
+        - label: If `adminComponents.json` is shipped, every entry declares a unique non-empty `componentKey` (snake_case)
+          required: true
+        - label: If `app-configuration/translations/` is included, `en-US.json` is present and covers every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
+          required: true
+        - label: All locale filenames use BCP-47 tags from the supported set in CONTRIBUTING.md
           required: true
         - label: I have tested the app in a sandbox environment
           required: true
