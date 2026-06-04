@@ -3,12 +3,14 @@
         "taskKey": "verify_script_loads",
         "name": "Verify Script Loads on Storefront",
         "description": "Open your storefront in a browser, inspect the page source or Network tab, and confirm the Noibu script (collect-core.js) is present in the <head>.",
-        "taskNumber": "1"
+        "taskNumber": "1",
+        "link": "https://console.noibu.com"
     },
     {
         "taskKey": "confirm_data_in_dashboard",
         "name": "Confirm Data in Noibu Dashboard",
         "description": "Log in to your Noibu dashboard and verify that session data is being received from your storefront.",
-        "taskNumber": "2"
+        "taskNumber": "2",
+        "link": "https://console.noibu.com"
     }
 ]
