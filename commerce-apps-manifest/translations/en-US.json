@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "Custom Payment",
         "description": "Configure a custom payment integration by providing your own APIs."
+    },
+    "custom-analytics": {
+        "name": "Custom Analytics",
+        "description": "Configure a custom analytics integration by providing your own APIs."
     }
 }

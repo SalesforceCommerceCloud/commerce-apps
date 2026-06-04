@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "自訂付款",
         "description": "透過提供您自己的 API 來設定自訂付款整合。"
+    },
+    "custom-analytics": {
+        "name": "自訂分析",
+        "description": "透過提供您自己的 API 來設定自訂分析整合。"
     }
 }

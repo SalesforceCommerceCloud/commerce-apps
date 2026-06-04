@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "Pagamento personalizado",
         "description": "Configure uma integração de pagamento personalizada fornecendo suas próprias APIs."
+    },
+    "custom-analytics": {
+        "name": "Análise personalizada",
+        "description": "Configure uma integração de análise personalizada fornecendo suas próprias APIs."
     }
 }
