@@ -25,6 +25,6 @@
     },
     "custom-analytics": {
         "name": "Analytique personnalisée",
-        "description": "Configurez une intégration analytique personnalisée en fournissant vos propres API."
+        "description": "Configurez une intégration d'analytique personnalisée en fournissant vos propres API."
     }
 }
