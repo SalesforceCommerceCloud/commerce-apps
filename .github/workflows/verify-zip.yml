@@ -188,16 +188,16 @@ jobs:
             rm -rf "$tmpdir"
           done < changed_zips.txt
 
-      - name: Step 5 - [Tax] Verify hooks exist and scripts resolve
+      - name: Step 5 - Verify hooks exist and scripts resolve
         shell: bash
         run: |
           set -euo pipefail
 
-          required_hooks=(
-            "sfcc.app.tax.calculate"
-            "sfcc.app.tax.commit"
-            "sfcc.app.tax.cancel"
-          )
+          # Required hook suffixes — every tax app must implement these
+          required_suffixes=(calculate commit cancel)
+
+          # Optional hook suffixes — allowed for any domain but not required
+          optional_suffixes=(checkConnectionHealth)
 
           [[ -s changed_zips.txt ]] || exit 0
 
@@ -211,6 +211,20 @@ jobs:
               tax/*) is_tax_app=true ;;
               *) continue ;;
             esac
+
+            # Derive domain from the directory (e.g. tax/avalara-tax/... → tax)
+            domain="$(echo "$zip_path" | cut -d'/' -f1)"
+
+            # Build required and optional hook arrays for this domain
+            required_hooks=()
+            for suffix in "${required_suffixes[@]}"; do
+              required_hooks+=("sfcc.app.${domain}.${suffix}")
+            done
+
+            optional_hooks=()
+            for suffix in "${optional_suffixes[@]}"; do
+              optional_hooks+=("sfcc.app.${domain}.${suffix}")
+            done
 
             tmpdir="$(mktemp -d)"
             trap 'rm -rf "$tmpdir"' RETURN
@@ -234,14 +248,15 @@ jobs:
             echo "ZIP: $zip_path"
             echo "hooks.json: $hooks_file"
 
-            # Ensure there are no non-required hook names
+            # Ensure there are no hooks outside the required + optional sets
+            allowed_hooks=("${required_hooks[@]}" "${optional_hooks[@]}")
             while IFS= read -r name; do
               ok=false
-              for hook in "${required_hooks[@]}"; do
+              for hook in "${allowed_hooks[@]}"; do
                 [[ "$name" == "$hook" ]] && ok=true && break
               done
               if [[ "$ok" == "false" ]]; then
-                echo "::error file=$hooks_file::Disallowed hook \"$name\". Only allowed: ${required_hooks[*]}"
+                echo "::error file=$hooks_file::Disallowed hook \"$name\". Only allowed: ${allowed_hooks[*]}"
                 exit 1
               fi
             done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
@@ -265,7 +280,24 @@ jobs:
               fi
             done
 
-            echo "SUCCESS - required tax hooks and scripts verified for $zip_path"
+            # Validate optional hooks — if present, their scripts must resolve
+            for hook in "${optional_hooks[@]}"; do
+              script="$(jq -r --arg name "$hook" '.hooks[]? | select(.name == $name) | .script // empty' "$hooks_file" | head -n 1)"
+
+              if [[ -z "$script" || "$script" == "null" ]]; then
+                continue
+              fi
+
+              rel="${script#./}"
+              target="$hooks_dir/$rel"
+
+              if [[ ! -f "$target" ]]; then
+                echo "::error file=$hooks_file::Script for optional hook \"$hook\" points to missing file: $script (resolved: $target)"
+                exit 1
+              fi
+            done
+
+            echo "SUCCESS - required ${domain} hooks and scripts verified for $zip_path"
 
             rm -rf "$tmpdir"
             trap - RETURN
