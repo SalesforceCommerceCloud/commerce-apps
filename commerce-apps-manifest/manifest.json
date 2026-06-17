@@ -65,5 +65,16 @@
             "provider": "custom"
         }
     ],
-    "fraud": []
+    "fraud": [],
+    "analytics": [
+        {
+            "id": "custom-analytics",
+            "name": "Custom Analytics",
+            "description": "Configure a custom analytics integration by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "analytics",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ]
 }

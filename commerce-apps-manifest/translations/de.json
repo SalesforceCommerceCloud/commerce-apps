@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "Benutzerdefinierte Zahlung",
         "description": "Konfigurieren Sie eine benutzerdefinierte Zahlungsintegration mit Ihren eigenen APIs."
+    },
+    "custom-analytics": {
+        "name": "Benutzerdefinierte Analyse",
+        "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."
     }
 }

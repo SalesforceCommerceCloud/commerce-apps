@@ -22,5 +22,9 @@
     "custom-payment": {
         "name": "Aangepaste betaling",
         "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
+    },
+    "custom-analytics": {
+        "name": "Aangepaste analyse",
+        "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
     }
 }
