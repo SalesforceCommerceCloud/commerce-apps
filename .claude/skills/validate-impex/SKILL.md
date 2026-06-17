@@ -12,6 +12,8 @@ description: >-
 
 Validate SFCC impex XML files to catch errors before import.
 
+> **Cross-tool note:** References to `/skill-name` (e.g., `/validate-app`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
+
 ## When to use this skill
 
 Use proactively:

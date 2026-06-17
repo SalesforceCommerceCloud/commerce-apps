@@ -13,6 +13,8 @@ description: >-
 
 Generate a complete starter structure for commerce apps with architecture-appropriate files and templates.
 
+> **Cross-tool note:** References to `/skill-name` (e.g., `/package-app`, `/generate-service-impex`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
+
 ## Architecture Types
 
 Three patterns optimize for different integration needs:

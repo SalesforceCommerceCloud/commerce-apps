@@ -13,6 +13,8 @@ description: >-
 
 Build a registry-ready Commerce App Package (CAP) ZIP from an app directory.
 
+> **Cross-tool note:** References to `/skill-name` (e.g., `/validate-app`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
+
 ## Step 1: Collect inputs
 
 | Input | Example | Required |

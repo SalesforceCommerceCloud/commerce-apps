@@ -12,6 +12,8 @@ description: >-
 
 Run comprehensive validation checks on a commerce app before submitting a PR.
 
+> **Cross-tool note:** References to `/skill-name` (e.g., `/submit-app`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
+
 ## Step 1: Identify app
 
 Gather:

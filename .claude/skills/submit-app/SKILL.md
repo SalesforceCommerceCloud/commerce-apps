@@ -13,6 +13,8 @@ description: >-
 
 Submit a PR for the commerce app registry with automated GitHub CLI integration.
 
+> **Cross-tool note:** References to `/skill-name` (e.g., `/validate-app`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
+
 ## Step 0: Check GitHub CLI
 
 ```bash

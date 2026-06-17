@@ -35,28 +35,37 @@ commerce-{app-name}-app-v{version}/  # Extracted directory (dev only)
 ## Available Skills
 
 ### App Development & Packaging
-| Skill | When to Use | What It Does |
-|-------|-------------|--------------|
-| `/scaffold-app` | Starting a new app from scratch | Generates complete directory structure with templates |
-| `/package-app` | Ready to package app for registry | Creates ZIP, updates manifest.json with SHA256 |
+| Skill | Procedure | When to Use | What It Does |
+|-------|-----------|-------------|--------------|
+| `/scaffold-app` | [SKILL.md](.claude/skills/scaffold-app/SKILL.md) | Starting a new app from scratch | Generates complete directory structure with templates |
+| `/package-app` | [SKILL.md](.claude/skills/package-app/SKILL.md) | Ready to package app for registry | Creates ZIP, updates manifest.json with SHA256 |
 
 ### Impex Generation
-| Skill | When to Use | What It Does |
-|-------|-------------|--------------|
-| `/generate-service-impex` | Need external API integration | Creates service credentials, profiles, definitions (install + uninstall) |
-| `/generate-site-preferences-impex` | Need merchant-configurable settings | Creates custom site preferences with all attribute types |
-| `/generate-custom-object-impex` | Need data storage (cache, config, logs) | Creates custom object type definitions with storage config |
-| `/validate-impex` | Before importing or submitting | Validates XML syntax, structure, install/uninstall pairs |
+| Skill | Procedure | When to Use | What It Does |
+|-------|-----------|-------------|--------------|
+| `/generate-service-impex` | [SKILL.md](.claude/skills/generate-service-impex/SKILL.md) | Need external API integration | Creates service credentials, profiles, definitions (install + uninstall) |
+| `/generate-site-preferences-impex` | [SKILL.md](.claude/skills/generate-site-preferences-impex/SKILL.md) | Need merchant-configurable settings | Creates custom site preferences with all attribute types |
+| `/generate-custom-object-impex` | [SKILL.md](.claude/skills/generate-custom-object-impex/SKILL.md) | Need data storage (cache, config, logs) | Creates custom object type definitions with storage config |
+| `/validate-impex` | [SKILL.md](.claude/skills/validate-impex/SKILL.md) | Before importing or submitting | Validates XML syntax, structure, install/uninstall pairs |
 
 ### Validation
-| Skill | When to Use | What It Does |
-|-------|-------------|--------------|
-| `/validate-app` | Before submitting PR | Validates ZIP structure, manifest, SHA256, commerce-app.json, impex, architecture |
+| Skill | Procedure | When to Use | What It Does |
+|-------|-----------|-------------|--------------|
+| `/validate-app` | [SKILL.md](.claude/skills/validate-app/SKILL.md) | Before submitting PR | Validates ZIP structure, manifest, SHA256, commerce-app.json, impex, architecture |
 
 ### Submission
-| Skill | When to Use | What It Does |
-|-------|-------------|--------------|
-| `/submit-app` | Ready to submit app to registry | Guides through PR creation with proper format and checklist |
+| Skill | Procedure | When to Use | What It Does |
+|-------|-----------|-------------|--------------|
+| `/submit-app` | [SKILL.md](.claude/skills/submit-app/SKILL.md) | Ready to submit app to registry | Guides through PR creation with proper format and checklist |
+
+### Using these procedures with Codex
+
+The procedures above are stored as `.claude/skills/<skill-name>/SKILL.md` files. Claude Code loads them automatically via its skill system. If you are using **OpenAI Codex CLI** (or any other AI assistant that reads `AGENTS.md`), follow the linked SKILL.md directly:
+
+1. Match your task to the skill table above (e.g., "validate" → `validate-app`)
+2. Read the linked SKILL.md file (e.g., `.claude/skills/validate-app/SKILL.md`)
+3. Follow the numbered steps in that file — they use standard shell commands and are not tied to any specific AI tool
+4. Where a SKILL.md references another skill with `/skill-name` syntax (e.g., "Run `/validate-app`"), read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` instead
 
 ## Common Workflows
 
