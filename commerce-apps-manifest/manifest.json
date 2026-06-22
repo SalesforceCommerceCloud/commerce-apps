@@ -68,6 +68,18 @@
     "fraud": [],
     "analytics": [
         {
+            "id": "noibu",
+            "name": "Noibu",
+            "description": "Loads Noibu session monitoring script on every storefront page",
+            "iconName": "noibu.png",
+            "domain": "analytics",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "noibu-v1.0.0.zip",
+            "sha256": "3fb1ceb8319292aa93d9cef10daf58e5e00f9950cbd43426ea44ff3667468b9f"
+        },
+        {
             "id": "custom-analytics",
             "name": "Custom Analytics",
             "description": "Configure a custom analytics integration by providing your own APIs.",
