@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce podatek ryczałtowy",
-        "description": "Skonfiguruj obliczanie podatku ryczałtowego."
-    },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Zautomatyzuj zgodność z podatkiem od sprzedaży dzięki Avalara."
-    },
-    "custom-tax": {
-        "name": "Podatek niestandardowy",
-        "description": "Skonfiguruj niestandardowe obliczanie podatku, podając własne interfejsy API."
-    },
-    "basic-shipping": {
-        "name": "Wysyłka podstawowa",
-        "description": "Skonfiguruj podstawowe obliczanie kosztów wysyłki."
-    },
-    "custom-shipping": {
-        "name": "Wysyłka niestandardowa",
-        "description": "Skonfiguruj niestandardowe obliczanie kosztów wysyłki, podając własne interfejsy API."
-    },
-    "custom-payment": {
-        "name": "Płatność niestandardowa",
-        "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "Analityka niestandardowa",
-        "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce podatek ryczałtowy",
+    "description": "Skonfiguruj obliczanie podatku ryczałtowego."
+  },
+  "avalara-tax": {
+    "name": "Avalara",
+    "description": "Zautomatyzuj zgodność z podatkiem od sprzedaży dzięki Avalara."
+  },
+  "custom-tax": {
+    "name": "Podatek niestandardowy",
+    "description": "Skonfiguruj niestandardowe obliczanie podatku, podając własne interfejsy API."
+  },
+  "basic-shipping": {
+    "name": "Wysyłka podstawowa",
+    "description": "Skonfiguruj podstawowe obliczanie kosztów wysyłki."
+  },
+  "custom-shipping": {
+    "name": "Wysyłka niestandardowa",
+    "description": "Skonfiguruj niestandardowe obliczanie kosztów wysyłki, podając własne interfejsy API."
+  },
+  "custom-payment": {
+    "name": "Płatność niestandardowa",
+    "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Ładuje skrypt monitorowania sesji Noibu na każdej stronie sklepu"
+  },
+  "custom-analytics": {
+    "name": "Analityka niestandardowa",
+    "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
+  }
 }

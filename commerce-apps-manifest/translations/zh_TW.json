@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce 固定稅",
-        "description": "設定固定稅計算。"
-    },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "使用 Avalara 自動執行銷售稅合規。"
-    },
-    "custom-tax": {
-        "name": "自訂稅務",
-        "description": "透過提供您自己的 API 來設定自訂稅務計算。"
-    },
-    "basic-shipping": {
-        "name": "基本配送",
-        "description": "設定基本配送計算。"
-    },
-    "custom-shipping": {
-        "name": "自訂配送",
-        "description": "透過提供您自己的 API 來設定自訂配送計算。"
-    },
-    "custom-payment": {
-        "name": "自訂付款",
-        "description": "透過提供您自己的 API 來設定自訂付款整合。"
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "自訂分析",
-        "description": "透過提供您自己的 API 來設定自訂分析整合。"
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce 固定稅",
+    "description": "設定固定稅計算。"
+  },
+  "avalara-tax": {
+    "name": "Avalara",
+    "description": "使用 Avalara 自動執行銷售稅合規。"
+  },
+  "custom-tax": {
+    "name": "自訂稅務",
+    "description": "透過提供您自己的 API 來設定自訂稅務計算。"
+  },
+  "basic-shipping": {
+    "name": "基本配送",
+    "description": "設定基本配送計算。"
+  },
+  "custom-shipping": {
+    "name": "自訂配送",
+    "description": "透過提供您自己的 API 來設定自訂配送計算。"
+  },
+  "custom-payment": {
+    "name": "自訂付款",
+    "description": "透過提供您自己的 API 來設定自訂付款整合。"
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "在每個店面頁面載入 Noibu 工作階段監控指令碼"
+  },
+  "custom-analytics": {
+    "name": "自訂分析",
+    "description": "透過提供您自己的 API 來設定自訂分析整合。"
+  }
 }

@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Imposta forfettaria Salesforce",
-        "description": "Configura un calcolo dell'imposta forfettaria."
-    },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatizza la conformità fiscale con Avalara."
-    },
-    "custom-tax": {
-        "name": "Imposta personalizzata",
-        "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
-    },
-    "basic-shipping": {
-        "name": "Spedizione base",
-        "description": "Configura un calcolo di spedizione base."
-    },
-    "custom-shipping": {
-        "name": "Spedizione personalizzata",
-        "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
-    },
-    "custom-payment": {
-        "name": "Pagamento personalizzato",
-        "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "Analisi personalizzata",
-        "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
-    }
+  "salesforce-flat-tax": {
+    "name": "Imposta forfettaria Salesforce",
+    "description": "Configura un calcolo dell'imposta forfettaria."
+  },
+  "avalara-tax": {
+    "name": "Avalara",
+    "description": "Automatizza la conformità fiscale con Avalara."
+  },
+  "custom-tax": {
+    "name": "Imposta personalizzata",
+    "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
+  },
+  "basic-shipping": {
+    "name": "Spedizione base",
+    "description": "Configura un calcolo di spedizione base."
+  },
+  "custom-shipping": {
+    "name": "Spedizione personalizzata",
+    "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
+  },
+  "custom-payment": {
+    "name": "Pagamento personalizzato",
+    "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Carica lo script di monitoraggio della sessione Noibu su ogni pagina della vetrina"
+  },
+  "custom-analytics": {
+    "name": "Analisi personalizzata",
+    "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
+  }
 }

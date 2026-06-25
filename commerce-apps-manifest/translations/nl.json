@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce vast belastingtarief",
-        "description": "Configureer een vaste belastingberekening."
-    },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatiseer uw btw-naleving met Avalara."
-    },
-    "custom-tax": {
-        "name": "Aangepaste belasting",
-        "description": "Configureer een aangepaste belastingberekening met uw eigen API's."
-    },
-    "basic-shipping": {
-        "name": "Basisverzending",
-        "description": "Configureer een basisverzendberekening."
-    },
-    "custom-shipping": {
-        "name": "Aangepaste verzending",
-        "description": "Configureer een aangepaste verzendberekening met uw eigen API's."
-    },
-    "custom-payment": {
-        "name": "Aangepaste betaling",
-        "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "Aangepaste analyse",
-        "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce vast belastingtarief",
+    "description": "Configureer een vaste belastingberekening."
+  },
+  "avalara-tax": {
+    "name": "Avalara",
+    "description": "Automatiseer uw btw-naleving met Avalara."
+  },
+  "custom-tax": {
+    "name": "Aangepaste belasting",
+    "description": "Configureer een aangepaste belastingberekening met uw eigen API's."
+  },
+  "basic-shipping": {
+    "name": "Basisverzending",
+    "description": "Configureer een basisverzendberekening."
+  },
+  "custom-shipping": {
+    "name": "Aangepaste verzending",
+    "description": "Configureer een aangepaste verzendberekening met uw eigen API's."
+  },
+  "custom-payment": {
+    "name": "Aangepaste betaling",
+    "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Laadt het Noibu-sessiecontrolescript op elke pagina van de winkel"
+  },
+  "custom-analytics": {
+    "name": "Aangepaste analyse",
+    "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
+  }
 }

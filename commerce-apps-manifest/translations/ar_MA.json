@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "ضريبة Salesforce الثابتة",
-        "description": "تكوين حساب ضريبة ثابتة."
-    },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "أتمتة الامتثال لضريبة المبيعات مع Avalara."
-    },
-    "custom-tax": {
-        "name": "ضريبة مخصصة",
-        "description": "تكوين حساب ضريبة مخصص من خلال توفير واجهات API الخاصة بك."
-    },
-    "basic-shipping": {
-        "name": "الشحن الأساسي",
-        "description": "تكوين حساب شحن أساسي."
-    },
-    "custom-shipping": {
-        "name": "شحن مخصص",
-        "description": "تكوين حساب شحن مخصص من خلال توفير واجهات API الخاصة بك."
-    },
-    "custom-payment": {
-        "name": "دفع مخصص",
-        "description": "تكوين تكامل دفع مخصص من خلال توفير واجهات API الخاصة بك."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "تحليلات مخصصة",
-        "description": "تكوين تكامل تحليلات مخصص من خلال توفير واجهات API الخاصة بك."
-    }
+  "salesforce-flat-tax": {
+    "name": "ضريبة Salesforce الثابتة",
+    "description": "تكوين حساب ضريبة ثابتة."
+  },
+  "avalara-tax": {
+    "name": "Avalara",
+    "description": "أتمتة الامتثال لضريبة المبيعات مع Avalara."
+  },
+  "custom-tax": {
+    "name": "ضريبة مخصصة",
+    "description": "تكوين حساب ضريبة مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "basic-shipping": {
+    "name": "الشحن الأساسي",
+    "description": "تكوين حساب شحن أساسي."
+  },
+  "custom-shipping": {
+    "name": "شحن مخصص",
+    "description": "تكوين حساب شحن مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "custom-payment": {
+    "name": "دفع مخصص",
+    "description": "تكوين تكامل دفع مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "يحمّل نص Noibu لمراقبة الجلسة على كل صفحة من صفحات الواجهة"
+  },
+  "custom-analytics": {
+    "name": "تحليلات مخصصة",
+    "description": "تكوين تكامل تحليلات مخصص من خلال توفير واجهات API الخاصة بك."
+  }
 }
