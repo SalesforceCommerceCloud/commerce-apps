@@ -82,5 +82,3 @@ $RECYCLE.BIN/
 # Only commit ZIP files, manifest.json, and catalog.json
 **/commerce-*-app-v*/
 **/commerce-*-app-*/
-
-# Noibu fork: track the Noibu app source directory
