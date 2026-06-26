@@ -14,7 +14,7 @@ Run comprehensive validation checks on a commerce app before submitting a PR.
 
 > **Cross-tool note:** References to `/skill-name` (e.g., `/submit-app`) are Claude Code invocation syntax. If using another assistant, read and follow the corresponding `.claude/skills/<skill-name>/SKILL.md` file instead.
 
-## Step 1: Identify app
+## Step 1: Identify app and resolve input
 
 Gather:
 - Domain (e.g., `tax`, `payment`, `shipping`)
@@ -23,20 +23,45 @@ Gather:
 
 **Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. See `references/folder-structure.md`.
 
-## Step 2: Verify ZIP exists
+The skill accepts **either** a packaged `.zip` **or** an already-extracted CAP root directory (e.g., `commerce-<appName>-app-v<version>/`). Set both variables once; later steps branch on `INPUT_KIND`:
 
 ```bash
-ls -lh <domain>/<appName>/<appName>-v<version>.zip
+# Resolve the input: a .zip path OR an extracted CAP root directory.
+INPUT="<path-to-zip-or-extracted-cap-root>"
+if [[ -f "$INPUT" && "$INPUT" == *.zip ]]; then
+  INPUT_KIND=zip
+  ZIP="$INPUT"
+  EXTRACT_DIR="$(mktemp -d)"
+  unzip -q "$ZIP" -d "$EXTRACT_DIR"
+  CAP_ROOT="$EXTRACT_DIR/commerce-<appName>-app-v<version>"
+elif [[ -d "$INPUT" ]]; then
+  INPUT_KIND=dir
+  CAP_ROOT="$INPUT"
+  ZIP=""        # no zip available — Step 3 will be skipped
+  EXTRACT_DIR="" # nothing to clean up in Step 14
+else
+  echo "Input must be a .zip file or extracted CAP root directory" >&2; exit 2
+fi
+```
+
+## Step 2: Verify input exists
+
+```bash
+if [[ "$INPUT_KIND" == "zip" ]]; then ls -lh "$ZIP"; else ls -ld "$CAP_ROOT"; fi
 ```
 
 ## Step 3: Validate SHA256
 
-```bash
-# Compute hash
-shasum -a 256 <domain>/<appName>/<appName>-v<version>.zip
+**Skip if `INPUT_KIND=dir`** — the manifest pins a hash of the `.zip` artifact, which can't be reproduced from extracted files. Note this gap in the report and re-run Step 3 once the ZIP is built.
 
-# Compare with commerce-apps-manifest/manifest.json
-jq '.[] | .[] | select(.id == "<appName>")' commerce-apps-manifest/manifest.json
+```bash
+if [[ "$INPUT_KIND" == "zip" ]]; then
+  shasum -a 256 "$ZIP"
+  jq '[.[] | select(type=="array")] | flatten | .[] | select(.id == "<appName>") | .sha256' \
+    commerce-apps-manifest/manifest.json
+else
+  echo "(skipped — no ZIP available; SHA256 must be re-checked against the built ZIP)"
+fi
 ```
 
 Hashes must match exactly.
@@ -64,23 +89,35 @@ Optional fields (validate if present):
 - Only `sfnext` and `sfra` keys allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` allowed inside each
 - `storefrontSupport` must be present in **both** the root manifest and `commerce-app.json` with matching values
 
-## Step 5: Validate ZIP contents
+## Step 5: Validate package contents
 
 ```bash
-unzip -l <domain>/<appName>/<appName>-v<version>.zip | head -30
+if [[ "$INPUT_KIND" == "zip" ]]; then
+  unzip -l "$ZIP" | head -30
+  unzip -l "$ZIP" | grep -E "\.DS_Store|__MACOSX" || echo "  ✓ no junk files"
+else
+  ls -la "$CAP_ROOT" | head -30
+  find "$CAP_ROOT" \( -name '.DS_Store' -o -name '__MACOSX' \) -print | head \
+    || echo "  ✓ no junk files"
+fi
+
+# Required files (works for both inputs)
+for f in commerce-app.json README.md app-configuration/tasksList.json; do
+  [[ -e "$CAP_ROOT/$f" ]] && echo "  ✓ $f" || echo "  ✗ MISSING: $f"
+done
 ```
 
 Check:
-- Single root: `commerce-<appName>-app-v<version>/`
+- Single root: `commerce-<appName>-app-v<version>/` (ZIP only — for `INPUT_KIND=dir`, the directory IS the root)
 - No junk files (`.DS_Store`, `__MACOSX`, hidden files)
-- No registry paths (`tax/`, `domain/`)
+- No registry paths (`tax/`, `domain/`) at the ZIP root (ZIP only)
 - Required: `commerce-app.json`, `README.md`, `app-configuration/tasksList.json`
 
 ## Step 6: Detect architecture
 
 ```bash
-HAS_UI=$(unzip -l <zip> | grep -c "storefront-next/" || echo 0)
-HAS_BACKEND=$(unzip -l <zip> | grep -c "cartridges/" || echo 0)
+HAS_UI=$([[ -d "$CAP_ROOT/storefront-next" ]] && echo 1 || echo 0)
+HAS_BACKEND=$([[ -d "$CAP_ROOT/cartridges" ]] && echo 1 || echo 0)
 ```
 
 Determine:
@@ -90,10 +127,8 @@ Determine:
 
 ## Step 7: Validate commerce-app.json
 
-Extract and check:
-
 ```bash
-unzip -p <zip> */commerce-app.json | jq .
+jq . "$CAP_ROOT/commerce-app.json"
 ```
 
 Required fields:
@@ -113,19 +148,29 @@ Optional fields (validate if present):
 
 **Skip if Backend-only.**
 
-Check for:
-- `storefront-next/src/extensions/<appName>/target-config.json`
-- `storefront-next/src/extensions/<appName>/index.ts`
-- Required locales: `en-US/`, `en-GB/`, `it-IT/`
+Required:
+- `storefront-next/src/extensions/<appName>/target-config.json` — entry point; declares `components[]`, `actionHooks[]`, etc., each pointing at a `path` under the extension directory.
+
+For each entry referenced from `target-config.json`, verify the file exists:
+
+```bash
+TC="$CAP_ROOT/storefront-next/src/extensions/<appName>/target-config.json"
+jq -r '[.components[]?.path, .actionHooks[]?.handler, .routes[]?.handler] | .[] | select(.)' "$TC" \
+  | while read -r p; do
+      [[ -f "$CAP_ROOT/storefront-next/src/$p" ]] \
+        && echo "  ✓ $p" \
+        || echo "  ✗ MISSING: $p"
+    done
+```
+
+If the extension ships translations, they live under `storefront-next/src/extensions/<appName>/locales/<locale>/translations.json`. Locale set is app-specific — not a fixed allowlist.
 
 ## Step 9: Validate impex (Backend-only/Fullstack)
 
 **Skip if UI-only.**
 
 ```bash
-# Extract and validate XML
-unzip -q <zip>
-find commerce-<appName>-app-v<version>/impex/ -name "*.xml" -exec xmllint --noout {} \;
+find "$CAP_ROOT/impex/" -name "*.xml" -exec xmllint --noout {} \;
 ```
 
 See `references/impex-validation.md` for detailed rules:
@@ -146,40 +191,27 @@ See `references/impex-validation.md` for detailed rules:
 }
 ```
 
-## Step 10b: Validate adminComponents.json (optional)
+## Step 10b: Validate app-configuration/ JSON via CI scripts
 
-If the CAP includes `app-configuration/adminComponents.json`, verify it matches the schema CI enforces:
+Run the same scripts CI runs against `$CAP_ROOT` (already set in Step 1). Each is the source of truth for its schema; scripts print errors to stderr and exit non-zero on failure.
 
 ```bash
-unzip -p <zip> "*/app-configuration/adminComponents.json" 2>/dev/null | jq .
+# tasksList.json schema (required file)
+bash .github/scripts/validate-tasks-list.sh "$CAP_ROOT/app-configuration/tasksList.json"
+
+# adminComponents.json schema (optional file)
+[[ -f "$CAP_ROOT/app-configuration/adminComponents.json" ]] && \
+  bash .github/scripts/validate-admin-components.sh "$CAP_ROOT/app-configuration/adminComponents.json"
+
+# app-shipped translations (optional directory; cross-references the two files above)
+bash .github/scripts/validate-translations.sh "$CAP_ROOT"
 ```
 
-Required:
-- File is valid JSON and a top-level object.
-- The `configuration` key, when present, must be an array.
-- Every entry in `configuration` has a non-empty string `type`.
-- For entries with `type == "storefrontComponentVisibility"`:
-  - `attributes` is a non-empty array.
-  - Each attribute has a non-empty string `id` (the `sfcc.*` UI target identifier the merchant can toggle), a non-empty string `label` (rendered next to the toggle in BM), and a boolean `defaultValue`.
+Each script prints schema details and exits non-zero with errors on stderr. See the script header comments for the schema contract.
 
-Example:
+## Step 11: Validate manifest-level translations
 
-```json
-{
-  "configuration": [
-    {
-      "type": "storefrontComponentVisibility",
-      "attributes": [
-        { "id": "sfcc.checkout.shippingAddress.after", "label": "Show on Checkout", "defaultValue": true }
-      ]
-    }
-  ]
-}
-```
-
-Skip this step if the file isn't present — `adminComponents.json` is optional.
-
-## Step 11: Validate translations
+The CAP-internal translations live under `app-configuration/translations/` (validated in Step 10b). The **manifest-level** `commerce-apps-manifest/translations/en-US.json` holds the marketplace `name` / `description` shown on the app card:
 
 ```bash
 jq '."<appName>"' commerce-apps-manifest/translations/en-US.json
@@ -193,11 +225,11 @@ Check:
 ## Step 12: Validate icon
 
 ```bash
-# Get iconName from manifest
-ICON_NAME=$(jq -r '.[] | .[] | select(.id == "<appName>") | .iconName' commerce-apps-manifest/manifest.json)
+ICON_NAME=$(jq -r '[.[] | select(type=="array")] | flatten | .[] | select(.id == "<appName>") | .iconName' \
+  commerce-apps-manifest/manifest.json)
 
-# Check ZIP contains matching icon
-unzip -l <zip> | grep "icons/$ICON_NAME"
+[[ -f "$CAP_ROOT/icons/$ICON_NAME" ]] && echo "  ✓ icon in package" || echo "  - not in package"
+[[ -f "commerce-apps-manifest/icons/$ICON_NAME" ]] && echo "  ✓ icon in registry" || echo "  ✗ MISSING in registry"
 ```
 
 Icon filename must match `iconName` field exactly. CI extracts automatically.
@@ -205,8 +237,7 @@ Icon filename must match `iconName` field exactly. CI extracts automatically.
 ## Step 13: Security scan
 
 ```bash
-unzip -q <zip>
-bash .github/scripts/security-scan.sh commerce-<appName>-app-v<version>/
+bash .github/scripts/security-scan.sh "$CAP_ROOT/"
 ```
 
 **If blocking findings (exit 1):** FAIL - fix issues first.
@@ -216,8 +247,10 @@ See `references/security-scan.md` for details.
 
 ## Step 14: Clean up
 
+Only remove the temp dir if Step 1 created one (`INPUT_KIND=zip`). When the user passed an extracted CAP root, leave it alone.
+
 ```bash
-rm -rf commerce-<appName>-app-v<version>/
+[[ -n "$EXTRACT_DIR" ]] && rm -rf "$EXTRACT_DIR"
 ```
 
 ## Report results
