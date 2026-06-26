@@ -23,6 +23,10 @@
         "name": "맞춤 결제",
         "description": "자체 API를 제공하여 맞춤 결제 통합을 구성합니다."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "모든 스토어프론트 페이지에 Noibu 세션 모니터링 스크립트를 로드합니다"
+    },
     "custom-analytics": {
         "name": "맞춤 분석",
         "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."

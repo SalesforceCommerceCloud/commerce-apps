@@ -23,6 +23,10 @@
         "name": "自定义支付",
         "description": "通过提供您自己的 API 来配置自定义支付集成。"
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "在每个店面页面加载 Noibu 会话监控脚本"
+    },
     "custom-analytics": {
         "name": "自定义分析",
         "description": "通过提供您自己的 API 来配置自定义分析集成。"

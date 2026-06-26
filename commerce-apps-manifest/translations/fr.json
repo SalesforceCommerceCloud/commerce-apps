@@ -23,6 +23,10 @@
         "name": "Paiement personnalisé",
         "description": "Configurez une intégration de paiement personnalisée en fournissant vos propres API."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Charge le script de surveillance de session Noibu sur chaque page de la boutique"
+    },
     "custom-analytics": {
         "name": "Analytique personnalisée",
         "description": "Configurez une intégration d'analytique personnalisée en fournissant vos propres API."

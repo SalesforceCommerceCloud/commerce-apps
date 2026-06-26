@@ -23,6 +23,10 @@
         "name": "カスタム決済",
         "description": "独自のAPIを使用してカスタム決済統合を設定します。"
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "すべてのストアフロントページにNoibuセッション監視スクリプトを読み込みます"
+    },
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"

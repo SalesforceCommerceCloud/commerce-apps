@@ -23,6 +23,10 @@
         "name": "Aangepaste betaling",
         "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Laadt het Noibu-sessiecontrolescript op elke pagina van de winkel"
+    },
     "custom-analytics": {
         "name": "Aangepaste analyse",
         "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
