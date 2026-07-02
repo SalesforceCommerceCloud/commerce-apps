@@ -77,7 +77,7 @@
             "provider": "thirdParty",
             "version": "1.0.0",
             "zip": "noibu-v1.0.0.zip",
-            "sha256": "cbad099c9159b5d9030485baf5eb7b007dafbd723949b8187ea300b1db2e8f64"
+            "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852"
         },
         {
             "id": "custom-analytics",
