@@ -75,6 +75,18 @@
             "domain": "analytics",
             "type": "custom",
             "provider": "custom"
+        },
+        {
+            "id": "commerce-ace-ga4",
+            "name": "Commerce Ace GA4 Analytics",
+            "description": "Connects Storefront Next to Google Analytics 4, streaming page-view, product-view, checkout, and purchase events to the merchant's GA4 property.",
+            "iconName": "icon.png",
+            "domain": "analytics",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "commerce-ace-ga4-v1.0.0.zip",
+            "sha256": "968d3e088a7a5108f5c98417f8a2c0de14873512a3f610b8be9b0d70d80d2dfb"
         }
     ]
 }
