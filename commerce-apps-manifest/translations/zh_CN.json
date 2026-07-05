@@ -29,6 +29,6 @@
     },
     "commerce-ace-ga4": {
         "name": "Commerce Ace GA4 Analytics",
-        "description": "Connects Storefront Next to Google Analytics 4, streaming page-view, product-view, checkout, and purchase events to the merchant's GA4 property."
+        "description": "将Storefront Next连接到Google Analytics 4，将页面浏览、商品查看、结账和购买事件传输到商家的GA4媒体资源。"
     }
 }

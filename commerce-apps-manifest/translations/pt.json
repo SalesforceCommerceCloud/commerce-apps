@@ -29,6 +29,6 @@
     },
     "commerce-ace-ga4": {
         "name": "Commerce Ace GA4 Analytics",
-        "description": "Connects Storefront Next to Google Analytics 4, streaming page-view, product-view, checkout, and purchase events to the merchant's GA4 property."
+        "description": "Conecta o Storefront Next ao Google Analytics 4, transmitindo eventos de visualização de página, visualização de produto, checkout e compra para a propriedade GA4 do comerciante."
     }
 }
