@@ -191,6 +191,14 @@ Your response:
 - Values must match exactly between root manifest and `commerce-app.json`
 - Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object
 
+### 8a. Company Name and Featured App Fields
+- `companyName` (**required** for third-party apps) - name of the publishing company/ISV (e.g., `"Avalara"`); shown alongside the app in the commerce apps workspace
+- The commerce apps workspace can highlight curated apps as **featured**. The following fields are optional and prepare an app to be *considered* for featured placement:
+  - `featuredTagline` - short marketing tagline; also add it to `commerce-apps-manifest/translations/en-US.json` under the app's key for localization
+  - `featuredLearnMoreUrl` - absolute URL to a "learn more" page
+  - `featuredImageName` - filename of a promotional image committed to `commerce-apps-manifest/featured-images/`
+- **`isFeatured` and `badge` are reserved for Salesforce and must NOT be set by app developers.** Both are controlled by Salesforce curation (`badge` supports `"new"`, `"popular"`). If a submission sets `isFeatured` or `badge`, flag it and remove it. To pursue featured status, ensure `companyName` is present and include the featured fields above so the app is ready to promote if selected.
+
 **Icon validation examples:**
 ```
 Scenario 1: Avalara v0.2.8 with avalara.png (hash: abc123)

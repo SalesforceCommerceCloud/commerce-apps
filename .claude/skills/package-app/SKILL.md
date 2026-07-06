@@ -129,6 +129,7 @@ Update `commerce-apps-manifest/manifest.json`:
   "name": "<displayName>",
   "description": "<description>",
   "iconName": "<appName>.png",
+  "companyName": "<companyName>",
   "domain": "<domain>",
   "type": "app",
   "provider": "thirdParty",
@@ -141,7 +142,9 @@ Update `commerce-apps-manifest/manifest.json`:
 }
 ```
 
-> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." Values must match the corresponding fields in `commerce-app.json` exactly.
+> **Note:** `companyName` (the publishing company/ISV) is required for third-party apps. Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." Values must match the corresponding fields in `commerce-app.json` exactly.
+
+> **Featured app fields (optional):** To make an app eligible for featured placement in the commerce apps workspace, add `featuredTagline`, `featuredLearnMoreUrl`, and `featuredImageName` (commit the image to `commerce-apps-manifest/featured-images/`). Add `featuredTagline` to `commerce-apps-manifest/translations/en-US.json` as well so it can be localized. **Never set `isFeatured` or `badge`** — both are reserved for Salesforce curation and must not be included in a submission.
 
 **Icon:** Must match filename in ZIP's `icons/` directory. CI extracts automatically.
 

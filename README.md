@@ -448,7 +448,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for complete submission requirements.
 1. Build your app directory with required structure
 2. Package as a CAP ZIP file: `zip -r my-app-v1.0.0.zip commerce-my-app-app-v1.0.0/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*"`
 3. Generate SHA256 hash: `shasum -a 256 my-app-v1.0.0.zip`
-4. Update root manifest at `commerce-apps-manifest/manifest.json` with app entry (id, name, description, iconName, domain, version, zip, sha256)
+4. Update root manifest at `commerce-apps-manifest/manifest.json` with app entry (id, name, description, iconName, companyName, domain, version, zip, sha256). To be considered for featured placement in the commerce apps workspace, also add `featuredTagline`, `featuredLearnMoreUrl`, and `featuredImageName` (commit the image to `commerce-apps-manifest/featured-images/`). Do **not** set `isFeatured` or `badge` — both are reserved for Salesforce curation.
 5. Add translations to `commerce-apps-manifest/translations/en-US.json` (minimum requirement)
 6. Create `catalog.json` with INIT placeholder (new apps only)
 7. Place ZIP at `{domain}/{appName}/` where `{appName}` matches the "id" field (e.g., `tax/avalara-tax/` or `address-verification/loqate-address-verification/`)

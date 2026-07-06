@@ -16,6 +16,7 @@
             "name": "Avalara Tax",
             "description": "Automated tax compliance solution by Avalara",
             "iconName": "avalara.png",
+            "companyName": "Avalara",
             "domain": "tax",
             "type": "app",
             "provider": "thirdParty",

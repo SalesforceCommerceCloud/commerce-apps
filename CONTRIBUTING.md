@@ -133,6 +133,7 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 - `name` - Display name
 - `description` - App description
 - `iconName` - Icon filename (e.g., `avalara.png`)
+- `companyName` - (String) Name of the company/ISV that publishes the app (e.g., `"Avalara"`). Required for all third-party apps; shown alongside the app in the commerce apps workspace.
 - `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
 - `type` - Always `"app"` for commerce apps
 - `provider` - Always `"thirdParty"` for ISV apps
@@ -155,6 +156,16 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 An app may declare support for one or both storefront types. If the `storefrontSupport` field is absent or a specific storefront key is omitted, no version gating is applied for that storefront. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
 
 When present, the `storefrontSupport` field in the root manifest must match the `storefrontSupport` field in the app's `commerce-app.json` inside the ZIP.
+
+#### Featured App Fields (Optional)
+
+The commerce apps workspace can highlight select apps as **featured**, giving them richer promotional placement (a tagline, a promotional image, and a "learn more" link). Featured status is curated by Salesforce — you cannot self-promote — but you can prepare your app so it is eligible.
+
+- `featuredTagline` - (String) Short marketing tagline shown on the featured placement (e.g., `"Automated tax compliance trusted by 30,000+ businesses worldwide."`). Also add it to `commerce-apps-manifest/translations/en-US.json` under your app's key so it can be localized.
+- `featuredLearnMoreUrl` - (String) Absolute URL to a page where merchants can learn more about the app (e.g., a product landing page).
+- `featuredImageName` - (String) Filename of a promotional image committed to `commerce-apps-manifest/featured-images/` (e.g., `"acme-featured.png"`).
+
+> **`isFeatured` and `badge` are reserved for Salesforce.** Do **not** set `isFeatured` or `badge` (`"new"`, `"popular"`) in your submission — both are controlled by Salesforce curation, and PRs that set them will be asked to remove them. To be **considered** for featured placement, include `companyName` (required) plus the featured fields above (`featuredTagline`, `featuredLearnMoreUrl`, `featuredImageName`) so your app is ready to promote if selected.
 
 #### Computing `sha256`
 
@@ -604,8 +615,10 @@ Before submitting your PR, please verify:
 ### Required Files
 - [ ] ZIP file name follows the required format: `[appName]-v[version].zip`
 - [ ] ZIP contains single root folder: `commerce-[appName]-app-v[version]/`
-- [ ] `manifest.json` includes all required fields (name, displayName, domain, description, version, zip, sha256)
+- [ ] `manifest.json` includes all required fields (name, displayName, domain, description, companyName, version, zip, sha256)
 - [ ] `catalog.json` is included for new apps only (with INIT values)
+- [ ] `isFeatured` and `badge` are **not** set in the submission (reserved for Salesforce curation)
+- [ ] If featured fields are provided, `featuredImageName` refers to an image committed under `commerce-apps-manifest/featured-images/`
 
 ### Version and Hash Validation
 - [ ] `version` in `manifest.json` matches `version` in `commerce-app.json`
