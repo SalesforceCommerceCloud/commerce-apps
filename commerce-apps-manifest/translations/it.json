@@ -3,10 +3,6 @@
         "name": "Imposta forfettaria Salesforce",
         "description": "Configura un calcolo dell'imposta forfettaria."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatizza la conformità fiscale con Avalara."
-    },
     "custom-tax": {
         "name": "Imposta personalizzata",
         "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."

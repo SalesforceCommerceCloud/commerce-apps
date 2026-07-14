@@ -3,10 +3,6 @@
         "name": "Salesforce 定額税",
         "description": "定額税の計算を設定します。"
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Avalaraで消費税コンプライアンスを自動化します。"
-    },
     "custom-tax": {
         "name": "カスタム税",
         "description": "独自のAPIを使用してカスタム税計算を設定します。"

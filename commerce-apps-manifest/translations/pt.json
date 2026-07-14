@@ -3,10 +3,6 @@
         "name": "Imposto fixo Salesforce",
         "description": "Configure um cálculo de imposto fixo."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatize a conformidade fiscal com a Avalara."
-    },
     "custom-tax": {
         "name": "Imposto personalizado",
         "description": "Configure um cálculo de imposto personalizado fornecendo suas próprias APIs."
