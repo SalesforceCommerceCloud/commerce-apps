@@ -3,10 +3,6 @@
         "name": "ضريبة Salesforce الثابتة",
         "description": "تكوين حساب ضريبة ثابتة."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "أتمتة الامتثال لضريبة المبيعات مع Avalara."
-    },
     "custom-tax": {
         "name": "ضريبة مخصصة",
         "description": "تكوين حساب ضريبة مخصص من خلال توفير واجهات API الخاصة بك."
