@@ -19,6 +19,10 @@
         "name": "Płatność niestandardowa",
         "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Ładuje skrypt monitorowania sesji Noibu na każdej stronie sklepu"
+    },
     "custom-analytics": {
         "name": "Analityka niestandardowa",
         "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."

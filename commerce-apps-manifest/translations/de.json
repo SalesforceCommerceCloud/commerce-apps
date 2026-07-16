@@ -19,6 +19,10 @@
         "name": "Benutzerdefinierte Zahlung",
         "description": "Konfigurieren Sie eine benutzerdefinierte Zahlungsintegration mit Ihren eigenen APIs."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Lädt das Noibu-Sitzungsüberwachungsskript auf jeder Storefront-Seite"
+    },
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",
         "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."

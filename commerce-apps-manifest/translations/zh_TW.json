@@ -19,6 +19,10 @@
         "name": "自訂付款",
         "description": "透過提供您自己的 API 來設定自訂付款整合。"
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "在每個店面頁面載入 Noibu 工作階段監控指令碼"
+    },
     "custom-analytics": {
         "name": "自訂分析",
         "description": "透過提供您自己的 API 來設定自訂分析整合。"
