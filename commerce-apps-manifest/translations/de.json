@@ -3,10 +3,6 @@
         "name": "Salesforce Pauschalsteuer",
         "description": "Konfigurieren Sie eine pauschale Steuerberechnung."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatisieren Sie Ihre Umsatzsteuer-Compliance mit Avalara."
-    },
     "custom-tax": {
         "name": "Benutzerdefinierte Steuer",
         "description": "Konfigurieren Sie eine benutzerdefinierte Steuerberechnung mit Ihren eigenen APIs."

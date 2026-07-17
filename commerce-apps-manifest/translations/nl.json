@@ -3,10 +3,6 @@
         "name": "Salesforce vast belastingtarief",
         "description": "Configureer een vaste belastingberekening."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatiseer uw btw-naleving met Avalara."
-    },
     "custom-tax": {
         "name": "Aangepaste belasting",
         "description": "Configureer een aangepaste belastingberekening met uw eigen API's."

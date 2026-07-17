@@ -3,10 +3,6 @@
         "name": "Salesforce podatek ryczałtowy",
         "description": "Skonfiguruj obliczanie podatku ryczałtowego."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Zautomatyzuj zgodność z podatkiem od sprzedaży dzięki Avalara."
-    },
     "custom-tax": {
         "name": "Podatek niestandardowy",
         "description": "Skonfiguruj niestandardowe obliczanie podatku, podając własne interfejsy API."
