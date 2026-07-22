@@ -1,0 +1,148 @@
+name: Notify Slack — CAP PR canary
+
+# Slack canary companion to gus-security-review.yml. Fires on every PR that
+# touches **/*.zip regardless of author, and posts one message per PR
+# (idempotent via a hidden HTML marker in a PR comment) so the security team
+# can visibly confirm the trigger + classifier are behaving even on PRs
+# where the GUS gate won't file a WI. Failure isolation: this workflow is
+# independent of gus-security-review.yml — if the GUS side breaks, this
+# canary still fires, so operators can distinguish a trigger failure from a
+# GUS-gate skip.
+#
+# Injection safety: every untrusted PR field (title, author login/email,
+# manifest values from the shared classifier) is passed via env: and
+# referenced as a shell variable inside run: — never interpolated directly
+# via ${{ ... }} into a script body.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+    paths:
+      - '**/*.zip'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR HEAD
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify PR
+        id: classify
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_EMAIL: ${{ github.event.pull_request.user.email }}
+        run: |
+          set -euo pipefail
+          classification="$(bash .github/scripts/classify-cap-pr.sh)"
+          printf '%s\n' "$classification"
+
+          {
+            printf 'classification<<EOF\n'
+            printf '%s\n' "$classification"
+            printf 'EOF\n'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing Slack marker on the PR
+        id: marker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
+              --jq '.[].body' | grep -qF '<!-- slack-cap-notify -->'; then
+            echo "already_notified=true" >> "$GITHUB_OUTPUT"
+            echo "Existing Slack marker found on PR #$PR_NUMBER — nothing to do."
+          else
+            echo "already_notified=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Slack payload
+        id: payload
+        if: steps.marker.outputs.already_notified == 'false'
+        env:
+          CLASSIFICATION: ${{ steps.classify.outputs.classification }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+
+          payload_file="$RUNNER_TEMP/slack-payload.json"
+
+          # Every substitution is fed through jq --arg (or --argjson for
+          # booleans) so a hostile PR title / manifest name cannot break the
+          # JSON envelope.
+          jq -n \
+            --arg pr_url "$PR_URL" \
+            --arg pr_number "$PR_NUMBER" \
+            --arg pr_title "$PR_TITLE" \
+            --argjson c "$CLASSIFICATION" \
+            '
+            def yn(b): if b then "yes" else "no" end;
+
+            {
+              text: ("CAP PR #" + $pr_number + ": " + ($c.manifest.name // "unknown") + " — "
+                    + (if $c.will_file_gus_wi then "GUS WI will be filed" else "no GUS WI" end)),
+              blocks: [
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*<" + $pr_url + "|CAP PR #" + $pr_number + ">*\n" + $pr_title)
+                  }
+                },
+                {
+                  type: "section",
+                  fields: [
+                    { type: "mrkdwn", text: ("*App:*\n" + ($c.manifest.name // "unknown")) },
+                    { type: "mrkdwn", text: ("*Version:*\n" + ($c.manifest.version // "unknown")) },
+                    { type: "mrkdwn", text: ("*Domain:*\n" + ($c.domain // "unknown")) },
+                    { type: "mrkdwn", text: ("*ISV:*\n" + ($c.isv // "unknown")) },
+                    { type: "mrkdwn", text: ("*Author:*\n" + $c.author.login + " <" + ($c.author.email // "") + ">") },
+                    { type: "mrkdwn", text: ("*Internal:*\n" + yn($c.author.is_internal)) },
+                    { type: "mrkdwn", text: ("*New app:*\n" + yn($c.is_new_app)) },
+                    { type: "mrkdwn", text: ("*Will file GUS WI:*\n" + yn($c.will_file_gus_wi)) }
+                  ]
+                }
+              ]
+            }' > "$payload_file"
+
+          printf 'file=%s\n' "$payload_file" >> "$GITHUB_OUTPUT"
+
+      - name: Send Slack notification
+        id: send
+        if: steps.marker.outputs.already_notified == 'false'
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload-file-path: ${{ steps.payload.outputs.file }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Drop marker on the PR
+        if: >-
+          steps.marker.outputs.already_notified == 'false' &&
+          steps.send.conclusion == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          body_file="$RUNNER_TEMP/slack-marker.md"
+          {
+            printf '<!-- slack-cap-notify -->\n'
+            printf '_Notified Slack channel of this CAP PR._\n'
+          } > "$body_file"
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" -f body=@"$body_file"
