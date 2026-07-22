@@ -90,3 +90,30 @@ present, the workflow logs "already filed" and exits before touching GUS.
 The Slack canary uses the equivalent marker
 `<!-- slack-cap-notify -->` and posts exactly one message per PR even across
 `synchronize` events.
+
+## Why both workflows use `pull_request_target`
+
+External CAP submissions arrive from **forks**. Under GitHub's default
+`pull_request` trigger, fork-PR workflow runs get an empty `secrets.*`
+context and a read-only `GITHUB_TOKEN` — meaning neither the GUS auth
+step nor the Slack post nor the "drop idempotency marker" comment can
+succeed on the exact PRs these workflows exist to handle.
+
+Both workflows therefore trigger on `pull_request_target` and follow the
+**fetch-but-do-not-execute** pattern:
+
+1. Check out the base ref only (`ref: github.event.pull_request.base.sha`).
+   Every script that subsequently runs — `classify-cap-pr.sh`, the inline
+   `jq` payload builders, the Slack action reference — comes from the
+   trusted base commit, NOT from the PR head.
+2. `git fetch` the PR head into the object database
+   (`+refs/pull/N/head:refs/remotes/origin/pr/N`). The head commit is now
+   reachable for `git show HEAD_SHA:path` and `git diff BASE HEAD`, but
+   nothing from it lands on the working tree.
+3. The classifier reads the PR-head manifest via `git show`, never
+   `cat manifest.json`.
+
+**When modifying either workflow, do not add a `checkout` of `head.sha`
+or any step that pipes head-provided content into `bash` / `sh` / `node`
+/ `python` / etc.** Doing so would let a fork PR exfiltrate
+`GUS_SFDX_AUTH_URL` and `SLACK_WEBHOOK_URL`.

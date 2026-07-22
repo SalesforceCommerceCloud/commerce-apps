@@ -18,7 +18,7 @@
 #   PR_AUTHOR_EMAIL        email of the author (blank if the API omitted it)
 #
 # Optional env:
-#   MANIFEST_PATH          override manifest.json location (tests use this)
+#   MANIFEST_PATH          override manifest.json path (repo-relative)
 #
 # Emitted JSON shape:
 #   {
@@ -88,24 +88,35 @@ fi
 # newly-added ZIP (PRs sometimes stage the ZIP without the manifest update);
 # treat that as null fields rather than an error, so the classifier still emits
 # a usable blob for the Slack canary.
+#
+# Read the manifest via `git show "$HEAD_SHA:$MANIFEST_PATH"` — NOT via a
+# working-tree file read. The workflows that call this classifier run under
+# `pull_request_target`, which checks out the base branch (trusted) with
+# secrets available; the PR head is fetched as a git object only. Reading the
+# manifest through git means we never touch PR-head files on disk, so a
+# fork's manipulated manifest can't influence anything beyond the string
+# fields we then pass through `jq --arg` (which quotes them safely).
 m_name="null"; m_version="null"; m_domain="null"; m_provider="null"; m_zip="null"
-if [[ -n "$added_zip" && -f "$MANIFEST_PATH" ]]; then
-  zip_basename="$(basename "$added_zip")"
-  entry="$(jq -c --arg z "$zip_basename" '
-    [
-      to_entries[]
-      | select(.value | type == "array")
-      | .value[]?
-      | select(type == "object" and (.zip? == $z))
-    ] | .[0] // null
-  ' "$MANIFEST_PATH")"
+if [[ -n "$added_zip" ]]; then
+  manifest_json="$(git show "$HEAD_SHA:$MANIFEST_PATH" 2>/dev/null || true)"
+  if [[ -n "$manifest_json" ]]; then
+    zip_basename="$(basename "$added_zip")"
+    entry="$(jq -c --arg z "$zip_basename" '
+      [
+        to_entries[]
+        | select(.value | type == "array")
+        | .value[]?
+        | select(type == "object" and (.zip? == $z))
+      ] | .[0] // null
+    ' <<< "$manifest_json")"
 
-  if [[ "$entry" != "null" && -n "$entry" ]]; then
-    m_name="$(jq -r '.name // "null"' <<< "$entry")"
-    m_version="$(jq -r '.version // "null"' <<< "$entry")"
-    m_domain="$(jq -r '.domain // "null"' <<< "$entry")"
-    m_provider="$(jq -r '.provider // "null"' <<< "$entry")"
-    m_zip="$(jq -r '.zip // "null"' <<< "$entry")"
+    if [[ "$entry" != "null" && -n "$entry" ]]; then
+      m_name="$(jq -r '.name // "null"' <<< "$entry")"
+      m_version="$(jq -r '.version // "null"' <<< "$entry")"
+      m_domain="$(jq -r '.domain // "null"' <<< "$entry")"
+      m_provider="$(jq -r '.provider // "null"' <<< "$entry")"
+      m_zip="$(jq -r '.zip // "null"' <<< "$entry")"
+    fi
   fi
 fi
 

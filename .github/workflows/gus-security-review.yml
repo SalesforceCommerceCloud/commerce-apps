@@ -10,13 +10,23 @@ name: GUS Security Review Auto-file
 # to the PR. Idempotent via a hidden HTML marker in the PR comment so
 # synchronize events don't file duplicate WIs.
 #
+# Trigger safety: this uses `pull_request_target`, which runs from the
+# TRUSTED base branch with secrets available (needed so fork PRs can auth
+# to GUS). The steps below check out ONLY the base ref, then do a bare
+# `git fetch` of the PR head into the object database — HEAD content is
+# reachable as git objects (`git show HEAD_SHA:path`, `git diff BASE HEAD`)
+# but is never on the working tree in a way that a subsequent step could
+# execute or import. The classifier reads the PR-head manifest via
+# `git show` for the same reason. Do not add `checkout` of head.sha or any
+# step that shells into head-provided code.
+#
 # Injection safety: every untrusted PR field (title, author login/email,
 # manifest values from the shared classifier) is passed via env: and
 # referenced as a shell variable inside run: — never interpolated directly
 # via ${{ ... }} into a script body.
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, ready_for_review, synchronize]
     paths:
       - '**/*.zip'
@@ -29,10 +39,24 @@ jobs:
   gus-security-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR HEAD
+      - name: Checkout base (trusted)
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
+
+      - name: Fetch PR head as git object only
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin \
+            "+refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}"
+          if ! git cat-file -e "$HEAD_SHA"; then
+            echo "::error::PR head SHA $HEAD_SHA is not reachable after fetch"
+            exit 1
+          fi
 
       - name: Install Salesforce CLI
         run: |
