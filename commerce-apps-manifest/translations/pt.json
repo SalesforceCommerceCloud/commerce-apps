@@ -19,6 +19,10 @@
         "name": "Pagamento personalizado",
         "description": "Configure uma integração de pagamento personalizada fornecendo suas próprias APIs."
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Processe pagamentos nativamente no Storefront Next. O Salesforce Payments oferece suporte a vários gateways e métodos de pagamento."
+    },
     "custom-analytics": {
         "name": "Análise personalizada",
         "description": "Configure uma integração de análise personalizada fornecendo suas próprias APIs."

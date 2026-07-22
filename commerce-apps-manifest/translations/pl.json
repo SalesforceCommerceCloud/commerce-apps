@@ -19,6 +19,10 @@
         "name": "Płatność niestandardowa",
         "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Przetwarzaj płatności natywnie w Storefront Next. Salesforce Payments obsługuje wiele bramek i metod płatności."
+    },
     "custom-analytics": {
         "name": "Analityka niestandardowa",
         "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
