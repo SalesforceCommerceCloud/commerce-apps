@@ -1,0 +1,271 @@
+name: GUS Security Review Auto-file
+
+# When an external contributor opens a PR that adds a brand-new commerce app
+# to this registry, the C360 Product Security Advisors team needs a GUS User
+# Story queued up immediately so the security review can start in parallel
+# with maintainer review. This workflow runs on every CAP PR, uses the shared
+# classifier to decide whether the PR qualifies (external author AND net-new
+# ISV directory), and — if it does — creates exactly one ADM_Work__c record
+# under the C360 PSA: Commerce Apps - Submissions epic and posts a link back
+# to the PR. Idempotent via a hidden HTML marker in the PR comment so
+# synchronize events don't file duplicate WIs.
+#
+# Trigger safety: this uses `pull_request_target`, which runs from the
+# TRUSTED base branch with secrets available (needed so fork PRs can auth
+# to GUS). The steps below check out ONLY the base ref, then do a bare
+# `git fetch` of the PR head into the object database — HEAD content is
+# reachable as git objects (`git show HEAD_SHA:path`, `git diff BASE HEAD`)
+# but is never on the working tree in a way that a subsequent step could
+# execute or import. The classifier reads the PR-head manifest via
+# `git show` for the same reason. Do not add `checkout` of head.sha or any
+# step that shells into head-provided code.
+#
+# Injection safety: every untrusted PR field (title, author login/email,
+# manifest values from the shared classifier) is passed via env: and
+# referenced as a shell variable inside run: — never interpolated directly
+# via ${{ ... }} into a script body.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review, synchronize]
+    paths:
+      - '**/*.zip'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gus-security-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base (trusted)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+
+      - name: Fetch PR head as git object only
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin \
+            "+refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}"
+          if ! git cat-file -e "$HEAD_SHA"; then
+            echo "::error::PR head SHA $HEAD_SHA is not reachable after fetch"
+            exit 1
+          fi
+
+      - name: Install Salesforce CLI
+        run: |
+          set -euo pipefail
+          npm install --global @salesforce/cli
+
+      - name: Classify PR
+        id: classify
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_EMAIL: ${{ github.event.pull_request.user.email }}
+        run: |
+          set -euo pipefail
+          classification="$(bash .github/scripts/classify-cap-pr.sh)"
+          printf '%s\n' "$classification"
+
+          {
+            printf 'classification<<EOF\n'
+            printf '%s\n' "$classification"
+            printf 'EOF\n'
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            printf 'will_file_gus_wi=%s\n' "$(jq -r '.will_file_gus_wi' <<< "$classification")"
+            printf 'is_new_app=%s\n'       "$(jq -r '.is_new_app' <<< "$classification")"
+            printf 'is_internal=%s\n'      "$(jq -r '.author.is_internal' <<< "$classification")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Skip if not an external new-app submission
+        if: steps.classify.outputs.will_file_gus_wi != 'true'
+        env:
+          IS_NEW_APP: ${{ steps.classify.outputs.is_new_app }}
+          IS_INTERNAL: ${{ steps.classify.outputs.is_internal }}
+        run: |
+          echo "Not an external net-new CAP submission — no GUS WI to file."
+          echo "  is_new_app  = $IS_NEW_APP"
+          echo "  is_internal = $IS_INTERNAL"
+
+      # Idempotency gate — the create step below only runs if no existing PR
+      # comment carries the hidden marker `<!-- gus-security-review-wi -->`.
+      # We check BEFORE authenticating to GUS so a re-run on an already-filed
+      # PR never pays the sfdx-url login cost.
+      - name: Check for existing WI marker on the PR
+        id: marker
+        if: steps.classify.outputs.will_file_gus_wi == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
+              --jq '.[].body' | grep -qF '<!-- gus-security-review-wi -->'; then
+            echo "already_filed=true" >> "$GITHUB_OUTPUT"
+            echo "Existing GUS WI marker found on PR #$PR_NUMBER — nothing to do."
+          else
+            echo "already_filed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Authenticate to GUS via sfdx-url
+        if: >-
+          steps.classify.outputs.will_file_gus_wi == 'true' &&
+          steps.marker.outputs.already_filed == 'false'
+        env:
+          GUS_SFDX_AUTH_URL: ${{ secrets.GUS_SFDX_AUTH_URL }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${GUS_SFDX_AUTH_URL:-}" ]]; then
+            echo "::error::Secret GUS_SFDX_AUTH_URL is not configured. See docs/maintainer-setup.md."
+            exit 1
+          fi
+          # Write the auth URL to a file so it never appears on a command
+          # line where a diagnostic dump could leak it into process logs.
+          printf '%s' "$GUS_SFDX_AUTH_URL" > "$RUNNER_TEMP/gus-auth.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/gus-auth.txt" --alias gus --set-default
+          rm -f "$RUNNER_TEMP/gus-auth.txt"
+          sf org display --target-org gus --json | jq '.result.username // "unknown"'
+
+      - name: Create GUS Work Item
+        id: create_wi
+        if: >-
+          steps.classify.outputs.will_file_gus_wi == 'true' &&
+          steps.marker.outputs.already_filed == 'false'
+        env:
+          CLASSIFICATION: ${{ steps.classify.outputs.classification }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_EMAIL: ${{ github.event.pull_request.user.email }}
+        run: |
+          set -euo pipefail
+
+          # Extract classifier fields into shell variables. Values come from
+          # `jq -r` on JSON; jq never eval's its inputs.
+          zip_path="$(jq -r '.added_zip // "unknown"'      <<< "$CLASSIFICATION")"
+          domain="$(jq -r '.domain // "unknown"'           <<< "$CLASSIFICATION")"
+          isv="$(jq -r '.isv // "unknown"'                 <<< "$CLASSIFICATION")"
+          app_name="$(jq -r '.manifest.name // "unknown"'  <<< "$CLASSIFICATION")"
+          app_version="$(jq -r '.manifest.version // "unknown"' <<< "$CLASSIFICATION")"
+          provider="$(jq -r '.manifest.provider // "unknown"'   <<< "$CLASSIFICATION")"
+          zip_basename="$(basename "$zip_path")"
+
+          # Details__c is HTML with three <h2> sections mirroring example WI
+          # W-23291307. jq --arg quotes every substitution safely.
+          details_html="$(jq -n \
+            --arg pr_url "$PR_URL" \
+            --arg pr_number "$PR_NUMBER" \
+            --arg pr_title "$PR_TITLE" \
+            --arg author "$PR_AUTHOR_LOGIN" \
+            --arg email "$PR_AUTHOR_EMAIL" \
+            --arg app_name "$app_name" \
+            --arg app_version "$app_version" \
+            --arg domain "$domain" \
+            --arg provider "$provider" \
+            --arg isv "$isv" \
+            --arg zip "$zip_basename" \
+            -r '
+              "<h2>User Story</h2>" +
+              "<p>An external contributor has opened a pull request submitting a new " +
+              "third-party Commerce App to <code>SalesforceCommerceCloud/commerce-apps</code>. " +
+              "Please conduct the security review before the PR is merged.</p>" +
+              "<h2>Overview</h2>" +
+              "<ul>" +
+              "<li><b>Pull request:</b> <a href=\"" + $pr_url + "\">#" + $pr_number + " " + ($pr_title | @html) + "</a></li>" +
+              "<li><b>Submitter:</b> " + ($author | @html) + " &lt;" + ($email | @html) + "&gt;</li>" +
+              "<li><b>App name:</b> " + ($app_name | @html) + "</li>" +
+              "<li><b>Version:</b> " + ($app_version | @html) + "</li>" +
+              "<li><b>Domain:</b> " + ($domain | @html) + "</li>" +
+              "<li><b>Provider:</b> " + ($provider | @html) + "</li>" +
+              "<li><b>ISV:</b> " + ($isv | @html) + "</li>" +
+              "<li><b>ZIP:</b> " + ($zip | @html) + "</li>" +
+              "</ul>" +
+              "<h2>Acceptance Criteria</h2>" +
+              "<ul>" +
+              "<li>Security review of the submitted CAP is complete and signed off, or blocking issues are filed back on the PR.</li>" +
+              "<li>PR is not merged until this review is closed.</li>" +
+              "</ul>"
+            ')"
+
+          # Build the ADM_Work__c create payload as a JSON file. Using a file
+          # (not a command-line arg) keeps large HTML off argv.
+          payload_file="$RUNNER_TEMP/adm-work-payload.json"
+          jq -n \
+            --arg subject "External CAP submission: $app_name ($isv) — PR #$PR_NUMBER" \
+            --arg details "$details_html" \
+            '{
+              RecordTypeId:    "0129000000006gDAAQ",
+              Type__c:         "User Story",
+              Status__c:       "New",
+              Epic__c:         "a3QEE000002VGqX2AW",
+              Product_Tag__c:  "a1aEE000001NDFJYA4",
+              Scrum_Team__c:   "a00EE00001Ux7RuYAJ",
+              Assignee__c:     "005B0000006B9w0IAC",
+              Subject__c:      $subject,
+              Details__c:      $details,
+              Priority__c:     "P2"
+            }' > "$payload_file"
+
+          create_response="$(sf data create record \
+            --target-org gus \
+            --sobject ADM_Work__c \
+            --file "$payload_file" \
+            --json)"
+
+          wi_id="$(jq -r '.result.id // empty' <<< "$create_response")"
+          if [[ -z "$wi_id" ]]; then
+            echo "::error::Failed to create ADM_Work__c record"
+            printf '%s\n' "$create_response"
+            exit 1
+          fi
+
+          wi_name="$(sf data query --target-org gus --json \
+            --query "SELECT Name FROM ADM_Work__c WHERE Id='$wi_id'" \
+            | jq -r '.result.records[0].Name // empty')"
+
+          if [[ -z "$wi_name" ]]; then
+            echo "::error::Created ADM_Work__c $wi_id but could not resolve its Name"
+            exit 1
+          fi
+
+          echo "Created GUS WI $wi_name (Id $wi_id)"
+          echo "wi_id=$wi_id"     >> "$GITHUB_OUTPUT"
+          echo "wi_name=$wi_name" >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment with WI link
+        if: >-
+          steps.classify.outputs.will_file_gus_wi == 'true' &&
+          steps.marker.outputs.already_filed == 'false' &&
+          steps.create_wi.outputs.wi_name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          WI_ID: ${{ steps.create_wi.outputs.wi_id }}
+          WI_NAME: ${{ steps.create_wi.outputs.wi_name }}
+        run: |
+          set -euo pipefail
+
+          body_file="$RUNNER_TEMP/pr-comment.md"
+          {
+            printf '<!-- gus-security-review-wi -->\n'
+            printf '## Security review queued: [%s](https://gus.lightning.force.com/lightning/r/ADM_Work__c/%s/view)\n\n' \
+              "$WI_NAME" "$WI_ID"
+            printf 'A GUS Work Item has been auto-filed under the C360 PSA: Commerce Apps - Submissions epic. '
+            printf '**This PR must not be merged until the security review is complete.**\n'
+          } > "$body_file"
+
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" \
+            -f body=@"$body_file"
