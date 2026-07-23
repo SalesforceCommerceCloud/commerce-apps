@@ -1,4 +1,12 @@
 {
-  "latest": {"version": "INIT", "tag": "INIT"},
-  "versions": []
+  "latest": {
+    "version": "1.0.0",
+    "tag": "sf-payments-v1.0.0"
+  },
+  "versions": [
+    {
+      "version": "1.0.0",
+      "tag": "sf-payments-v1.0.0"
+    }
+  ]
 }
