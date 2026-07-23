@@ -19,6 +19,10 @@
         "name": "カスタム決済",
         "description": "独自のAPIを使用してカスタム決済統合を設定します。"
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Storefront Nextでネイティブに決済を処理します。Salesforce Paymentsは複数の決済ゲートウェイと決済方法をサポートしています。"
+    },
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
