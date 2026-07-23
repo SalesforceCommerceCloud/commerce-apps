@@ -584,6 +584,84 @@ assert_no_warning "clean hook has no session warning" "Session access" "$cap"
 echo ""
 
 # ---------------------------------------------------------------------------
+# S17: BM guard.ensure without 'csrf' on state-changing method (WARN)
+# ---------------------------------------------------------------------------
+echo "--- S17: BM CSRF ---"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.get('Show', guard.ensure(['get','https','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_passes "BM guard.ensure with only 'get' does not warn" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.post('Save', guard.ensure(['post','https','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_warns "BM guard.ensure with 'post' but no 'csrf' warns" "BM guard.ensure" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.post('Save', guard.ensure(['post','https','csrf','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_no_warning "BM guard.ensure with 'post' and 'csrf' does not warn" "BM guard.ensure" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.put('Update', guard.ensure(['put','https']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_warns "BM guard.ensure with 'put' but no 'csrf' warns" "BM guard.ensure" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/site_cartridges/int_avatax/cartridge/controllers"
+printf "server.post('Save', guard.ensure(['post','https','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/site_cartridges/int_avatax/cartridge/controllers/Site.js"
+assert_no_warning "storefront (non-BM) guard.ensure with 'post' does not warn (scoped to BM only)" "BM guard.ensure" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "// server.post('Save', guard.ensure(['post','https','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_no_warning "commented BM guard.ensure is ignored" "BM guard.ensure" "$cap"
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# S18: Raw error/response objects stringified into logs (WARN)
+# ---------------------------------------------------------------------------
+echo "--- S18: Raw error/response in logs ---"
+
+cap="$(mkcap)"; printf "logger.error('AvaTax API call failed: ' + JSON.stringify(response.details));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(response...) in logger.error warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "Logger.warn('Failed: ' + JSON.stringify(err));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(err) in Logger.warn warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "log.debug('svc: ' + JSON.stringify(svcResponse));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(svcResponse) in log.debug warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "logger.error('AvaTax API call failed: ' + error.message);\n" > "$cap/app.js"
+assert_no_warning "logger with error.message does not warn" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "var payload = JSON.stringify(err);\nlogger.info('ok');\n" > "$cap/app.js"
+assert_no_warning "JSON.stringify outside a log call does not warn" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "// logger.error('x: ' + JSON.stringify(err));\n" > "$cap/app.js"
+assert_no_warning "commented log with JSON.stringify(err) is ignored" "Raw error/response" "$cap"
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# S19: encodeURI with concatenation / template-literal args (WARN)
+# ---------------------------------------------------------------------------
+echo "--- S19: encodeURI misuse ---"
+
+cap="$(mkcap)"; printf "var u = encodeURI('/api/' + userInput);\n" > "$cap/app.js"
+assert_warns "encodeURI with '+' concatenation warns" "encodeURI()" "$cap"
+
+cap="$(mkcap)"; printf 'var u = encodeURI(`/api/${userInput}`);\n' > "$cap/app.js"
+assert_warns "encodeURI with template-literal interpolation warns" "encodeURI()" "$cap"
+
+cap="$(mkcap)"; printf "var u = encodeURI('/api/static/path');\n" > "$cap/app.js"
+assert_no_warning "encodeURI with static string does not warn" "encodeURI()" "$cap"
+
+cap="$(mkcap)"; printf "var u = encodeURIComponent(userInput + '/x');\n" > "$cap/app.js"
+assert_no_warning "encodeURIComponent (not encodeURI) does not warn" "encodeURI()" "$cap"
+
+cap="$(mkcap)"; printf "// var u = encodeURI('/api/' + userInput);\n" > "$cap/app.js"
+assert_no_warning "commented encodeURI is ignored" "encodeURI()" "$cap"
+
+echo ""
+
+# ---------------------------------------------------------------------------
 # P1: Service profile timeout (BLOCK)
 # ---------------------------------------------------------------------------
 echo "--- P1: Service profile timeout ---"
