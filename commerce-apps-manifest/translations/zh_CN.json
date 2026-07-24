@@ -26,5 +26,9 @@
     "custom-analytics": {
         "name": "自定义分析",
         "description": "通过提供您自己的 API 来配置自定义分析集成。"
+    },
+    "commerce-ace-ga4": {
+        "name": "Commerce Ace GA4 Analytics",
+        "description": "将Storefront Next连接到Google Analytics 4，将页面浏览、商品查看、结账和购买事件传输到商家的GA4媒体资源。"
     }
 }

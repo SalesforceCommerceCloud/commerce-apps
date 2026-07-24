@@ -26,5 +26,9 @@
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",
         "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."
+    },
+    "commerce-ace-ga4": {
+        "name": "Commerce Ace GA4 Analytics",
+        "description": "Verbindet Storefront Next mit Google Analytics 4 und überträgt Seitenaufruf-, Produktansicht-, Checkout- und Kaufereignisse an die GA4-Property des Händlers."
     }
 }

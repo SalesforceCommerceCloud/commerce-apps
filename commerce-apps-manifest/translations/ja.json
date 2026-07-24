@@ -26,5 +26,9 @@
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
+    },
+    "commerce-ace-ga4": {
+        "name": "Commerce Ace GA4 Analytics",
+        "description": "Storefront NextをGoogle Analytics 4に接続し、ページビュー、商品閲覧、チェックアウト、購入イベントをマーチャントのGA4プロパティに送信します。"
     }
 }
