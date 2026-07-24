@@ -604,6 +604,14 @@ cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/cont
 printf "server.put('Update', guard.ensure(['put','https']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
 assert_warns "BM guard.ensure with 'put' but no 'csrf' warns" "BM guard.ensure" "$cap"
 
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.patch('Patch', guard.ensure(['patch','https']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_warns "BM guard.ensure with 'patch' but no 'csrf' warns" "BM guard.ensure" "$cap"
+
+cap="$(mkcap)"; mkdir -p "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers"
+printf "server.delete('Purge', guard.ensure(['delete','https']), function(req, res, next){});\n" > "$cap/cartridges/bm_cartridges/bm_avatax/cartridge/controllers/AvaTaxAdmin.js"
+assert_warns "BM guard.ensure with 'delete' but no 'csrf' warns" "BM guard.ensure" "$cap"
+
 cap="$(mkcap)"; mkdir -p "$cap/cartridges/site_cartridges/int_avatax/cartridge/controllers"
 printf "server.post('Save', guard.ensure(['post','https','loggedIn']), function(req, res, next){});\n" > "$cap/cartridges/site_cartridges/int_avatax/cartridge/controllers/Site.js"
 assert_no_warning "storefront (non-BM) guard.ensure with 'post' does not warn (scoped to BM only)" "BM guard.ensure" "$cap"
@@ -627,6 +635,18 @@ assert_warns "JSON.stringify(err) in Logger.warn warns" "Raw error/response" "$c
 
 cap="$(mkcap)"; printf "log.debug('svc: ' + JSON.stringify(svcResponse));\n" > "$cap/app.js"
 assert_warns "JSON.stringify(svcResponse) in log.debug warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "logger.info('svc: ' + JSON.stringify(result));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(result) in logger.info warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "log.trace('svc: ' + JSON.stringify(svcResult));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(svcResult) in log.trace warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "Logger.error('svc: ' + JSON.stringify(error));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(error) in Logger.error warns" "Raw error/response" "$cap"
+
+cap="$(mkcap)"; printf "logger.warn('svc: ' + JSON.stringify(e));\n" > "$cap/app.js"
+assert_warns "JSON.stringify(e) in logger.warn warns" "Raw error/response" "$cap"
 
 cap="$(mkcap)"; printf "logger.error('AvaTax API call failed: ' + error.message);\n" > "$cap/app.js"
 assert_no_warning "logger with error.message does not warn" "Raw error/response" "$cap"
