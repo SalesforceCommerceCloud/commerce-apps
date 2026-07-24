@@ -38,6 +38,12 @@ permissions:
 jobs:
   gus-security-review:
     runs-on: ubuntu-latest
+    # Temporarily disabled: the GUS Connected App backing GUS_SFDX_AUTH_URL
+    # enforces IP restrictions, so refresh-token auth from GitHub-hosted
+    # runners fails with "RefreshTokenAuthError: ip restricted". Re-enable
+    # by removing this `if:` once a Connected App with "Relax IP
+    # restrictions" is provisioned and the secret is rotated.
+    if: false
     steps:
       - name: Checkout base (trusted)
         uses: actions/checkout@v4
