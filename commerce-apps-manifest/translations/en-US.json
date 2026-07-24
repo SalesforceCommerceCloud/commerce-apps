@@ -26,5 +26,9 @@
     "custom-analytics": {
         "name": "Custom Analytics",
         "description": "Configure a custom analytics integration by providing your own APIs."
+    },
+    "checkoutcom-payments": {
+        "name": "Checkout.com Payments",
+        "description": "Accept cards, wallets (Apple Pay, Google Pay, PayPal) and alternative payment methods (Klarna, Alma, Sequra, MB WAY, Bizum, Tabby, ACH) with Checkout.com. Includes 3D Secure, auto-capture, capture/void/refund management from Business Manager and webhook reconciliation."
     }
 }

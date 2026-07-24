@@ -73,6 +73,23 @@
             "connectionDetailsComponents": [
                 "ccbm_payments/merchantAccountDetails"
             ]
+        },
+        {
+            "id": "checkoutcom-payments",
+            "name": "Checkout.com Payments",
+            "description": "Accept cards, wallets (Apple Pay, Google Pay, PayPal) and alternative payment methods (Klarna, Alma, Sequra, MB WAY, Bizum, Tabby, ACH) with Checkout.com. Includes 3D Secure, auto-capture, capture/void/refund management from Business Manager and webhook reconciliation.",
+            "iconName": "checkoutcom.svg",
+            "domain": "payment",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "27.0.0",
+            "zip": "checkoutcom-payments-v27.0.0.zip",
+            "sha256": "218c506dfb276efb5f3ff136294c518df844eeebfaed7aa9ac3259b6a46e9087",
+            "storefrontSupport": {
+                "sfra": {
+                    "minVersion": "7.0.1"
+                }
+            }
         }
     ],
     "fraud": [],
