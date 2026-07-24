@@ -63,7 +63,7 @@
             "requiredFeatureToggle": "SalesforcePaymentsAllowed",
             "version": "1.0.1",
             "zip": "sf-payments-v1.0.1.zip",
-            "sha256": "93c11dfc71f77bb2366e7d9f070606d4a21966bad5ba9c2ec30f54d8fd9a6b3b",
+            "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
             "configurationComponents": [
                 "ccbm_payments/multiStepPaymentMethods",
                 "ccbm_payments/expressPaymentMethods",
