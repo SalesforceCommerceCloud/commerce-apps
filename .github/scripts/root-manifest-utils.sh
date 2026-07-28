@@ -72,12 +72,53 @@ get_manifest_entry_for_zip() {
   match_count="$(jq 'length' <<< "$matches")"
 
   if [[ "$match_count" -eq 0 ]]; then
-    echo "::error file=$manifest_path::No manifest entry found for ZIP $zip_file"
+    # stderr so the annotation survives when a caller captures stdout via $(...)
+    echo "::error file=$manifest_path::No manifest entry found for ZIP $zip_file" >&2
     return 1
   fi
   if [[ "$match_count" -gt 1 ]]; then
-    echo "::error file=$manifest_path::Multiple manifest entries found for ZIP $zip_file"
+    echo "::error file=$manifest_path::Multiple manifest entries found for ZIP $zip_file" >&2
     return 1
+  fi
+
+  jq -c '.[0]' <<< "$matches"
+}
+
+# Prints the single matching manifest entry JSON object for a zip filename, or
+# nothing (empty stdout, exit 0) when the manifest has no entry for it.
+#
+# Unlike get_manifest_entry_for_zip, an absent entry is NOT an error: on a
+# forward-integration branch the monotonic manifest guard deliberately leaves a
+# back-ported (older) ZIP unreferenced - the branch's manifest stays pinned to
+# the newer version. Such a ZIP has no version/sha256 contract on this branch
+# and is not installable here, so the catalog/promotion jobs skip it rather
+# than failing. Ambiguous duplicates remain a hard error (return 1).
+lookup_manifest_entry_for_zip() {
+  local zip_file="${1:?zip filename is required}"
+  local manifest_path="${2:?manifest path is required}"
+
+  local matches
+  matches="$(
+    jq -c --arg z "$zip_file" '
+      [
+        to_entries[]
+        | select(.value | type == "array")
+        | .value[]?
+        | select(type == "object" and (.zip? == $z))
+      ]
+    ' "$manifest_path"
+  )"
+
+  local match_count
+  match_count="$(jq 'length' <<< "$matches")"
+
+  if [[ "$match_count" -gt 1 ]]; then
+    # stderr so the annotation survives when a caller captures stdout via $(...)
+    echo "::error file=$manifest_path::Multiple manifest entries found for ZIP $zip_file" >&2
+    return 1
+  fi
+  if [[ "$match_count" -eq 0 ]]; then
+    return 0
   fi
 
   jq -c '.[0]' <<< "$matches"
