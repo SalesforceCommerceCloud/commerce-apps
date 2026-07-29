@@ -310,8 +310,14 @@ jobs:
           fi
 
           # 4) Switch to the target branch working tree.
+          #
+          # Check out a LOCAL branch named after the target ($next) tracking its
+          # real origin ref, NOT a throwaway name. create-pull-request treats the
+          # checked-out branch as its "working base" and, during cleanup, runs
+          # `git reset --hard origin/<checked-out-branch>`; a phantom name like
+          # `promote-work` has no origin ref and that reset aborts the action.
           git fetch origin "+refs/heads/$next:refs/remotes/origin/$next"
-          git checkout -B promote-work "origin/$next"
+          git checkout -B "$next" "origin/$next"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

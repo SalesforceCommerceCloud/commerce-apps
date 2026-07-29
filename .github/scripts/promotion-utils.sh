@@ -108,7 +108,10 @@ merge_manifest_entry() {
   local entry_json="${2:?entry JSON is required}"
   local category="${3:?category is required}"
 
-  jq --argjson entry "$entry_json" --arg cat "$category" '
+  # The committed manifest.json uses 4-space indentation, so pass --indent 4
+  # to keep the upsert a minimal diff (just the changed entry) instead of
+  # reformatting the whole file to jq's 2-space default on every promotion.
+  jq --indent 4 --argjson entry "$entry_json" --arg cat "$category" '
     def mmp($s): ($s | split("-")[0] | split(".") | map(tonumber));
     def rank($s): (if ($s | test("-")) then 0 else 1 end);
     # Compare two semver strings: 1 if a>b, 0 if equal, -1 if a<b.
