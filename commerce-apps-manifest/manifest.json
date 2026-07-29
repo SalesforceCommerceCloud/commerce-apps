@@ -64,6 +64,28 @@
             "domain": "payment",
             "type": "custom",
             "provider": "custom"
+        },
+        {
+            "id": "sf-payments",
+            "name": "Salesforce Payments",
+            "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
+            "iconName": "salesforce.svg",
+            "domain": "payment",
+            "type": "app",
+            "provider": "salesforce",
+            "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+            "version": "1.0.1",
+            "zip": "sf-payments-v1.0.1.zip",
+            "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
+            "configurationComponents": [
+                "ccbm_payments/multiStepPaymentMethods",
+                "ccbm_payments/expressPaymentMethods",
+                "ccbm_payments/expressCheckoutDisplay",
+                "ccbm_payments/paymentAdvancedSettings"
+            ],
+            "connectionDetailsComponents": [
+                "ccbm_payments/merchantAccountDetails"
+            ]
         }
     ],
     "fraud": [],
