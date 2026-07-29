@@ -19,6 +19,10 @@
         "name": "Benutzerdefinierte Zahlung",
         "description": "Konfigurieren Sie eine benutzerdefinierte Zahlungsintegration mit Ihren eigenen APIs."
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Verarbeiten Sie Zahlungen nativ in Storefront Next. Salesforce Payments unterstützt mehrere Zahlungs-Gateways und -Methoden."
+    },
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",
         "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."

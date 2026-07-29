@@ -19,6 +19,10 @@
         "name": "Aangepaste betaling",
         "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden."
+    },
     "custom-analytics": {
         "name": "Aangepaste analyse",
         "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."

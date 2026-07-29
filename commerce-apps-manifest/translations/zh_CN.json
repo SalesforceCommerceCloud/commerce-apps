@@ -19,6 +19,10 @@
         "name": "自定义支付",
         "description": "通过提供您自己的 API 来配置自定义支付集成。"
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "在 Storefront Next 中原生处理支付。Salesforce Payments 支持多种支付网关和支付方式。"
+    },
     "custom-analytics": {
         "name": "自定义分析",
         "description": "通过提供您自己的 API 来配置自定义分析集成。"
