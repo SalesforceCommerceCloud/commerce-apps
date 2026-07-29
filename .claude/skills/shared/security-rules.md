@@ -28,10 +28,13 @@ Must fix before packaging or submission:
 - Q6: Absolute file paths in code
 - Q7: Console logging in cartridge code — use dw.system.Logger
 
-## Warning findings (3 checks — review recommended)
+## Warning findings (6 checks — review recommended)
 
 Should fix but non-blocking:
 
 - S6: Non-cryptographic random number generation (Math.random)
 - S12: PII field names in Logger calls (may be false positive — requires context)
 - S16: Session object access in hook scripts (dw.system.Session, session.privacy)
+- S17: BM controller `guard.ensure([...])` includes a state-changing method (`post`/`put`/`patch`/`delete`) but omits `'csrf'`. Scoped to files under `/bm_cartridges/` so storefront controllers with their own CSRF-token flow are not flagged. **Suggested fix:** add `'csrf'` to the guard array, e.g. `guard.ensure(['post', 'https', 'csrf', 'loggedIn'], ...)`.
+- S18: Logger call stringifies a raw error/response object — `Logger.(warn|error|info|debug|trace)(... JSON.stringify(err|error|e|response|svcResponse|svcResult|result ...))`. Whole error/response payloads can carry PII, stack traces, or vendor internals. **Suggested fix:** log only `error.message` (and a request/status code) or a purpose-built redacted view; never the whole object.
+- S19: `encodeURI(...)` used to sanitize a URL built by concatenation (`+`) or template-literal interpolation. `encodeURI` preserves URL delimiters (`/`, `?`, `&`, `=`, `#`) and single quotes, so a hostile segment can break out into a new query param or path. **Suggested fix:** `encodeURIComponent` each user-provided segment/param individually, or use a URL builder that percent-encodes per component.
