@@ -19,6 +19,10 @@
         "name": "دفع مخصص",
         "description": "تكوين تكامل دفع مخصص من خلال توفير واجهات API الخاصة بك."
     },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "معالجة المدفوعات بشكل أصلي في Storefront Next. يدعم Salesforce Payments بوابات وطرق دفع متعددة."
+    },
     "custom-analytics": {
         "name": "تحليلات مخصصة",
         "description": "تكوين تكامل تحليلات مخصص من خلال توفير واجهات API الخاصة بك."
