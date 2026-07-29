@@ -284,6 +284,43 @@ for f in ${HOOK_SCRIPT_FILES[@]+"${HOOK_SCRIPT_FILES[@]}"}; do
   done < <(grep -nE 'dw\.system\.Session|require.*dw/system/Session|session\.(privacy|custom|forms)' "$f" 2>/dev/null | head -5)
 done
 
+# S17: BM controller guard.ensure includes a state-changing method but omits 'csrf' (WARN)
+# Scoped to /bm_cartridges/ so storefront controllers (which use their own CSRF token flow) are not flagged.
+for f in ${JS_FILES[@]+"${JS_FILES[@]}"}; do
+  [[ -z "$f" ]] && continue
+  case "$f" in */bm_cartridges/*) ;; *) continue ;; esac
+  while IFS= read -r match; do
+    # $match is "N:<line contents>"; strip the line-num prefix before shape checks
+    body="${match#*:}"
+    # Must include a state-changing method: post|put|patch|delete
+    if echo "$body" | grep -qE "['\"](post|put|patch|delete)['\"]"; then
+      # Must omit 'csrf'
+      if ! echo "$body" | grep -qE "['\"]csrf['\"]"; then
+        warn "$f" "BM guard.ensure includes a state-changing method but omits 'csrf' — add CSRF protection: $match"
+      fi
+    fi
+  done < <(grep -nE 'guard\.ensure\s*\(\s*\[[^]]*\]' "$f" 2>/dev/null | strip_comments | head -5)
+done
+
+# S18: Raw error/response objects stringified into logs (WARN)
+# Recommend logging only error.message or a redacted status; JSON.stringify(err|response|...) can leak PII, stack, or vendor payloads.
+for f in ${ALL_CODE_FILES[@]+"${ALL_CODE_FILES[@]}"}; do
+  [[ -z "$f" ]] && continue
+  while IFS= read -r line; do
+    warn "$f" "Raw error/response object stringified in log — log only the message or a redacted view: $line"
+  done < <(grep -nE '(Logger|logger|log)\.(warn|error|info|debug|trace)\s*\(.*JSON\.stringify\s*\(\s*(err|error|e|response|svcResponse|svcResult|result)\b' "$f" 2>/dev/null | strip_comments | head -5)
+done
+
+# S19: encodeURI() used to sanitize concatenated/interpolated URLs (WARN)
+# encodeURI preserves URL delimiters (/ ? & = # ') — use encodeURIComponent per user-provided segment/param instead.
+# \bencodeURI\b requires the next char be a non-word so encodeURIComponent( does not match.
+for f in ${ALL_CODE_FILES[@]+"${ALL_CODE_FILES[@]}"}; do
+  [[ -z "$f" ]] && continue
+  while IFS= read -r line; do
+    warn "$f" "encodeURI() with concatenation or template-literal argument — preserves URL delimiters; use encodeURIComponent per segment: $line"
+  done < <(grep -nE '\bencodeURI\s*\([^)]*(\+|\$\{)' "$f" 2>/dev/null | strip_comments | head -5)
+done
+
 echo ""
 
 # ============================ PERFORMANCE ===================================
