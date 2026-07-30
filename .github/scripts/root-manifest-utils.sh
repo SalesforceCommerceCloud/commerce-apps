@@ -51,6 +51,25 @@ validate_manifest() {
   fi
 }
 
+# SFRA is additive-only to SFNext: rejects storefrontSupport.sfra declared
+# without a storefrontSupport.sfnext.minVersion alongside it.
+validate_sfra_requires_sfnext() {
+  local entry_json="${1:?JSON object is required}"
+  local context="${2:-storefrontSupport}"
+  local file="${3:-}"
+
+  local has_sfra
+  has_sfra="$(jq -r '(.storefrontSupport // {}) | has("sfra")' <<< "$entry_json")"
+  [[ "$has_sfra" == "true" ]] || return 0
+
+  local sfnext_min_version
+  sfnext_min_version="$(jq -r '.storefrontSupport.sfnext.minVersion // empty' <<< "$entry_json")"
+  if [[ -z "$sfnext_min_version" ]]; then
+    echo "::error file=$file::storefrontSupport.sfra declared without storefrontSupport.sfnext.minVersion in $context (SFRA is additive-only to SFNext)"
+    return 1
+  fi
+}
+
 # Returns exactly one matching manifest entry JSON object for zip filename.
 get_manifest_entry_for_zip() {
   local zip_file="${1:?zip filename is required}"
