@@ -28,7 +28,7 @@
     "description": "Configure una integración de analítica personalizada proporcionando sus propias API."
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "Zenkraft Envío",
+    "description": "Cálculo de tarifas de envío y fechas de entrega estimadas con tecnología de Zenkraft."
   }
 }

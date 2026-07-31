@@ -28,7 +28,7 @@
     "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "Zenkraft 배송",
+    "description": "Zenkraft가 제공하는 배송 요금 계산 및 예상 배송 날짜."
   }
 }

@@ -28,7 +28,7 @@
     "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "Zenkraft 配送",
+    "description": "Zenkraftによる配送料計算と推定配達日。"
   }
 }

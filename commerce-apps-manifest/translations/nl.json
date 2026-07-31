@@ -28,7 +28,7 @@
     "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "Zenkraft Verzending",
+    "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
   }
 }

@@ -28,7 +28,7 @@
     "description": "通过提供您自己的 API 来配置自定义分析集成。"
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "Zenkraft 配送",
+    "description": "由 Zenkraft 提供支持的运费计算和预计交货日期。"
   }
 }

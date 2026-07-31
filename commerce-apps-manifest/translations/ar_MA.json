@@ -28,7 +28,7 @@
     "description": "تكوين تكامل تحليلات مخصص من خلال توفير واجهات API الخاصة بك."
   },
   "zenkraft-shipping": {
-    "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "name": "شحن Zenkraft",
+    "description": "حساب أسعار الشحن وتواريخ التسليم المقدرة، مدعومة بـ Zenkraft."
   }
 }
