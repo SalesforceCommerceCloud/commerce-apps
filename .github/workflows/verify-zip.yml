@@ -499,6 +499,19 @@ jobs:
               done
             done
 
+            # SFRA is additive-only to SFNext: reject sfra declared without sfnext,
+            # checked on both the manifest entry and the extracted commerce-app.json.
+            if ! validate_sfra_requires_sfnext "$entry" "manifest entry for $zip_file" "$manifest_path"; then
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+            if [[ -n "$commerce_app" && -f "$commerce_app" ]]; then
+              if ! validate_sfra_requires_sfnext "$(cat "$commerce_app")" "commerce-app.json for $zip_file" "$manifest_path"; then
+                rm -rf "$tmpdir"
+                exit 1
+              fi
+            fi
+
             # Cross-validate every storefrontSupport min/max value between manifest and commerce-app.json.
             for storefront in sfnext sfra; do
               for field in minVersion maxVersion; do
