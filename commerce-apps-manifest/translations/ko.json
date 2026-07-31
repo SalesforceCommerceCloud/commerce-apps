@@ -1,34 +1,34 @@
 {
-  "salesforce-flat-tax": {
-    "name": "Salesforce 정액세",
-    "description": "정액세 계산을 구성합니다."
-  },
-  "custom-tax": {
-    "name": "맞춤 세금",
-    "description": "자체 API를 제공하여 맞춤 세금 계산을 구성합니다."
-  },
-  "basic-shipping": {
-    "name": "기본 배송",
-    "description": "기본 배송 계산을 구성합니다."
-  },
-  "custom-shipping": {
-    "name": "맞춤 배송",
-    "description": "자체 API를 제공하여 맞춤 배송 계산을 구성합니다."
-  },
-  "custom-payment": {
-    "name": "맞춤 결제",
-    "description": "자체 API를 제공하여 맞춤 결제 통합을 구성합니다."
-  },
-  "sf-payments": {
-    "name": "Salesforce Payments",
-    "description": "Storefront Next에서 기본적으로 결제를 처리합니다. Salesforce Payments는 여러 결제 게이트웨이 및 방식을 지원합니다."
-  },
-  "custom-analytics": {
-    "name": "맞춤 분석",
-    "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
-  },
-  "zenkraft-shipping": {
-    "name": "Zenkraft 배송",
-    "description": "Zenkraft가 제공하는 배송 요금 계산 및 예상 배송 날짜."
-  }
+    "salesforce-flat-tax": {
+        "name": "Salesforce 정액세",
+        "description": "정액세 계산을 구성합니다."
+    },
+    "custom-tax": {
+        "name": "맞춤 세금",
+        "description": "자체 API를 제공하여 맞춤 세금 계산을 구성합니다."
+    },
+    "basic-shipping": {
+        "name": "기본 배송",
+        "description": "기본 배송 계산을 구성합니다."
+    },
+    "custom-shipping": {
+        "name": "맞춤 배송",
+        "description": "자체 API를 제공하여 맞춤 배송 계산을 구성합니다."
+    },
+    "custom-payment": {
+        "name": "맞춤 결제",
+        "description": "자체 API를 제공하여 맞춤 결제 통합을 구성합니다."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Storefront Next에서 기본적으로 결제를 처리합니다. Salesforce Payments는 여러 결제 게이트웨이 및 방식을 지원합니다."
+    },
+    "custom-analytics": {
+        "name": "맞춤 분석",
+        "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft 배송",
+        "description": "Zenkraft가 제공하는 배송 요금 계산 및 예상 배송 날짜."
+    }
 }

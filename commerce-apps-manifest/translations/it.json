@@ -1,34 +1,34 @@
 {
-  "salesforce-flat-tax": {
-    "name": "Imposta forfettaria Salesforce",
-    "description": "Configura un calcolo dell'imposta forfettaria."
-  },
-  "custom-tax": {
-    "name": "Imposta personalizzata",
-    "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
-  },
-  "basic-shipping": {
-    "name": "Spedizione base",
-    "description": "Configura un calcolo di spedizione base."
-  },
-  "custom-shipping": {
-    "name": "Spedizione personalizzata",
-    "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
-  },
-  "custom-payment": {
-    "name": "Pagamento personalizzato",
-    "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
-  },
-  "sf-payments": {
-    "name": "Salesforce Payments",
-    "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento."
-  },
-  "custom-analytics": {
-    "name": "Analisi personalizzata",
-    "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
-  },
-  "zenkraft-shipping": {
-    "name": "Zenkraft Spedizione",
-    "description": "Calcolo delle tariffe di spedizione e date di consegna stimate powered by Zenkraft."
-  }
+    "salesforce-flat-tax": {
+        "name": "Imposta forfettaria Salesforce",
+        "description": "Configura un calcolo dell'imposta forfettaria."
+    },
+    "custom-tax": {
+        "name": "Imposta personalizzata",
+        "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
+    },
+    "basic-shipping": {
+        "name": "Spedizione base",
+        "description": "Configura un calcolo di spedizione base."
+    },
+    "custom-shipping": {
+        "name": "Spedizione personalizzata",
+        "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
+    },
+    "custom-payment": {
+        "name": "Pagamento personalizzato",
+        "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento."
+    },
+    "custom-analytics": {
+        "name": "Analisi personalizzata",
+        "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft Spedizione",
+        "description": "Calcolo delle tariffe di spedizione e date di consegna stimate powered by Zenkraft."
+    }
 }
