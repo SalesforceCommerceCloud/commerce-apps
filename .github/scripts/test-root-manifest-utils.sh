@@ -85,6 +85,28 @@ assert_fail  "just text: abc"              validate_semver "abc"
 echo ""
 
 # ---------------------------------------------------------------------------
+# validate_sfra_requires_sfnext
+# ---------------------------------------------------------------------------
+echo "--- validate_sfra_requires_sfnext ---"
+
+assert_pass  "no storefrontSupport at all" \
+  validate_sfra_requires_sfnext '{}'
+
+assert_pass  "sfnext alone" \
+  validate_sfra_requires_sfnext '{"storefrontSupport":{"sfnext":{"minVersion":"1.0.0"}}}'
+
+assert_pass  "sfnext and sfra together" \
+  validate_sfra_requires_sfnext '{"storefrontSupport":{"sfnext":{"minVersion":"1.0.0"},"sfra":{"minVersion":"2.0.0"}}}'
+
+assert_fail  "sfra without sfnext" \
+  validate_sfra_requires_sfnext '{"storefrontSupport":{"sfra":{"minVersion":"2.0.0"}}}'
+
+assert_fail  "sfra with sfnext present but no minVersion" \
+  validate_sfra_requires_sfnext '{"storefrontSupport":{"sfnext":{},"sfra":{"minVersion":"2.0.0"}}}'
+
+echo ""
+
+# ---------------------------------------------------------------------------
 # validate_manifest
 # ---------------------------------------------------------------------------
 echo "--- validate_manifest ---"
