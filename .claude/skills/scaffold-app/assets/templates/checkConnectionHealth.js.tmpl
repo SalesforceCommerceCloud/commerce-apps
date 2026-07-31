@@ -1,0 +1,32 @@
+'use strict';
+
+var Status = require('dw/system/Status');
+var {{serviceVar}} = require('*/cartridge/scripts/services/{{serviceModule}}');
+
+/**
+ * Connection health check hook for {{displayName}}.
+ * Verifies connectivity to the external service.
+ *
+ * @returns {dw.system.Status} Health status with message and remediation details
+ */
+exports.checkConnectionHealth = function () {
+    try {
+        var result = {{serviceVar}}.call('GET', '{{healthEndpoint}}', null);
+
+        if (result.success) {
+            var status = new Status(Status.OK, 'HEALTHY');
+            status.addDetail('message', '{{displayName}} service responded in ' + result.latency + 'ms');
+            return status;
+        }
+
+        var unhealthy = new Status(Status.ERROR, 'UNHEALTHY');
+        unhealthy.addDetail('message', 'Unable to reach {{displayName}} service' + (result.error ? ': ' + result.error : ''));
+        unhealthy.addDetail('remediation', 'Verify credentials in Administration > Operations > Services > {{serviceId}}');
+        return unhealthy;
+    } catch (e) {
+        var errorStatus = new Status(Status.ERROR, 'UNHEALTHY');
+        errorStatus.addDetail('message', 'Unexpected error during health check: ' + e.message);
+        errorStatus.addDetail('remediation', 'Verify credentials in Administration > Operations > Services > {{serviceId}}');
+        return errorStatus;
+    }
+};

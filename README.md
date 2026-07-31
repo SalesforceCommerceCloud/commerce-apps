@@ -114,6 +114,120 @@ Example:
 
 CI validates this file's shape on PR. If the file is omitted, the merchant doesn't see a visibility section in BM and every registered target stays enabled.
 
+### Connection Health Check Hook (optional)
+
+Any Commerce App can implement a **connection health check hook** so Business Manager displays connectivity status on the app's tile in the Checkout Hub. The hook is called when a merchant loads the app details page or manually refreshes the connection status — it shows a health badge (Healthy, Degraded, Unhealthy, or Unknown) alongside an optional message and remediation hint. How you define "connection" is up to you — it could be an API endpoint, a credential validation, a third-party service ping, or any check that confirms your app's external dependency is reachable.
+
+#### Hook Registration
+
+Add the hook entry to your cartridge's `hooks.json`:
+
+```json
+{
+  "hooks": [
+    {
+      "name": "sfcc.app.<domain>.checkConnectionHealth",
+      "script": "./hooks/checkConnectionHealth.js"
+    }
+  ]
+}
+```
+
+Replace `<domain>` with your app's domain (e.g., `tax`, `shipping`, `payment`). The hook name **must** follow the `sfcc.app.<domain>.checkConnectionHealth` convention — the platform uses it to associate the hook with your app's installation.
+
+#### Hook Implementation
+
+The hook must export a `checkConnectionHealth` function that returns a `dw.system.Status`:
+
+```javascript
+'use strict';
+
+var Status = require('dw/system/Status');
+
+exports.checkConnectionHealth = function () {
+    var myService = require('*/cartridge/scripts/services/myService');
+
+    try {
+        var result = myService.call('GET', '/health', null);
+
+        if (result.success) {
+            var status = new Status(Status.OK, 'HEALTHY');
+            status.addDetail('message', 'Service responded in ' + result.latency + 'ms');
+            return status;
+        }
+
+        var unhealthy = new Status(Status.ERROR, 'UNHEALTHY');
+        unhealthy.addDetail('message', 'Unable to reach service');
+        unhealthy.addDetail('remediation',
+            'Verify credentials in Administration > Operations > Services');
+        return unhealthy;
+    } catch (e) {
+        var errorStatus = new Status(Status.ERROR, 'UNHEALTHY');
+        errorStatus.addDetail('message', 'Unexpected error: ' + e.message);
+        errorStatus.addDetail('remediation',
+            'Verify credentials in Administration > Operations > Services');
+        return errorStatus;
+    }
+};
+```
+
+#### Status Codes
+
+The BM endpoint interprets the returned `Status` as follows:
+
+| Return value | Health badge | When to use |
+|---|---|---|
+| `new Status(Status.OK, 'HEALTHY')` | **Healthy** | Service is reachable and credentials are valid |
+| `new Status(Status.ERROR, 'DEGRADED')` | **Degraded** | Service is reachable but partially impaired (e.g., auth failed, rate-limited) |
+| `new Status(Status.ERROR, 'UNHEALTHY')` | **Unhealthy** | Service is unreachable or returning errors |
+| `null` or exception thrown | **Unknown** | Hook timed out or threw — platform handles gracefully |
+
+#### Status Details
+
+Use `status.addDetail(key, value)` to attach structured information that BM surfaces in the health indicator UI:
+
+| Detail Key | Purpose | Example |
+|---|---|---|
+| `"message"` | Brief description of the current state | `"Service responded in 142ms"` |
+| `"remediation"` | Actionable steps the merchant can take to fix a degraded/unhealthy state | `"Verify your API credentials in Administration > Operations > Services > myvendor.api"` |
+
+Both values are surfaced **verbatim** in Business Manager. Keep them concise and merchant-friendly.
+
+#### Localizing Health Check Messages
+
+The hook executes in the **BM session locale** context, so you can use `dw.web.Resource` to provide translated messages:
+
+```javascript
+var Resource = require('dw/web/Resource');
+var Status = require('dw/system/Status');
+
+exports.checkConnectionHealth = function () {
+    // ...
+    var degraded = new Status(Status.ERROR, 'DEGRADED');
+    degraded.addDetail('message',
+        Resource.msg('healthcheck.degraded.message', 'myapp', null));
+    degraded.addDetail('remediation',
+        Resource.msgf('healthcheck.degraded.remediation', 'myapp', null, serviceName));
+    return degraded;
+};
+```
+
+Place resource bundles under `cartridge/templates/resources/` in your cartridge (e.g., `myapp.properties` for English, `myapp_de.properties` for German). The `Resource.msg()` call resolves against the BM admin's current language.
+
+If you do not need localization, hardcoded English strings are acceptable — they flow through to the UI as-is.
+
+#### Best Practices
+
+- **Keep it lightweight.** The platform applies a CPU timeout. Prefer a simple ping or auth-check endpoint over heavy operations.
+- **Always return a Status.** Never return `undefined` — return `null` if you cannot determine health, and the platform shows "Unknown."
+- **Wrap in try/catch.** An unhandled exception produces an "Unknown" badge with no message. Catching lets you return a meaningful remediation hint.
+- **Be specific in remediation.** Include the exact BM navigation path where the merchant can fix the issue (e.g., `Administration > Operations > Services > my.service.id`).
+- **Test degraded states.** Use invalid credentials or an unreachable endpoint in your sandbox to verify degraded/unhealthy responses render correctly.
+
+#### Apps Without a Health Check
+
+If an app does not register `sfcc.app.<domain>.checkConnectionHealth`, the Checkout Hub tile does not display a health badge. The health check is optional — apps that don't depend on an external connection typically skip it.
+
 ## Published Apps
 
 Apps are organized by domain and app name:
