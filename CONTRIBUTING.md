@@ -482,7 +482,7 @@ Locale filenames are validated against the set of locales supported by Business 
 
 | Locale | Filename |
 |:--|:--|
-| Arabic (Morocco) | `ar_MA.json` |
+| Arabic (Morocco) | `ar-MA.json` |
 | German | `de.json` |
 | English (United States) | `en-US.json` |
 | Spanish | `es.json` |
@@ -493,8 +493,8 @@ Locale filenames are validated against the set of locales supported by Business 
 | Dutch | `nl.json` |
 | Polish | `pl.json` |
 | Portuguese | `pt.json` |
-| Chinese (Simplified) | `zh_CN.json` |
-| Chinese (Traditional) | `zh_TW.json` |
+| Chinese (Simplified) | `zh-CN.json` |
+| Chinese (Traditional) | `zh-TW.json` |
 
 CI will reject locale files whose filenames are outside this set.
 
