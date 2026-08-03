@@ -12,6 +12,18 @@
             "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
         },
         {
+            "id": "avalara-tax",
+            "name": "Avalara Tax",
+            "description": "Automated tax compliance solution by Avalara",
+            "iconName": "avalara.png",
+            "domain": "tax",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "avalara-tax-v1.0.0.zip",
+            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
+        },
+        {
             "id": "custom-tax",
             "name": "Custom Tax",
             "description": "Configure a custom tax calculation by providing your own APIs.",
