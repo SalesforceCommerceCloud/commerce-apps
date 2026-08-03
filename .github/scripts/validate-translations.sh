@@ -38,7 +38,7 @@ fi
 
 # Set of supported BM locales — must match the table in CONTRIBUTING.md
 # under "Localizing app-shipped strings > Supported locales".
-SUPPORTED_LOCALES=("ar_MA" "de" "en-US" "es" "fr" "it" "ja" "ko" "nl" "pl" "pt" "zh_CN" "zh_TW")
+SUPPORTED_LOCALES=("ar-MA" "de" "en-US" "es" "fr" "it" "ja" "ko" "nl" "pl" "pt" "zh-CN" "zh-TW")
 
 translations_dir="$cap_root/app-configuration/translations"
 
