@@ -1,102 +1,102 @@
 {
-  "defaultLocale": "en-US",
-  "tax": [
-    {
-      "id": "salesforce-flat-tax",
-      "name": "Salesforce Flat Tax",
-      "description": "Configure a flat tax calculation.",
-      "iconName": "salesforce.svg",
-      "domain": "tax",
-      "type": "feature",
-      "provider": "salesforce",
-      "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
-    },
-    {
-      "id": "custom-tax",
-      "name": "Custom Tax",
-      "description": "Configure a custom tax calculation by providing your own APIs.",
-      "iconName": "custom.svg",
-      "domain": "tax",
-      "type": "custom",
-      "provider": "custom"
-    },
-    {
-      "id": "avalara-tax",
-      "name": "Avalara Tax",
-      "description": "Automated tax compliance solution by Avalara",
-      "iconName": "avalara.png",
-      "domain": "tax",
-      "type": "app",
-      "provider": "thirdParty",
-      "version": "1.0.0",
-      "zip": "avalara-tax-v1.0.0.zip",
-      "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
-    }
-  ],
-  "shipping": [
-    {
-      "id": "basic-shipping",
-      "name": "Basic Shipping",
-      "description": "Configure a basic shipping calculation.",
-      "iconName": "salesforce.svg",
-      "domain": "shipping",
-      "type": "feature",
-      "provider": "salesforce",
-      "configurationUrl": "/on/demandware.store/Sites-Site/default/ShippingMethodList-ListAll"
-    },
-    {
-      "id": "custom-shipping",
-      "name": "Custom Shipping",
-      "description": "Configure a custom shipping calculation by providing your own APIs.",
-      "iconName": "custom.svg",
-      "domain": "shipping",
-      "type": "custom",
-      "provider": "custom"
-    }
-  ],
-  "payment": [
-    {
-      "id": "custom-payment",
-      "name": "Custom Payment",
-      "description": "Configure a custom payment integration by providing your own APIs.",
-      "iconName": "custom.svg",
-      "domain": "payment",
-      "type": "custom",
-      "provider": "custom"
-    },
-    {
-      "id": "sf-payments",
-      "name": "Salesforce Payments",
-      "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
-      "iconName": "salesforce.svg",
-      "domain": "payment",
-      "type": "app",
-      "provider": "salesforce",
-      "requiredFeatureToggle": "SalesforcePaymentsAllowed",
-      "version": "1.0.1",
-      "zip": "sf-payments-v1.0.1.zip",
-      "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
-      "configurationComponents": [
-        "ccbm_payments/multiStepPaymentMethods",
-        "ccbm_payments/expressPaymentMethods",
-        "ccbm_payments/expressCheckoutDisplay",
-        "ccbm_payments/paymentAdvancedSettings"
-      ],
-      "connectionDetailsComponents": [
-        "ccbm_payments/merchantAccountDetails"
-      ]
-    }
-  ],
-  "fraud": [],
-  "analytics": [
-    {
-      "id": "custom-analytics",
-      "name": "Custom Analytics",
-      "description": "Configure a custom analytics integration by providing your own APIs.",
-      "iconName": "custom.svg",
-      "domain": "analytics",
-      "type": "custom",
-      "provider": "custom"
-    }
-  ]
+    "defaultLocale": "en-US",
+    "tax": [
+        {
+            "id": "salesforce-flat-tax",
+            "name": "Salesforce Flat Tax",
+            "description": "Configure a flat tax calculation.",
+            "iconName": "salesforce.svg",
+            "domain": "tax",
+            "type": "feature",
+            "provider": "salesforce",
+            "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
+        },
+        {
+            "id": "avalara-tax",
+            "name": "Avalara Tax",
+            "description": "Automated tax compliance solution by Avalara",
+            "iconName": "avalara.png",
+            "domain": "tax",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "avalara-tax-v1.0.0.zip",
+            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
+        },
+        {
+            "id": "custom-tax",
+            "name": "Custom Tax",
+            "description": "Configure a custom tax calculation by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "tax",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ],
+    "shipping": [
+        {
+            "id": "basic-shipping",
+            "name": "Basic Shipping",
+            "description": "Configure a basic shipping calculation.",
+            "iconName": "salesforce.svg",
+            "domain": "shipping",
+            "type": "feature",
+            "provider": "salesforce",
+            "configurationUrl": "/on/demandware.store/Sites-Site/default/ShippingMethodList-ListAll"
+        },
+        {
+            "id": "custom-shipping",
+            "name": "Custom Shipping",
+            "description": "Configure a custom shipping calculation by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "shipping",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ],
+    "payment": [
+        {
+            "id": "custom-payment",
+            "name": "Custom Payment",
+            "description": "Configure a custom payment integration by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "payment",
+            "type": "custom",
+            "provider": "custom"
+        },
+        {
+            "id": "sf-payments",
+            "name": "Salesforce Payments",
+            "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
+            "iconName": "salesforce.svg",
+            "domain": "payment",
+            "type": "app",
+            "provider": "salesforce",
+            "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+            "version": "1.0.1",
+            "zip": "sf-payments-v1.0.1.zip",
+            "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
+            "configurationComponents": [
+                "ccbm_payments/multiStepPaymentMethods",
+                "ccbm_payments/expressPaymentMethods",
+                "ccbm_payments/expressCheckoutDisplay",
+                "ccbm_payments/paymentAdvancedSettings"
+            ],
+            "connectionDetailsComponents": [
+                "ccbm_payments/merchantAccountDetails"
+            ]
+        }
+    ],
+    "fraud": [],
+    "analytics": [
+        {
+            "id": "custom-analytics",
+            "name": "Custom Analytics",
+            "description": "Configure a custom analytics integration by providing your own APIs.",
+            "iconName": "custom.svg",
+            "domain": "analytics",
+            "type": "custom",
+            "provider": "custom"
+        }
+    ]
 }

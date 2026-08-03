@@ -1,12 +1,7 @@
 {
   "latest": {
-    "version": "1.0.0",
-    "tag": "avalara-tax-v1.0.0"
+    "version": "INIT",
+    "tag": "INIT"
   },
-  "versions": [
-    {
-      "version": "1.0.0",
-      "tag": "avalara-tax-v1.0.0"
-    }
-  ]
+  "versions": []
 }
