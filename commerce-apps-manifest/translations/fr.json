@@ -3,10 +3,6 @@
         "name": "Taxe forfaitaire Salesforce",
         "description": "Configurez un calcul de taxe forfaitaire."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatisez votre conformité fiscale avec Avalara."
-    },
     "custom-tax": {
         "name": "Taxe personnalisée",
         "description": "Configurez un calcul de taxe personnalisé en fournissant vos propres API."

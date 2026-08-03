@@ -3,10 +3,6 @@
         "name": "Salesforce 固定税",
         "description": "配置固定税计算。"
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "使用 Avalara 自动执行销售税合规。"
-    },
     "custom-tax": {
         "name": "自定义税务",
         "description": "通过提供您自己的 API 来配置自定义税务计算。"
