@@ -36,6 +36,7 @@
 - [ ] `catalog.json` included for new apps only (with INIT values)
 - [ ] If updating existing app: Did NOT add new versions to `catalog.json` (CI handles this)
 - [ ] If deprecating a version: Added `"deprecated": true` to existing version in `catalog.json`
+- [ ] If the app declares SFRA support, it also declares SFNext support (no SFRA-only apps)
 
 ### Version and Hash Validation
 - [ ] `version` in `manifest.json` matches `version` in `commerce-app.json`
@@ -101,3 +102,4 @@
 - I am only committing ZIP, manifest.json, translations, and catalog.json (no extracted directories)
 - All hardcoded credentials are placeholders, not production values
 - I have signed the Contributor License Agreement (CLA) if I am an external contributor
+- This app is covered by an appropriate ISV partnership agreement with Salesforce

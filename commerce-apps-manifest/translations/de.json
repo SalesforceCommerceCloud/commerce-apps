@@ -3,10 +3,6 @@
         "name": "Salesforce Pauschalsteuer",
         "description": "Konfigurieren Sie eine pauschale Steuerberechnung."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatisieren Sie Ihre Umsatzsteuer-Compliance mit Avalara."
-    },
     "custom-tax": {
         "name": "Benutzerdefinierte Steuer",
         "description": "Konfigurieren Sie eine benutzerdefinierte Steuerberechnung mit Ihren eigenen APIs."
@@ -22,6 +18,10 @@
     "custom-payment": {
         "name": "Benutzerdefinierte Zahlung",
         "description": "Konfigurieren Sie eine benutzerdefinierte Zahlungsintegration mit Ihren eigenen APIs."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Verarbeiten Sie Zahlungen nativ in Storefront Next. Salesforce Payments unterstützt mehrere Zahlungs-Gateways und -Methoden."
     },
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",

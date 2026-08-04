@@ -19,9 +19,9 @@
             "domain": "tax",
             "type": "app",
             "provider": "thirdParty",
-            "version": "1.1.2",
-            "zip": "avalara-tax-v1.1.2.zip",
-            "sha256": "d6ed794e9fb1f6bc34cf7437d149b9b46460b7458ca7cb1457e46090b50ccf1a"
+            "version": "1.0.0",
+            "zip": "avalara-tax-v1.0.0.zip",
+            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
         },
         {
             "id": "custom-tax",
@@ -63,6 +63,28 @@
             "domain": "payment",
             "type": "custom",
             "provider": "custom"
+        },
+        {
+            "id": "sf-payments",
+            "name": "Salesforce Payments",
+            "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
+            "iconName": "salesforce.svg",
+            "domain": "payment",
+            "type": "app",
+            "provider": "salesforce",
+            "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+            "version": "1.0.1",
+            "zip": "sf-payments-v1.0.1.zip",
+            "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
+            "configurationComponents": [
+                "ccbm_payments/multiStepPaymentMethods",
+                "ccbm_payments/expressPaymentMethods",
+                "ccbm_payments/expressCheckoutDisplay",
+                "ccbm_payments/paymentAdvancedSettings"
+            ],
+            "connectionDetailsComponents": [
+                "ccbm_payments/merchantAccountDetails"
+            ]
         }
     ],
     "fraud": [],

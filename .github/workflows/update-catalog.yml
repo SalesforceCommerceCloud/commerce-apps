@@ -2,9 +2,14 @@ name: Update Catalog.json w New App Version PR
 
 on:
   push:
-    branches: [main]
-    paths:
-      - '**/*.zip'
+    branches:
+      - main
+      - 'release/**'
+    # No `paths` filter: `update-catalog-pr` only acts on changed ZIPs and
+    # no-ops otherwise, but `promote-forward` also carries non-CAP file
+    # changes (docs, skills, manifest.json edits) forward across release
+    # branches, so the workflow must fire on those pushes too. Each job below
+    # no-ops on its own when nothing relevant changed.
 
 permissions:
   contents: write
@@ -15,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout main
+      - name: Checkout pushed branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -28,16 +33,23 @@ jobs:
         run: |
           set -euo pipefail
           source ".github/scripts/root-manifest-utils.sh"
+          source ".github/scripts/promotion-utils.sh"
           manifest_path="commerce-apps-manifest/manifest.json"
-          validate_manifest "$manifest_path"
 
-          # 1) Find ZIP files changed in this push to main (merge commit)
+          # 1) Find ZIP files changed in this push to the target branch (merge commit).
+          #    Checked BEFORE validate_manifest: this job has nothing to do when no
+          #    ZIP changed, so an unrelated push (docs/skills/workflow-only) must not
+          #    be blocked by a pre-existing manifest defect it never touches - the
+          #    workflow now fires on every push (see the `on.push` comment above),
+          #    not just ZIP-touching ones.
           mapfile -t changed_zips < <(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- '**/*.zip')
 
           if [[ ${#changed_zips[@]} -eq 0 ]]; then
             echo "No .zip files changed. Exiting."
             exit 0
           fi
+
+          validate_manifest "$manifest_path"
 
           echo "Changed ZIPs:"
           printf ' - %s\n' "${changed_zips[@]}"
@@ -63,7 +75,17 @@ jobs:
             fi
 
             zip_file="$(basename "$zip_path")"
-            entry="$(get_manifest_entry_for_zip "$zip_file" "$manifest_path")"
+            entry="$(lookup_manifest_entry_for_zip "$zip_file" "$manifest_path")"
+
+            # No manifest entry: this is a back-ported (older) ZIP that the
+            # monotonic manifest guard deliberately left unreferenced on this
+            # branch - the manifest stays pinned to the newer version. It has no
+            # version/sha256 contract here and nothing installs it, so skip it
+            # (the newer version already carries this branch's catalog/tag).
+            if [[ -z "$entry" ]]; then
+              echo "No manifest entry for $zip_file on this branch; skipping (back-ported/unpinned artifact)."
+              continue
+            fi
 
             # Version from manifest entry (expects .version)
             version="$(jq -r '.version // empty' <<< "$entry")"
@@ -75,21 +97,28 @@ jobs:
             # 3) Tag name = zip filename without .zip
             tag_name="${zip_file%.zip}"
 
-            # Create + push tag (skip if already exists)
-            if ! git rev-parse -q --verify "refs/tags/$tag_name" >/dev/null; then
+            # Tags are immutable and shared across branches: a given app version
+            # maps to exactly one artifact, so the tag is created once and never
+            # moved. The remote is the source of truth (the CI checkout is shallow
+            # per branch and may not have the tag locally). If it already exists on
+            # the remote, this is a promotion of an already-published version -
+            # leave the tag pinned to its original commit.
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag_name" >/dev/null 2>&1; then
+              echo "Tag $tag_name already exists on remote; leaving it pinned (immutable, shared)."
+            else
               git tag -a "$tag_name" -m "Release $tag_name"
-            fi
-            if ! git ls-remote --exit-code --tags origin "refs/tags/$tag_name" >/dev/null 2>&1; then
               git push origin "refs/tags/$tag_name"
             fi
 
-            # 4) Update latest and 5) Append a new versions entry
+            # 4) Merge this version/tag into catalog.json (shared helper).
+            # versions is a union (idempotent: re-publishing the same ZIP does
+            # not duplicate entries), and latest is recomputed monotonically as
+            # the highest semver across the merged versions - so this job stays
+            # consistent with the promotion job and never regresses latest when
+            # an older version is (re)published on a branch that already carries
+            # a newer one.
             tmp="$(mktemp)"
-            jq --arg v "$version" --arg t "$tag_name" '
-              .versions = (.versions // []) |
-              .latest = {"version": $v, "tag": $t} |
-              .versions = (.versions + [{"version": $v, "tag": $t}])
-            ' "$catalog_path" > "$tmp"
+            merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
 
             mv "$tmp" "$catalog_path"
             git add "$catalog_path"
@@ -155,12 +184,13 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: CI/update-catalog-${{ github.run_id }}
+          base: ${{ github.ref_name }}
+          branch: CI/update-catalog-${{ github.ref_name }}-${{ github.run_id }}
           delete-branch: true
           commit-message: "CI: update catalog.json after ZIP merge"
-          title: "CI: update catalog.json after ZIP merge"
+          title: "CI: update catalog.json after ZIP merge into ${{ github.ref_name }}"
           body: |
-            This PR was auto-generated after a ZIP file was merged into `main`.
+            This PR was auto-generated after a ZIP file was merged into `${{ github.ref_name }}`.
 
             - Creates a tag matching the ZIP filename (without `.zip`)
             - Updates `catalog.json` `latest`
@@ -168,3 +198,319 @@ jobs:
             - Extracts and adds app icons to `commerce-apps-manifest/icons/`
           labels: |
             automation
+
+  # ---------------------------------------------------------------------------
+  # Forward-integration (auto-promotion).
+  #
+  # When a ZIP lands on a release branch, open a self-contained promotion PR
+  # into the next branch in the chain
+  #   release/<older> -> release/<newer> -> main
+  # carrying the ZIP, its manifest entry, the merged catalog.json, and icons.
+  #
+  # Because the PR carries a ZIP, merging it re-fires THIS workflow on the next
+  # branch, which advances the chain one hop further. The chain is therefore
+  # self-propagating with one gated (human/App-reviewed) merge per hop and no
+  # cross-workflow wiring. The `update-catalog-pr` job on the next branch sees
+  # no diff (catalog merge is idempotent, tag is immutable) and is a no-op.
+  #
+  # Runs only on release branches; `main` is the end of the chain.
+  # ---------------------------------------------------------------------------
+  promote-forward:
+    runs-on: ubuntu-latest
+    # Run after the catalog job so the immutable tag for this version is already
+    # pushed before the promotion PR (which references that tag) is opened.
+    needs: update-catalog-pr
+    if: ${{ startsWith(github.ref_name, 'release/') }}
+
+    steps:
+      - name: Checkout pushed branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare promotion onto the next branch
+        id: prepare
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          SOURCE_REF: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          source ".github/scripts/root-manifest-utils.sh"
+          source ".github/scripts/promotion-utils.sh"
+          manifest_path="commerce-apps-manifest/manifest.json"
+
+          # 1) What changed in this push (the merge commit on the source
+          #    branch). On branch creation github.event.before is all-zeros and
+          #    there is no real "before" commit to diff against; skip rather
+          #    than promote a whole branch's worth of history on its first push.
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            echo "Branch-creation push (no prior commit); nothing to promote."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mapfile -t changed_zips < <(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- '**/*.zip')
+          manifest_changed=false
+          if ! git diff --quiet "$BEFORE_SHA" "$AFTER_SHA" -- "$manifest_path"; then
+            manifest_changed=true
+          fi
+          translations_changed=false
+          if ! git diff --quiet "$BEFORE_SHA" "$AFTER_SHA" -- 'commerce-apps-manifest/translations/**'; then
+            translations_changed=true
+          fi
+          # Non-CAP: every tracked file except ZIPs, their sibling
+          # catalog.json, extracted icons, manifest.json, and translations
+          # (each of those is promoted separately above/below via its own
+          # merge, not a plain patch). One patch file PER changed path (not one
+          # combined patch): git apply/reverse-check are all-or-nothing, so a
+          # single conflicting or binary file must not drop every other,
+          # unrelated file bundled into the same push.
+          stash="$RUNNER_TEMP/promote"
+          rm -rf "$stash"; mkdir -p "$stash/non-cap-patches"
+          non_cap_changed=false
+          mapfile -t non_cap_files < <(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- "${NON_CAP_PATHSPEC[@]}")
+          if [[ ${#non_cap_files[@]} -gt 0 ]]; then
+            non_cap_changed=true
+            : > "$stash/non-cap-files.txt"
+            for f in "${non_cap_files[@]}"; do
+              printf '%s\n' "$f" >> "$stash/non-cap-files.txt"
+              slug="$(echo "$f" | tr '/' '_')"
+              git diff --binary "$BEFORE_SHA" "$AFTER_SHA" -- "$f" > "$stash/non-cap-patches/$slug.patch"
+            done
+          fi
+
+          if [[ ${#changed_zips[@]} -eq 0 && "$manifest_changed" == "false" && "$translations_changed" == "false" && "$non_cap_changed" == "false" ]]; then
+            echo "No promotable changes (no ZIPs, manifest, translations, or non-CAP files). Nothing to promote."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # validate_manifest only after confirming there's something to
+          # promote: an unrelated push (docs/skills-only) with no ZIP/manifest/
+          # translations change must not be hard-failed by a pre-existing
+          # manifest defect it never touches, now that this workflow fires on
+          # every push rather than only ZIP-touching ones.
+          validate_manifest "$manifest_path"
+
+          # 2) Determine the next hop from the live remote branch list. Fail loud
+          #    if the remote returned nothing: an empty list would make
+          #    next_release_branch fall through to "main" and skip release hops.
+          branch_list="$(git ls-remote --heads origin | awk '{print $2}')"
+          if [[ -z "$branch_list" ]]; then
+            echo "::error::git ls-remote returned no branches; cannot determine next hop"
+            exit 1
+          fi
+          next="$(next_release_branch "$SOURCE_REF" "$branch_list")"
+          if [[ -z "$next" ]]; then
+            echo "No forward hop from $SOURCE_REF; chain terminates."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Promoting $SOURCE_REF -> $next"
+
+          # 3) Stash remaining source artifacts (ZIP bytes + source manifest)
+          #    into the SAME stash dir from step 1 (which already holds the
+          #    per-file non-cap patches) BEFORE we switch to the target
+          #    working tree.
+          cp "$manifest_path" "$stash/source-manifest.json"
+          [[ -d commerce-apps-manifest/translations ]] && cp -r commerce-apps-manifest/translations "$stash/source-translations"
+          : > "$stash/items.tsv"
+
+          for zip_path in "${changed_zips[@]}"; do
+            [[ -f "$zip_path" ]] || continue   # skip deletions
+            zip_file="$(basename "$zip_path")"
+            entry="$(lookup_manifest_entry_for_zip "$zip_file" "$stash/source-manifest.json")"
+
+            # No manifest entry on the source branch: a back-ported (older) ZIP
+            # the monotonic guard left unreferenced. It is not the pinned
+            # artifact here and the newer version already cascaded forward on its
+            # own, so do not carry it to the next branch.
+            if [[ -z "$entry" ]]; then
+              echo "No manifest entry for $zip_file on $SOURCE_REF; not promoting (back-ported/unpinned artifact)."
+              continue
+            fi
+
+            version="$(jq -r '.version // empty' <<< "$entry")"
+            category="$(jq -r --arg z "$zip_file" '
+              to_entries[]
+              | select(.value | type == "array")
+              | select(any(.value[]?; .zip? == $z))
+              | .key
+            ' "$stash/source-manifest.json")"
+            if [[ -z "$version" || "$version" == "null" || -z "$category" ]]; then
+              echo "::error file=$manifest_path::Missing version/category for ZIP $zip_file"
+              exit 1
+            fi
+            mkdir -p "$stash/zips/$(dirname "$zip_path")"
+            cp "$zip_path" "$stash/zips/$zip_path"
+            printf '%s\t%s\t%s\n' "$zip_path" "$version" "$category" >> "$stash/items.tsv"
+          done
+
+          if [[ ! -s "$stash/items.tsv" && "$manifest_changed" == "false" && "$translations_changed" == "false" && "$non_cap_changed" == "false" ]]; then
+            echo "No promotable ZIPs (all deletions) and no manifest/translations/non-CAP changes. Nothing to promote."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 4) Switch to the target branch working tree.
+          #
+          # Check out a LOCAL branch named after the target ($next) tracking its
+          # real origin ref, NOT a throwaway name. create-pull-request treats the
+          # checked-out branch as its "working base" and, during cleanup, runs
+          # `git reset --hard origin/<checked-out-branch>`; a phantom name like
+          # `promote-work` has no origin ref and that reset aborts the action.
+          git fetch origin "+refs/heads/$next:refs/remotes/origin/$next"
+          git checkout -B "$next" "origin/$next"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          icons_manifest_dir="commerce-apps-manifest/icons"
+          mkdir -p "$icons_manifest_dir"
+
+          # 5) Apply each stashed artifact onto the target branch.
+          while IFS=$'\t' read -r zip_path version category; do
+            [[ -z "$zip_path" ]] && continue
+            zip_file="$(basename "$zip_path")"
+            tag_name="${zip_file%.zip}"
+            entry="$(get_manifest_entry_for_zip "$zip_file" "$stash/source-manifest.json")"
+
+            # 5a) ZIP bytes (creates the app directory on the target if new).
+            mkdir -p "$(dirname "$zip_path")"
+            cp "$stash/zips/$zip_path" "$zip_path"
+            git add "$zip_path"
+
+            # 5b) Manifest entry (monotonic upsert keyed by app id).
+            tmp="$(mktemp)"
+            merge_manifest_entry "$manifest_path" "$entry" "$category" > "$tmp"
+            mv "$tmp" "$manifest_path"
+            git add "$manifest_path"
+
+            # 5c) catalog.json next to the ZIP (union versions, monotonic latest).
+            #     Seed an empty catalog for a brand-new app on the target.
+            catalog_path="$(dirname "$zip_path")/catalog.json"
+            [[ -f "$catalog_path" ]] || echo '{}' > "$catalog_path"
+            tmp="$(mktemp)"
+            merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
+            mv "$tmp" "$catalog_path"
+            git add "$catalog_path"
+
+            # 5d) Icons: copy from the ZIP into the shared icons dir.
+            isv_name="$(echo "$zip_path" | cut -d'/' -f2)"
+            if [[ -n "$isv_name" ]]; then
+              tmpdir="$(mktemp -d)"
+              unzip -q "$zip_path" -d "$tmpdir"
+              icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+              if [[ -n "$icons_dir" && -d "$icons_dir" ]]; then
+                mapfile -t icon_files < <(find "$icons_dir" -type f \( -iname "*.png" -o -iname "*.svg" -o -iname "*.jpg" -o -iname "*.jpeg" \) -print)
+                for icon_file in "${icon_files[@]}"; do
+                  dest_icon="$icons_manifest_dir/$(basename "$icon_file")"
+                  if [[ ! -f "$dest_icon" ]] || ! cmp -s "$icon_file" "$dest_icon"; then
+                    cp "$icon_file" "$dest_icon"
+                    git add "$dest_icon"
+                  fi
+                done
+              fi
+              rm -rf "$tmpdir"
+            fi
+          done < "$stash/items.tsv"
+
+          # 5e) Manifest entries not tied to a specific promoted ZIP (e.g. a
+          #     manual, hand-edited manifest.json change pushed with no ZIP)
+          #     still need to reach the target. Merge the whole source
+          #     manifest in - the same monotonic, id-keyed guard as 5b makes
+          #     this idempotent alongside the per-ZIP merges above (any entry
+          #     already merged in 5b is a byte-identical no-op here).
+          if [[ "$manifest_changed" == "true" ]]; then
+            tmp="$(mktemp)"
+            merge_manifest_file "$manifest_path" "$stash/source-manifest.json" > "$tmp"
+            mv "$tmp" "$manifest_path"
+            git add "$manifest_path"
+          fi
+
+          # 5f) Translations locale files (commerce-apps-manifest/translations/*.json)
+          #     merge additively per key (app id) - never overwriting a key the
+          #     target already has, so two branches independently adding
+          #     different apps' translations to the same locale file never
+          #     conflict, unlike a textual patch on the same file.
+          if [[ "$translations_changed" == "true" ]]; then
+            for locale_path in "$stash/source-translations"/*.json; do
+              [[ -f "$locale_path" ]] || continue
+              locale_file="$(basename "$locale_path")"
+              target_locale="commerce-apps-manifest/translations/$locale_file"
+              [[ -f "$target_locale" ]] || echo '{}' > "$target_locale"
+              tmp="$(mktemp)"
+              merge_translations_file "$target_locale" "$locale_path" > "$tmp"
+              mv "$tmp" "$target_locale"
+              git add "$target_locale"
+            done
+          fi
+
+          # 5g) Non-CAP file changes (docs, skills, and other plain-content
+          #     files - excludes .github/workflows/**, see NON_CAP_PATHSPEC)
+          #     - not a monotonic merge, so apply
+          #     via a per-file patch that no-ops if already present on the
+          #     target and is skipped (never forced) on genuine conflict with
+          #     intentional per-branch divergence. Per-file (not one combined
+          #     patch) so one conflicting/binary file never drops the rest.
+          #     apply_non_cap_patch already stages the result via
+          #     `git apply --index` (including deletions) - no extra `git add`
+          #     needed, and `git add` on a deleted path would fail under `set -e`.
+          if [[ "$non_cap_changed" == "true" ]]; then
+            while IFS= read -r f; do
+              [[ -z "$f" ]] && continue
+              slug="$(echo "$f" | tr '/' '_')"
+              patch_file="$stash/non-cap-patches/$slug.patch"
+              [[ -f "$patch_file" ]] || continue
+              result="$(apply_non_cap_patch "$patch_file")"
+              echo "Non-CAP patch result for $f: $result"
+            done < "$stash/non-cap-files.txt"
+          fi
+
+          if git diff --cached --quiet; then
+            echo "Target $next already carries these artifacts. Nothing to promote."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 6) Emit outputs for the PR step (slugs avoid slashes in the PR branch).
+          next_slug="${next//\//-}"
+          src_slug="${SOURCE_REF//\//-}"
+          {
+            echo "promote=true"
+            echo "next_branch=$next"
+            echo "pr_branch=CI/promote-${src_slug}-to-${next_slug}-${RUN_ID}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create forward-promotion PR
+        if: ${{ steps.prepare.outputs.promote == 'true' }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ steps.prepare.outputs.next_branch }}
+          branch: ${{ steps.prepare.outputs.pr_branch }}
+          delete-branch: true
+          commit-message: "CI: promote app artifacts from ${{ github.ref_name }} to ${{ steps.prepare.outputs.next_branch }}"
+          title: "CI: promote from ${{ github.ref_name }} → ${{ steps.prepare.outputs.next_branch }}"
+          body: |
+            Forward-integration PR auto-generated after a push to `${{ github.ref_name }}`.
+
+            Carries the promoted changes, already merged, into `${{ steps.prepare.outputs.next_branch }}`:
+
+            - Any app ZIP(s)
+            - The matching `commerce-apps-manifest/manifest.json` entry/entries (monotonic upsert keyed by app id)
+            - The merged `catalog.json` (union `versions`, monotonic `latest`)
+            - Any app icons under `commerce-apps-manifest/icons/`
+            - Any `commerce-apps-manifest/translations/*.json` changes (additive per-key merge, keyed by app id)
+            - Any other non-CAP file changes (docs, skills, etc. - excluding `.github/workflows/**`, which
+              `GITHUB_TOKEN` cannot push), applied as a patch that is skipped rather than forced if it
+              conflicts with intentional per-branch divergence
+
+            Merging this PR re-triggers the catalog workflow on `${{ steps.prepare.outputs.next_branch }}`,
+            which promotes forward to the next branch in the chain. Tags are immutable and shared,
+            so version-pinned installs stay stable across branches.
+          labels: |
+            automation
+            promotion

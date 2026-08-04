@@ -3,10 +3,6 @@
         "name": "Salesforce 固定稅",
         "description": "設定固定稅計算。"
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "使用 Avalara 自動執行銷售稅合規。"
-    },
     "custom-tax": {
         "name": "自訂稅務",
         "description": "透過提供您自己的 API 來設定自訂稅務計算。"
@@ -22,6 +18,10 @@
     "custom-payment": {
         "name": "自訂付款",
         "description": "透過提供您自己的 API 來設定自訂付款整合。"
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "在 Storefront Next 中原生處理付款。Salesforce Payments 支援多種付款閘道和付款方式。"
     },
     "custom-analytics": {
         "name": "自訂分析",

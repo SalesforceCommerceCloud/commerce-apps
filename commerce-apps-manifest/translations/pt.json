@@ -3,10 +3,6 @@
         "name": "Imposto fixo Salesforce",
         "description": "Configure um cálculo de imposto fixo."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatize a conformidade fiscal com a Avalara."
-    },
     "custom-tax": {
         "name": "Imposto personalizado",
         "description": "Configure um cálculo de imposto personalizado fornecendo suas próprias APIs."
@@ -22,6 +18,10 @@
     "custom-payment": {
         "name": "Pagamento personalizado",
         "description": "Configure uma integração de pagamento personalizada fornecendo suas próprias APIs."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Processe pagamentos nativamente no Storefront Next. O Salesforce Payments oferece suporte a vários gateways e métodos de pagamento."
     },
     "custom-analytics": {
         "name": "Análise personalizada",

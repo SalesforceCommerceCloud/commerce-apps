@@ -3,10 +3,6 @@
         "name": "Salesforce vast belastingtarief",
         "description": "Configureer een vaste belastingberekening."
     },
-    "avalara-tax": {
-        "name": "Avalara",
-        "description": "Automatiseer uw btw-naleving met Avalara."
-    },
     "custom-tax": {
         "name": "Aangepaste belasting",
         "description": "Configureer een aangepaste belastingberekening met uw eigen API's."
@@ -22,6 +18,10 @@
     "custom-payment": {
         "name": "Aangepaste betaling",
         "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden."
     },
     "custom-analytics": {
         "name": "Aangepaste analyse",

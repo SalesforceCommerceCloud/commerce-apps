@@ -28,7 +28,7 @@ Build a registry-ready Commerce App Package (CAP) ZIP from an app directory.
 | Publisher URL | `https://developer.avalara.com/` | Yes |
 | SFNext min version | `1.0.0` | No |
 | SFNext max version | `2.0.0` | No |
-| SFRA min version | `7.0.0` | No |
+| SFRA min version | `7.0.0` | No — only valid if SFNext min version is also set |
 | SFRA max version | `8.0.0` | No |
 
 **Valid domains:** `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
@@ -76,7 +76,7 @@ Ensure version matches throughout:
 }
 ```
 
-> **Note:** `storefrontSupport` is optional. Include only if the app declares a minimum storefront version. Omit the entire object if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); omit it for "no upper bound." When present, the values here must match the root manifest entry exactly.
+> **Note:** `storefrontSupport` is optional. Include only if the app declares a minimum storefront version. Omit the entire object if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); omit it for "no upper bound." An `sfra` key without an `sfnext` key will fail validation — SFRA support is always additive to SFNext. When present, the values here must match the root manifest entry exactly.
 
 ## Step 4: Run validation
 
@@ -141,7 +141,7 @@ Update `commerce-apps-manifest/manifest.json`:
 }
 ```
 
-> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." Values must match the corresponding fields in `commerce-app.json` exactly.
+> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." An `sfra` key without an `sfnext` key will fail validation — SFRA support is always additive to SFNext. Values must match the corresponding fields in `commerce-app.json` exactly.
 
 **Icon:** Must match filename in ZIP's `icons/` directory. CI extracts automatically.
 
