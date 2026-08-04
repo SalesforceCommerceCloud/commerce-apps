@@ -87,6 +87,7 @@ Optional fields (validate if present):
 - `storefrontSupport.sfra.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
 - `storefrontSupport.sfra.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
 - Only `sfnext` and `sfra` keys allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` allowed inside each
+- If `storefrontSupport.sfra` is present, `storefrontSupport.sfnext` must also be present (with a valid `minVersion`). Fail validation on SFRA-only declarations.
 - `storefrontSupport` must be present in **both** the root manifest and `commerce-app.json` with matching values
 
 ## Step 5: Validate package contents
@@ -142,6 +143,7 @@ Optional fields (validate if present):
 - `storefrontSupport.sfnext.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
 - `storefrontSupport.sfra.minVersion` - valid semver (`X.Y.Z` or `X.Y.Z-prerelease`)
 - `storefrontSupport.sfra.maxVersion` - valid semver, optional (`X.Y.Z` or `X.Y.Z-prerelease`)
+- If `storefrontSupport.sfra` is present, `storefrontSupport.sfnext` must also be present (with a valid `minVersion`). Fail validation on SFRA-only declarations.
 - Values must match the corresponding fields in the root manifest entry
 
 ## Step 8: Validate storefront files (UI-only/Fullstack)
