@@ -28,6 +28,8 @@ Merchants install Commerce Apps through Business Manager with a click-to-install
 | **API Adapter Only** | Script API hooks implementing platform contracts | Hook dispatch, lifecycle management | Tax calculation (Avalara), fraud detection |
 | **Full App** | Both UI components and backend adapters | All of the above | Shipping estimator, BNPL provider |
 
+Apps that target a storefront must declare Storefront Next (SFNext) support; SFRA support is additive and may only be declared alongside SFNext — SFRA-only apps aren't accepted.
+
 ## Quick Start
 
 ### Using Agent Skills
@@ -484,6 +486,8 @@ The repository `.gitignore` is configured to exclude extracted directories and s
 ### External Contributors
 
 All external contributors must sign the Contributor License Agreement (CLA). A prompt to sign the agreement appears when a pull request is submitted.
+
+Beyond the CLA, every published app must be covered by an appropriate ISV partnership agreement with Salesforce. This is a business/legal requirement independent of code review — contact your partner account manager if you're unsure whether your agreement covers the app you're submitting.
 
 ## Disclaimer
 
