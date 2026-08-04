@@ -37,6 +37,10 @@ These skills automate many of the manual steps described below and help catch co
 
 ---
 
+## ISV Partnership Requirement
+
+Every published app must be covered by an appropriate ISV partnership agreement with Salesforce. This applies regardless of app architecture (UI-only, backend-only, or fullstack) or domain. PRs from ISVs without a current, applicable partnership agreement will not be merged. If you're unsure whether your agreement covers the app you're submitting, contact your partner account manager or file a support case in the partner portal before opening a PR.
+
 ## Pull Request Requirements
 
 Each PR **must** include the following items:
@@ -151,8 +155,9 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
   - `sfra` - (Object) SFRA compatibility
     - `minVersion` - (String) Minimum SFRA version the app requires (semver format: `X.Y.Z` or `X.Y.Z-prerelease`)
     - `maxVersion` - (String, optional) Maximum SFRA version the app supports, inclusive (semver format: `X.Y.Z` or `X.Y.Z-prerelease`).
+    - `sfra` may only be declared alongside `sfnext`. An app may not declare `sfra` support without also declaring `sfnext` support.
 
-An app may declare support for one or both storefront types. If the `storefrontSupport` field is absent or a specific storefront key is omitted, no version gating is applied for that storefront. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
+An app may declare `sfnext` alone, or `sfnext` and `sfra` together. An app may **not** declare `sfra` alone — SFRA support is always additive to SFNext. If `storefrontSupport` is absent (e.g., a backend-only app), no version gating is applied. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
 
 When present, the `storefrontSupport` field in the root manifest must match the `storefrontSupport` field in the app's `commerce-app.json` inside the ZIP.
 

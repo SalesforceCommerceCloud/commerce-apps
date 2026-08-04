@@ -184,12 +184,12 @@ Your response:
 ### 8. Storefront Support (Optional)
 - `storefrontSupport` must be present in **both** the root manifest entry and `commerce-app.json` inside the ZIP
 - Use semver format (`X.Y.Z` or `X.Y.Z-prerelease`) for all `minVersion` and `maxVersion` fields
-- Apps may declare `sfnext`, `sfra`, or both
+- Apps may declare `sfnext` alone, or `sfnext` + `sfra`. Declaring `sfra` without `sfnext` is invalid.
 - `minVersion` is required when the storefront key is present; `maxVersion` is optional and inclusive
 - Use `maxVersion` only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); absence means "no upper bound"
 - If absent, no version gating is applied at install time
 - Values must match exactly between root manifest and `commerce-app.json`
-- Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object
+- Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object, and `sfra` requires `sfnext` to also be present.
 
 **Icon validation examples:**
 ```
