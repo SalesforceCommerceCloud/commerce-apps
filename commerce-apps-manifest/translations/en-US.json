@@ -23,6 +23,10 @@
         "name": "Salesforce Payments",
         "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Loads Noibu session monitoring script on every storefront page"
+    },
     "custom-analytics": {
         "name": "Custom Analytics",
         "description": "Configure a custom analytics integration by providing your own APIs."
