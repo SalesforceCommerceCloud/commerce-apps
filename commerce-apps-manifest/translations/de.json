@@ -23,6 +23,10 @@
         "name": "Salesforce Payments",
         "description": "Verarbeiten Sie Zahlungen nativ in Storefront Next. Salesforce Payments unterstützt mehrere Zahlungs-Gateways und -Methoden."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Lädt das Noibu-Sitzungsüberwachungsskript auf jeder Storefront-Seite"
+    },
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",
         "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."
