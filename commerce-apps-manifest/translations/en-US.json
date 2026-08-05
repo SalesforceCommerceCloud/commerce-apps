@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods."
+        "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
+        "featuredTagline": "Collect payments fast with a seamless end-to-end solution for Adyen, Stripe, and PayPal."
     },
     "custom-analytics": {
         "name": "Custom Analytics",
