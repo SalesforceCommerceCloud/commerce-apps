@@ -1,34 +1,34 @@
 {
-  "salesforce-flat-tax": {
-    "name": "Taxe forfaitaire Salesforce",
-    "description": "Configurez un calcul de taxe forfaitaire."
-  },
-  "custom-tax": {
-    "name": "Taxe personnalisée",
-    "description": "Configurez un calcul de taxe personnalisé en fournissant vos propres API."
-  },
-  "basic-shipping": {
-    "name": "Livraison de base",
-    "description": "Configurez un calcul de livraison de base."
-  },
-  "custom-shipping": {
-    "name": "Livraison personnalisée",
-    "description": "Configurez un calcul de livraison personnalisé en fournissant vos propres API."
-  },
-  "custom-payment": {
-    "name": "Paiement personnalisé",
-    "description": "Configurez une intégration de paiement personnalisée en fournissant vos propres API."
-  },
-  "sf-payments": {
-    "name": "Salesforce Payments",
-    "description": "Traitez les paiements nativement dans Storefront Next. Salesforce Payments prend en charge plusieurs passerelles et méthodes de paiement."
-  },
-  "custom-analytics": {
-    "name": "Analytique personnalisée",
-    "description": "Configurez une intégration d'analytique personnalisée en fournissant vos propres API."
-  },
-  "noibu": {
-    "name": "Noibu",
-    "description": "Charge le script de surveillance de session Noibu sur chaque page de la boutique"
-  }
+    "salesforce-flat-tax": {
+        "name": "Taxe forfaitaire Salesforce",
+        "description": "Configurez un calcul de taxe forfaitaire."
+    },
+    "custom-tax": {
+        "name": "Taxe personnalisée",
+        "description": "Configurez un calcul de taxe personnalisé en fournissant vos propres API."
+    },
+    "basic-shipping": {
+        "name": "Livraison de base",
+        "description": "Configurez un calcul de livraison de base."
+    },
+    "custom-shipping": {
+        "name": "Livraison personnalisée",
+        "description": "Configurez un calcul de livraison personnalisé en fournissant vos propres API."
+    },
+    "custom-payment": {
+        "name": "Paiement personnalisé",
+        "description": "Configurez une intégration de paiement personnalisée en fournissant vos propres API."
+    },
+    "sf-payments": {
+        "name": "Salesforce Payments",
+        "description": "Traitez les paiements nativement dans Storefront Next. Salesforce Payments prend en charge plusieurs passerelles et méthodes de paiement."
+    },
+    "custom-analytics": {
+        "name": "Analytique personnalisée",
+        "description": "Configurez une intégration d'analytique personnalisée en fournissant vos propres API."
+    },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Charge le script de surveillance de session Noibu sur chaque page de la boutique"
+    }
 }
