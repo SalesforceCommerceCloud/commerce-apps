@@ -69,6 +69,10 @@ mkfile() {
   printf '%s' "$f"
 }
 
+mkextractdir() {
+  mktemp -d "$TMPDIR_ROOT/extract_XXXXXX"
+}
+
 BRANCHES="$(printf '%s\n' \
   refs/heads/main \
   refs/heads/release/26.8 \
@@ -78,6 +82,41 @@ BRANCHES="$(printf '%s\n' \
   refs/heads/CI/update-catalog-123)"
 
 echo "=== promotion-utils.sh tests ==="
+echo ""
+
+# ---------------------------------------------------------------------------
+# find_cap_icons_dir
+# ---------------------------------------------------------------------------
+echo "--- find_cap_icons_dir ---"
+
+# CAP root icons/ is found (the normal case: <root>/<cap>/icons/).
+e1="$(mkextractdir)"
+mkdir -p "$e1/commerce-avalara-tax-app-v1.1.3/icons"
+touch "$e1/commerce-avalara-tax-app-v1.1.3/icons/avalara.png"
+assert_eq "finds CAP-root icons dir" \
+  "$e1/commerce-avalara-tax-app-v1.1.3/icons" \
+  find_cap_icons_dir "$e1"
+
+# A nested icons/ dir inside a cartridge (e.g. BM static theme assets) must be
+# ignored; only the CAP-root one is returned. This is the exact shape of the
+# bug from PR #87: a nested icons/ dir was picked up instead of the CAP root.
+e2="$(mkextractdir)"
+mkdir -p "$e2/commerce-avalara-tax-app-v1.1.3/icons"
+touch "$e2/commerce-avalara-tax-app-v1.1.3/icons/avalara.png"
+mkdir -p "$e2/commerce-avalara-tax-app-v1.1.3/cartridges/int_avatax/cartridge/static/default/icons"
+touch "$e2/commerce-avalara-tax-app-v1.1.3/cartridges/int_avatax/cartridge/static/default/icons/circle-info-solid-min.png"
+assert_eq "ignores nested cartridge-static icons dir" \
+  "$e2/commerce-avalara-tax-app-v1.1.3/icons" \
+  find_cap_icons_dir "$e2"
+
+# No CAP-root icons/ dir at all -> prints nothing, even if a nested one exists.
+e3="$(mkextractdir)"
+mkdir -p "$e3/commerce-noicon-app-v1.0.0/cartridges/int_noicon/cartridge/static/default/icons"
+touch "$e3/commerce-noicon-app-v1.0.0/cartridges/int_noicon/cartridge/static/default/icons/theme.png"
+assert_eq "no CAP-root icons dir -> empty" \
+  "" \
+  find_cap_icons_dir "$e3"
+
 echo ""
 
 # ---------------------------------------------------------------------------
