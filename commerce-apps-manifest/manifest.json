@@ -19,9 +19,12 @@
             "domain": "tax",
             "type": "app",
             "provider": "thirdParty",
+            "companyName": "Avalara",
             "version": "1.0.0",
             "zip": "avalara-tax-v1.0.0.zip",
-            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
+            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98",
+            "badge": "popular",
+            "isFeatured": true
         },
         {
             "id": "custom-tax",
@@ -72,7 +75,12 @@
             "domain": "payment",
             "type": "app",
             "provider": "salesforce",
+            "badge": "new",
             "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+            "isFeatured": true,
+            "featuredTagline": "Collect payments fast with a seamless end-to-end solution for Adyen, Stripe, and PayPal.",
+            "featuredLearnMoreUrl": "https://help.salesforce.com/s/articleView?id=cc.b2c_salesforce_payments.htm",
+            "featuredImageName": "sf-payments-featured.png",
             "version": "1.0.1",
             "zip": "sf-payments-v1.0.1.zip",
             "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
