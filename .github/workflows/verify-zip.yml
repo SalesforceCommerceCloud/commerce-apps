@@ -311,6 +311,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source ".github/scripts/promotion-utils.sh"
 
           [[ -s changed_zips.txt ]] || exit 0
 
@@ -331,11 +332,12 @@ jobs:
 
             unzip -q "$zip_path" -d "$tmpdir"
 
-            # Find icons directory in the extracted CAP
-            icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+            # Anchored to the CAP root - see find_cap_icons_dir in
+            # promotion-utils.sh for why this must not be an unbounded find.
+            icons_dir="$(find_cap_icons_dir "$tmpdir")"
 
             if [[ -z "$icons_dir" || ! -d "$icons_dir" ]]; then
-              echo "No icons directory found in $zip_path - skipping icon validation"
+              echo "No top-level icons directory found in $zip_path - skipping icon validation"
               rm -rf "$tmpdir"
               trap - RETURN
               continue
