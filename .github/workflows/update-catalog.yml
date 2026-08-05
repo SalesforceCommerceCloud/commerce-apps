@@ -132,8 +132,9 @@ jobs:
               tmpdir="$(mktemp -d)"
               unzip -q "$zip_path" -d "$tmpdir"
 
-              # Find icons directory in the extracted CAP
-              icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+              # Anchored to the CAP root - see find_cap_icons_dir in
+              # promotion-utils.sh for why this must not be an unbounded find.
+              icons_dir="$(find_cap_icons_dir "$tmpdir")"
 
               if [[ -n "$icons_dir" && -d "$icons_dir" ]]; then
                 echo "Extracting icons from $zip_path for ISV: $isv_name"
@@ -163,6 +164,8 @@ jobs:
                     fi
                   fi
                 done
+              else
+                echo "No top-level icons directory found in $zip_path for ISV: $isv_name; skipping icon extraction."
               fi
 
               rm -rf "$tmpdir"
@@ -389,12 +392,20 @@ jobs:
             git add "$manifest_path"
 
             # 5c) catalog.json next to the ZIP (union versions, monotonic latest).
-            #     Seed an empty catalog for a brand-new app on the target.
+            #     A brand-new app on the target has no catalog.json yet - seed
+            #     it with the INIT template and skip merge_catalog_json so the
+            #     target branch's own post-merge update-catalog run is what
+            #     first populates version history (the CONTRIBUTING.md
+            #     contract for new apps), instead of the promotion writing a
+            #     concrete version here and duplicating that work.
             catalog_path="$(dirname "$zip_path")/catalog.json"
-            [[ -f "$catalog_path" ]] || echo '{}' > "$catalog_path"
-            tmp="$(mktemp)"
-            merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
-            mv "$tmp" "$catalog_path"
+            if [[ -f "$catalog_path" ]]; then
+              tmp="$(mktemp)"
+              merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
+              mv "$tmp" "$catalog_path"
+            else
+              printf '{\n  "latest": {\n    "version": "INIT",\n    "tag": "INIT"\n  },\n  "versions": []\n}\n' > "$catalog_path"
+            fi
             git add "$catalog_path"
 
             # 5d) Icons: copy from the ZIP into the shared icons dir.
@@ -402,7 +413,9 @@ jobs:
             if [[ -n "$isv_name" ]]; then
               tmpdir="$(mktemp -d)"
               unzip -q "$zip_path" -d "$tmpdir"
-              icons_dir="$(find "$tmpdir" -type d -name icons -print -quit)"
+              # Anchored to the CAP root - see find_cap_icons_dir in
+              # promotion-utils.sh for why this must not be an unbounded find.
+              icons_dir="$(find_cap_icons_dir "$tmpdir")"
               if [[ -n "$icons_dir" && -d "$icons_dir" ]]; then
                 mapfile -t icon_files < <(find "$icons_dir" -type f \( -iname "*.png" -o -iname "*.svg" -o -iname "*.jpg" -o -iname "*.jpeg" \) -print)
                 for icon_file in "${icon_files[@]}"; do
@@ -412,6 +425,8 @@ jobs:
                     git add "$dest_icon"
                   fi
                 done
+              else
+                echo "No top-level icons directory found in $zip_path for ISV: $isv_name; skipping icon extraction."
               fi
               rm -rf "$tmpdir"
             fi
