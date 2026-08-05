@@ -55,6 +55,25 @@ next_release_branch() {
   fi
 }
 
+# Prints the path to a CAP's own icons/ directory within its unpacked ZIP, or
+# nothing if it has none.
+#
+#   find_cap_icons_dir <extracted_zip_root>
+#
+# ZIPs unpack to <extracted_zip_root>/<cap-root>/, so the CAP-level icons/ is
+# always exactly two levels below the extraction root (one level below the
+# cap-root). Anchoring to that exact depth (rather than an unbounded
+# `find -name icons`) avoids picking up an
+# unrelated nested icons/ dir that a bundled cartridge asset may carry (e.g.
+# Business Manager static theme icons under
+# cartridges/*/cartridge/static/default/icons/), which would otherwise be
+# copied into commerce-apps-manifest/icons/ and could overwrite the real app
+# icon with the wrong file.
+find_cap_icons_dir() {
+  local extracted_root="${1:?extracted ZIP root is required}"
+  find "$extracted_root" -mindepth 2 -maxdepth 2 -type d -name icons -print -quit
+}
+
 # Merges a promoted (version, tag) into the target branch's catalog.json and
 # prints the merged JSON to stdout. Two invariants:
 #   - versions is a union: the (version, tag) pair is appended only when absent,
