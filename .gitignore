@@ -82,6 +82,3 @@ $RECYCLE.BIN/
 # Only commit ZIP files, manifest.json, and catalog.json
 **/commerce-*-app-v*/
 **/commerce-*-app-*/
-
-# build-it run logs (local only)
-docs/superpowers/
