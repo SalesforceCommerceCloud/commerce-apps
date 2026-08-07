@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "Przetwarzaj płatności natywnie w Storefront Next. Salesforce Payments obsługuje wiele bramek i metod płatności."
+        "description": "Przetwarzaj płatności natywnie w Storefront Next. Salesforce Payments obsługuje wiele bramek i metod płatności.",
+        "featuredTagline": "Szybko zbieraj płatności dzięki płynnemu, kompleksowemu rozwiązaniu dla Adyen, Stripe i PayPal."
     },
     "custom-analytics": {
         "name": "Analityka niestandardowa",

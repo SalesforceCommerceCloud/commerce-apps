@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "Storefront Nextでネイティブに決済を処理します。Salesforce Paymentsは複数の決済ゲートウェイと決済方法をサポートしています。"
+        "description": "Storefront Nextでネイティブに決済を処理します。Salesforce Paymentsは複数の決済ゲートウェイと決済方法をサポートしています。",
+        "featuredTagline": "Adyen、Stripe、PayPal向けのシームレスなエンドツーエンドソリューションで、迅速に決済を受け付けます。"
     },
     "custom-analytics": {
         "name": "カスタムアナリティクス",

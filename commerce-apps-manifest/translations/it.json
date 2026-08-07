@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento."
+        "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento.",
+        "featuredTagline": "Incassa i pagamenti rapidamente con una soluzione end-to-end senza interruzioni per Adyen, Stripe e PayPal."
     },
     "custom-analytics": {
         "name": "Analisi personalizzata",

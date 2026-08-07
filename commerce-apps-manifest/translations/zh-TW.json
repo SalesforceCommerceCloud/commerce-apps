@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "在 Storefront Next 中原生處理付款。Salesforce Payments 支援多種付款閘道和付款方式。"
+        "description": "在 Storefront Next 中原生處理付款。Salesforce Payments 支援多種付款閘道和付款方式。",
+        "featuredTagline": "透過適用於 Adyen、Stripe 和 PayPal 的無縫端對端解決方案快速收款。"
     },
     "custom-analytics": {
         "name": "自訂分析",

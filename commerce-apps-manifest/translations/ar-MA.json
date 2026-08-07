@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "معالجة المدفوعات بشكل أصلي في Storefront Next. يدعم Salesforce Payments بوابات وطرق دفع متعددة."
+        "description": "معالجة المدفوعات بشكل أصلي في Storefront Next. يدعم Salesforce Payments بوابات وطرق دفع متعددة.",
+        "featuredTagline": "اجمع المدفوعات بسرعة من خلال حل شامل وسلس لـ Adyen و Stripe و PayPal."
     },
     "custom-analytics": {
         "name": "تحليلات مخصصة",

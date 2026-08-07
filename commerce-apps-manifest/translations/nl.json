@@ -21,7 +21,8 @@
     },
     "sf-payments": {
         "name": "Salesforce Payments",
-        "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden."
+        "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden.",
+        "featuredTagline": "Ontvang snel betalingen met een naadloze end-to-end-oplossing voor Adyen, Stripe en PayPal."
     },
     "custom-analytics": {
         "name": "Aangepaste analyse",
