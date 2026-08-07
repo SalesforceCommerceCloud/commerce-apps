@@ -161,13 +161,17 @@ Your response:
 
 ### 6. ZIP Contents
 - Single root folder: `commerce-{app-name}-app-v{version}/`
-- NO junk files: `.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files
+- NO junk hidden files: `.DS_Store`, `__MACOSX`, `Thumbs.db`, `.env`, secrets
 - NO `node_modules`, `.git`, IDE files
 - NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`)
+- **REQUIRED:** Every cartridge root (each immediate child of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/`) MUST include a `.project` file — may be empty, but must be present (required for b2c cartridge discovery)
 - Optional: `icons/` directory with ISV icon(s)
-- Use exclusions when creating ZIP:
+- Use exclusions when creating ZIP — do NOT use a blanket `-x "*/.*"`, it strips `.project`:
   ```bash
-  zip -r app.zip folder/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+  zip -r app.zip folder/ \
+    -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+    -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+    -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
   ```
 
 ### 7. Icons (Optional)
@@ -359,8 +363,14 @@ tax/avalara-tax/catalog.json
 # WRONG - Creates junk files
 zip -r app.zip folder/
 
-# RIGHT - Excludes junk files
+# WRONG - Blanket "*/.*" also strips the REQUIRED .project files from cartridges
 zip -r app.zip folder/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+
+# RIGHT - Excludes junk explicitly, keeps .project
+zip -r app.zip folder/ \
+  -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+  -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+  -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
 ```
 
 ## Understanding the Domain
@@ -468,7 +478,8 @@ Before suggesting `/submit-app-pr`, verify:
 
 **ZIP Contents:**
 - [ ] Single root folder: `commerce-{app-name}-app-v{version}/`
-- [ ] No junk files (`.DS_Store`, `__MACOSX`, hidden files)
+- [ ] No junk hidden files (`.DS_Store`, `__MACOSX`, `.env`, secrets)
+- [ ] Every cartridge root has a `.project` file (may be empty)
 - [ ] All required files present (commerce-app.json, README.md, etc.)
 
 **Manifest Validation:**
