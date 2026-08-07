@@ -1,34 +1,34 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce podatek ryczałtowy",
-        "description": "Skonfiguruj obliczanie podatku ryczałtowego."
-    },
-    "custom-tax": {
-        "name": "Podatek niestandardowy",
-        "description": "Skonfiguruj niestandardowe obliczanie podatku, podając własne interfejsy API."
-    },
-    "basic-shipping": {
-        "name": "Wysyłka podstawowa",
-        "description": "Skonfiguruj podstawowe obliczanie kosztów wysyłki."
-    },
-    "custom-shipping": {
-        "name": "Wysyłka niestandardowa",
-        "description": "Skonfiguruj niestandardowe obliczanie kosztów wysyłki, podając własne interfejsy API."
-    },
-    "custom-payment": {
-        "name": "Płatność niestandardowa",
-        "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
-    },
-    "sf-payments": {
-        "name": "Salesforce Payments",
-        "description": "Przetwarzaj płatności natywnie w Storefront Next. Salesforce Payments obsługuje wiele bramek i metod płatności."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Ładuje skrypt monitorowania sesji Noibu na każdej stronie sklepu"
-    },
-    "custom-analytics": {
-        "name": "Analityka niestandardowa",
-        "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce podatek ryczałtowy",
+    "description": "Skonfiguruj obliczanie podatku ryczałtowego."
+  },
+  "custom-tax": {
+    "name": "Podatek niestandardowy",
+    "description": "Skonfiguruj niestandardowe obliczanie podatku, podając własne interfejsy API."
+  },
+  "basic-shipping": {
+    "name": "Wysyłka podstawowa",
+    "description": "Skonfiguruj podstawowe obliczanie kosztów wysyłki."
+  },
+  "custom-shipping": {
+    "name": "Wysyłka niestandardowa",
+    "description": "Skonfiguruj niestandardowe obliczanie kosztów wysyłki, podając własne interfejsy API."
+  },
+  "custom-payment": {
+    "name": "Płatność niestandardowa",
+    "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
+  },
+  "sf-payments": {
+    "name": "Salesforce Payments",
+    "description": "Przetwarzaj płatności natywnie w Storefront Next. Salesforce Payments obsługuje wiele bramek i metod płatności."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Ładuje skrypt monitorowania sesji Noibu na każdej stronie sklepu"
+  },
+  "custom-analytics": {
+    "name": "Analityka niestandardowa",
+    "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
+  }
 }
