@@ -45,7 +45,8 @@
 - [ ] SHA256 hash verified with: `shasum -a 256 [path-to-zip]`
 
 ### ZIP Content Validation
-- [ ] No junk files (`.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files)
+- [ ] No junk hidden files (`.DS_Store`, `__MACOSX`, `.env`, secrets)
+- [ ] Every cartridge root has a `.project` file (may be empty)
 - [ ] No registry path prefixes in ZIP (no `tax/`, `domain/`, etc.)
 - [ ] Required files present: `commerce-app.json`, `README.md`, `app-configuration/tasksList.json`
 - [ ] All referenced scripts/files exist
