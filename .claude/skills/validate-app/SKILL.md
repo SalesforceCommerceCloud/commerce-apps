@@ -110,7 +110,7 @@ done
 
 Check:
 - Single root: `commerce-<appName>-app-v<version>/` (ZIP only — for `INPUT_KIND=dir`, the directory IS the root)
-- No junk files (`.DS_Store`, `__MACOSX`, hidden files)
+- No junk hidden files (`.DS_Store`, `__MACOSX`, `.env`, secrets) — **except** `.project`, which every cartridge root MUST include (see Step 6b)
 - No registry paths (`tax/`, `domain/`) at the ZIP root (ZIP only)
 - Required: `commerce-app.json`, `README.md`, `app-configuration/tasksList.json`
 
@@ -125,6 +125,16 @@ Determine:
 - **UI-only:** Has `storefront-next/`, NO `cartridges/`
 - **Backend-only:** Has `cartridges/`, NO `storefront-next/`
 - **Fullstack:** Has both
+
+## Step 6b: Validate cartridge `.project` files (Backend-only/Fullstack)
+
+**Skip if UI-only** (`HAS_BACKEND=0`).
+
+Every immediate child directory of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/` must contain a `.project` file. It may be empty (auto-created by scaffolding/packaging) or a real, non-empty Eclipse `.project` file — both PASS. Missing is a FAIL.
+
+```bash
+bash .github/scripts/validate-cartridge-project.sh "$CAP_ROOT"
+```
 
 ## Step 7: Validate commerce-app.json
 
