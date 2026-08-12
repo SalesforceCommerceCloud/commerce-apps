@@ -129,7 +129,9 @@ body:
           required: true
         - label: I am NOT committing extracted directories (only ZIP, manifest.json, catalog.json)
           required: true
-        - label: The ZIP contains no junk files (.DS_Store, __MACOSX, hidden files)
+        - label: The ZIP contains no junk hidden files (.DS_Store, __MACOSX, .env, secrets)
+          required: true
+        - label: Every cartridge root (cartridges/site_cartridges/*/, cartridges/bm_cartridges/*/) includes a .project file (may be empty)
           required: true
         - label: Every entry in `tasksList.json` declares a unique non-empty `taskKey` (snake_case)
           required: true
