@@ -144,6 +144,10 @@
         {
           "name": "commerce-app.json exists with correct metadata",
           "description": "All apps need manifest"
+        },
+        {
+          "name": "cartridge roots have .project files",
+          "description": "cartridges/site_cartridges/<cartridgeName>/.project and cartridges/bm_cartridges/bm_<appName>/.project must exist (empty is fine)"
         }
       ]
     },
@@ -209,6 +213,10 @@
         {
           "name": "hooks.json for loyalty domain",
           "description": "Should include loyalty-specific hooks"
+        },
+        {
+          "name": "cartridge roots have .project files",
+          "description": "cartridges/site_cartridges/<cartridgeName>/.project and cartridges/bm_cartridges/bm_<appName>/.project must exist (empty is fine)"
         },
         {
           "name": "all three locale files exist (en-US, en-GB, it-IT)",

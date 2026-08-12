@@ -105,7 +105,13 @@ mkdir -p impex/{install/meta,install/sites/SITEID,uninstall}
 
 # Fullstack only: Add Business Manager cartridge
 mkdir -p cartridges/bm_cartridges/bm_<appName>
+
+# Every cartridge root needs an empty .project file (required for b2c cartridge discovery)
+touch cartridges/site_cartridges/<cartridgeName>/.project
+touch cartridges/bm_cartridges/bm_<appName>/.project
 ```
+
+**`.project` files:** Every cartridge root (each immediate child of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/`) MUST contain a `.project` file — required for b2c cartridge discovery. `create_structure.sh` creates these empty automatically. If a developer later imports a real Eclipse-generated `.project` file (non-empty), leave it as-is — don't overwrite it.
 
 This structure enables the installation URL pattern and allows side-by-side development of different versions.
 
@@ -205,6 +211,7 @@ Check:
 - [ ] **app-configuration/tasksList.json created** with merchant post-installation tasks
 - [ ] Backend apps: cartridge files, hooks.json (with explicit script paths), **both install/ and uninstall/ impex directories**
 - [ ] Backend apps: package.json includes `"hooks": "cartridge/scripts/hooks.json"` field
+- [ ] Backend/Fullstack apps: every cartridge root (`cartridges/site_cartridges/<cartridgeName>/`, `cartridges/bm_cartridges/bm_<appName>/`) has a `.project` file (empty is fine)
 - [ ] Backend apps: Hook implementations use `require()` not `importPackage()`, always return dw.system.Status
 - [ ] UI apps: storefront-next structure with target-config.json, TypeScript components, tests
 - [ ] UI apps: index.ts barrel file, **all three locale files** (en-US, en-GB, it-IT), i18n usage with useTranslation

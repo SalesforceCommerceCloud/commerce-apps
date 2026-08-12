@@ -185,6 +185,17 @@ jobs:
               echo "  ✓ $admin_output"
             fi
 
+            # Every cartridge root must ship a .project file (required for
+            # b2c cartridge discovery). See .github/scripts/validate-cartridge-project.sh.
+            # Skips gracefully if the CAP has no cartridges/ directory (UI-only apps).
+            if ! project_output="$(bash ".github/scripts/validate-cartridge-project.sh" "$root" 2>&1)"; then
+              echo "::error file=$zip_path::cartridge .project validation failed:"
+              printf '%s\n' "$project_output"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+            echo "  ✓ $project_output"
+
             rm -rf "$tmpdir"
           done < changed_zips.txt
 

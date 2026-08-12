@@ -24,6 +24,12 @@ mkdir -p "cartridges/site_cartridges/${CARTRIDGE_NAME}/cartridge/scripts/"{hooks
 mkdir -p "cartridges/site_cartridges/${CARTRIDGE_NAME}/test/"{mocks,unit}
 mkdir -p "cartridges/bm_cartridges/bm_${APP_NAME}"
 
+# Every cartridge root needs a .project file for b2c cartridge discovery.
+# Empty is fine here — Eclipse-generated .project files are left untouched
+# elsewhere (e.g. when importing an existing cartridge).
+touch "cartridges/site_cartridges/${CARTRIDGE_NAME}/.project"
+touch "cartridges/bm_cartridges/bm_${APP_NAME}/.project"
+
 # Storefront Next extensions
 mkdir -p "storefront-next/src/extensions/${APP_NAME}/"{components,context,hooks,locales,middlewares,providers,routes,stores,tests}
 
