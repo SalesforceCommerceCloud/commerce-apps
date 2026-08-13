@@ -5,6 +5,7 @@ on:
     types: [opened, reopened, synchronize, edited, ready_for_review]
     paths:
       - '**/*.zip'
+      - 'commerce-apps-manifest/translations/**'
 
 jobs:
   verify-zips:
@@ -569,3 +570,9 @@ jobs:
 
             rm -rf "$tmpdir"
           done < changed_zips.txt
+
+      - name: Step 10 - Validate registry translation locale filenames
+        shell: bash
+        run: |
+          bash ".github/scripts/validate-registry-translations.sh" \
+            "commerce-apps-manifest/translations"

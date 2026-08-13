@@ -513,7 +513,9 @@ Locale filenames are validated against the set of locales supported by Business 
 | Chinese (Simplified) | `zh-CN.json` |
 | Chinese (Traditional) | `zh-TW.json` |
 
-CI will reject locale files whose filenames are outside this set.
+CI enforces this filename set for registry-level files under
+`commerce-apps-manifest/translations/`. Locale filenames packaged under
+`app-configuration/translations/` are not validated for dash case by the registry.
 
 ---
 
