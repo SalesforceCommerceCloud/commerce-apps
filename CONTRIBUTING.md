@@ -461,7 +461,7 @@ Rules:
 - Translatable fields per task: `name`, `description` (both required, non-empty, in every locale file that lists the task).
 - Translatable fields per admin component: `attributes.<id>.label` (required, non-empty, for every (componentKey, attribute id) pair listed in the locale file).
 - Every [required default BM locale](#supported-locales) must be present when `translations/` exists.
-- Additional locales are accepted when their filenames use the intentionally narrow BM-style format `^[a-z]{2}(-[A-Z]{2})?\.json$` (`en-US.json`, `de.json`, `fr-CA.json`, …).
+- Additional locales are accepted when their filenames use the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$` (`en-US.json`, `de.json`, `fr-CA.json`, …).
 - `en-US.json` defines the canonical key set every other locale file must match exactly — no extra keys, no missing keys, in either namespace.
 - The English text in `en-US.json` and the literal English in `tasksList.json` / `adminComponents.json` must stay in sync. If a string changes, update both.
 
@@ -491,7 +491,7 @@ to both `commerce-apps-manifest/translations/` and any packaged
 `app-configuration/translations/` directory.
 
 Both directories may include additional locale files only when each filename
-matches the BM-style format `^[a-z]{2}(-[A-Z]{2})?\.json$`.
+matches the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$`.
 
 ---
 
@@ -634,7 +634,7 @@ Before submitting your PR, please verify:
 - [ ] `commerce-apps-manifest/translations/` and, when present, `app-configuration/translations/` contain every required default BM locale
 - [ ] If `app-configuration/translations/` exists, `en-US.json` lists every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
 - [ ] Every non-default locale file lists exactly the same keys as `en-US.json` (no extras, no missing) in both `tasks` and `adminComponents` namespaces
-- [ ] Additional locale filenames match the BM-style format `^[a-z]{2}(-[A-Z]{2})?\.json$`
+- [ ] Additional locale filenames match the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$`
 - [ ] English text in `en-US.json` matches the literal English in `tasksList.json` and `adminComponents.json`
 
 ### Domain and Naming

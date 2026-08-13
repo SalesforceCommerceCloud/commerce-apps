@@ -73,7 +73,7 @@ assert_rejects() {
 echo "=== registry translations validator tests ==="
 
 assert_passes "all required default locale files are valid"
-assert_passes "additional valid BM-style locale is accepted" add:fr-CA
+assert_passes "additional valid BCP-47 locale is accepted" add:fr-CA
 assert_rejects "missing default locale is rejected" \
   "missing required locale file(s): ja.json" remove:ja
 assert_rejects "misformatted locale is rejected" \

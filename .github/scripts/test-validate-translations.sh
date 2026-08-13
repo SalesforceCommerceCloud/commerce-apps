@@ -148,7 +148,7 @@ assert_passes "adminComponents pair coverage and parity" \
   "tasks:de.json:{\"tasks\":{\"setup_account\":{\"name\":\"S\",\"description\":\"d\"}},\"adminComponents\":{\"component_visibility\":{\"attributes\":{\"sfcc.checkout.shippingAddress.after\":{\"label\":\"Beim Checkout\"}}}}}" \
   "adminComponents:{\"configuration\":[{\"componentKey\":\"component_visibility\",\"type\":\"storefrontComponentVisibility\",\"attributes\":[{\"id\":\"sfcc.checkout.shippingAddress.after\",\"label\":\"Show on Checkout\",\"defaultValue\":true}]}]}"
 
-assert_passes "additional valid BM-style locale is accepted" \
+assert_passes "additional valid BCP-47 locale is accepted" \
   "tasks:en-US.json:$EN_BASIC" \
   "tasks:fr-CA.json:$EN_BASIC"
 

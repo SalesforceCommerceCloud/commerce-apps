@@ -10,7 +10,7 @@
 #
 # Schema:
 #   - Every required default BM locale file must be present when the directory
-#     exists, and additional locale filenames must use BM-style locale tags.
+#     exists, and additional locale filenames must use the BM-supported BCP-47 format.
 #   - Each locale file must be a JSON object with a "tasks" object whose
 #     entries each have non-empty "name" and "description" strings.
 #     Optional "adminComponents" object holds per-component "attributes"

@@ -79,7 +79,7 @@ assert_rejects "missing required locale is rejected" \
 
 translations_dir="$(make_translations_dir)"
 printf '{}\n' > "$translations_dir/fr-CA.json"
-assert_passes "additional valid BM-style locale is accepted" "$translations_dir"
+assert_passes "additional valid BCP-47 locale is accepted" "$translations_dir"
 
 translations_dir="$(make_translations_dir)"
 printf '{}\n' > "$translations_dir/zh_CN.json"

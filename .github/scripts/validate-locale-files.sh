@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Validate required and BM-style locale JSON filenames in a translations directory.
+# Validate required and BM-supported BCP-47 locale filenames in a translations directory.
 #
 # Usage: validate-locale-files.sh <translations-dir> [label]
 #
@@ -65,7 +65,7 @@ if [[ ${#missing_locales[@]} -gt 0 ]]; then
 fi
 
 if [[ ${#misformatted_locales[@]} -gt 0 ]]; then
-  echo "$label contains misformatted locale file(s): ${misformatted_locales[*]} (expected BM-style filename such as de.json or en-US.json)" >&2
+  echo "$label contains misformatted locale file(s): ${misformatted_locales[*]} (expected BM-supported BCP-47 filename such as de.json or en-US.json)" >&2
   validation_failed=true
 fi
 

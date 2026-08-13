@@ -139,7 +139,7 @@ body:
           required: true
         - label: If `app-configuration/translations/` is included, `en-US.json` is present and covers every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
           required: true
-        - label: All required default BM locale files are present, and any additional locale filenames use the BM-style format documented in CONTRIBUTING.md
+        - label: All required default BM locale files are present, and any additional locale filenames use the BM-supported BCP-47 format documented in CONTRIBUTING.md
           required: true
         - label: I have tested the app in a sandbox environment
           required: true
