@@ -9,9 +9,8 @@
 #   2 - usage error (bad args or unreadable input)
 #
 # Schema:
-#   - Locale filenames must be in the supported set (kept in sync with the
-#     "Supported locales" table in CONTRIBUTING.md).
-#   - en-US.json is required when the directory exists.
+#   - Every required default BM locale file must be present when the directory
+#     exists, and additional locale filenames must use BM-style locale tags.
 #   - Each locale file must be a JSON object with a "tasks" object whose
 #     entries each have non-empty "name" and "description" strings.
 #     Optional "adminComponents" object holds per-component "attributes"
@@ -23,6 +22,8 @@
 #     all non-default locales must match en-US.json's pair set exactly.
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ $# -ne 1 ]]; then
   echo "Usage: $(basename "$0") <cap-root>" >&2
@@ -36,10 +37,6 @@ if [[ ! -d "$cap_root" ]]; then
   exit 2
 fi
 
-# Set of supported BM locales — must match the table in CONTRIBUTING.md
-# under "Localizing app-shipped strings > Supported locales".
-SUPPORTED_LOCALES=("ar-MA" "de" "en-US" "es" "fr" "it" "ja" "ko" "nl" "pl" "pt" "zh-CN" "zh-TW")
-
 translations_dir="$cap_root/app-configuration/translations"
 
 if [[ ! -d "$translations_dir" ]]; then
@@ -47,11 +44,11 @@ if [[ ! -d "$translations_dir" ]]; then
   exit 0
 fi
 
+bash "$SCRIPT_DIR/validate-locale-files.sh" \
+  "$translations_dir" \
+  "app-configuration/translations/"
+
 default_locale="$translations_dir/en-US.json"
-if [[ ! -f "$default_locale" ]]; then
-  echo "app-configuration/translations/ exists but en-US.json is missing" >&2
-  exit 1
-fi
 
 # Validate per-file shape.
 shape_errors=""
@@ -114,22 +111,6 @@ done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json'
 
 if [[ -n "$shape_errors" ]]; then
   echo "app-configuration/translations/ shape validation failed:$shape_errors" >&2
-  exit 1
-fi
-
-# Locale filenames must be in the supported set.
-unsupported_locales=()
-while IFS= read -r locale_file; do
-  fname="$(basename "$locale_file" .json)"
-  ok=false
-  for supported in "${SUPPORTED_LOCALES[@]}"; do
-    [[ "$fname" == "$supported" ]] && ok=true && break
-  done
-  [[ "$ok" == "false" ]] && unsupported_locales+=("$fname")
-done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json')
-
-if [[ ${#unsupported_locales[@]} -gt 0 ]]; then
-  echo "Unsupported locale file(s) in app-configuration/translations/: ${unsupported_locales[*]} (supported: ${SUPPORTED_LOCALES[*]})" >&2
   exit 1
 fi
 
