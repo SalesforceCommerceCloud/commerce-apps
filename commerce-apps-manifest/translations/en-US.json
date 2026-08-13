@@ -1,34 +1,38 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce Flat Tax",
-        "description": "Configure a flat tax calculation."
-    },
-    "custom-tax": {
-        "name": "Custom Tax",
-        "description": "Configure a custom tax calculation by providing your own APIs."
-    },
-    "basic-shipping": {
-        "name": "Basic Shipping",
-        "description": "Configure a basic shipping calculation."
-    },
-    "custom-shipping": {
-        "name": "Custom Shipping",
-        "description": "Configure a custom shipping calculation by providing your own APIs."
-    },
-    "custom-payment": {
-        "name": "Custom Payment",
-        "description": "Configure a custom payment integration by providing your own APIs."
-    },
-    "sf-payments": {
-        "name": "Salesforce Payments",
-        "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Loads Noibu session monitoring script on every storefront page"
-    },
-    "custom-analytics": {
-        "name": "Custom Analytics",
-        "description": "Configure a custom analytics integration by providing your own APIs."
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce Flat Tax",
+    "description": "Configure a flat tax calculation."
+  },
+  "custom-tax": {
+    "name": "Custom Tax",
+    "description": "Configure a custom tax calculation by providing your own APIs."
+  },
+  "basic-shipping": {
+    "name": "Basic Shipping",
+    "description": "Configure a basic shipping calculation."
+  },
+  "custom-shipping": {
+    "name": "Custom Shipping",
+    "description": "Configure a custom shipping calculation by providing your own APIs."
+  },
+  "custom-payment": {
+    "name": "Custom Payment",
+    "description": "Configure a custom payment integration by providing your own APIs."
+  },
+  "sf-payments": {
+    "name": "Salesforce Payments",
+    "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Loads Noibu session monitoring script on every storefront page"
+  },
+  "custom-analytics": {
+    "name": "Custom Analytics",
+    "description": "Configure a custom analytics integration by providing your own APIs."
+  },
+  "approaching-discounts": {
+    "name": "Approaching Discounts",
+    "description": "Show shoppers how close their basket is to unlocking order and shipping promotions."
+  }
 }
