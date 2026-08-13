@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "注文および配送のプロモーションのロック解除まで、バスケットがどれだけ近づいているかを買い物客に表示します。"
     }
 }

@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "맞춤 분석",
         "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "쇼핑객에게 장바구니가 주문 및 배송 프로모션 잠금 해제에 얼마나 가까운지 보여줍니다."
     }
 }
