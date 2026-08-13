@@ -502,7 +502,9 @@ Locale filenames are validated against the set of locales supported by Business 
 | Chinese (Simplified) | `zh-CN.json` |
 | Chinese (Traditional) | `zh-TW.json` |
 
-CI will reject locale files whose filenames are outside this set.
+CI enforces this filename set for both registry-level files under
+`commerce-apps-manifest/translations/` and locale files packaged under
+`app-configuration/translations/`.
 
 ---
 
