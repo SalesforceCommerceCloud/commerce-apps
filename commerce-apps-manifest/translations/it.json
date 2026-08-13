@@ -1,35 +1,39 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Imposta forfettaria Salesforce",
-        "description": "Configura un calcolo dell'imposta forfettaria."
-    },
-    "custom-tax": {
-        "name": "Imposta personalizzata",
-        "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
-    },
-    "basic-shipping": {
-        "name": "Spedizione base",
-        "description": "Configura un calcolo di spedizione base."
-    },
-    "custom-shipping": {
-        "name": "Spedizione personalizzata",
-        "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
-    },
-    "custom-payment": {
-        "name": "Pagamento personalizzato",
-        "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
-    },
-    "sf-payments": {
-        "name": "Salesforce Payments",
-        "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento.",
-        "featuredTagline": "Incassa i pagamenti rapidamente con una soluzione end-to-end senza interruzioni per Adyen, Stripe e PayPal."
-    },
-    "custom-analytics": {
-        "name": "Analisi personalizzata",
-        "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Carica lo script di monitoraggio della sessione Noibu su ogni pagina della vetrina"
-    }
+  "salesforce-flat-tax": {
+    "name": "Imposta forfettaria Salesforce",
+    "description": "Configura un calcolo dell'imposta forfettaria."
+  },
+  "custom-tax": {
+    "name": "Imposta personalizzata",
+    "description": "Configura un calcolo fiscale personalizzato fornendo le tue API."
+  },
+  "basic-shipping": {
+    "name": "Spedizione base",
+    "description": "Configura un calcolo di spedizione base."
+  },
+  "custom-shipping": {
+    "name": "Spedizione personalizzata",
+    "description": "Configura un calcolo di spedizione personalizzato fornendo le tue API."
+  },
+  "custom-payment": {
+    "name": "Pagamento personalizzato",
+    "description": "Configura un'integrazione di pagamento personalizzata fornendo le tue API."
+  },
+  "sf-payments": {
+    "name": "Salesforce Payments",
+    "description": "Elabora i pagamenti in modo nativo in Storefront Next. Salesforce Payments supporta più gateway e metodi di pagamento.",
+    "featuredTagline": "Incassa i pagamenti rapidamente con una soluzione end-to-end senza interruzioni per Adyen, Stripe e PayPal."
+  },
+  "custom-analytics": {
+    "name": "Analisi personalizzata",
+    "description": "Configura un'integrazione di analisi personalizzata fornendo le tue API."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Carica lo script di monitoraggio della sessione Noibu su ogni pagina della vetrina"
+  },
+  "approaching-discounts": {
+    "name": "Approaching Discounts",
+    "description": "Mostra ai clienti quanto il loro carrello è vicino a sbloccare promozioni su ordini e spedizioni."
+  }
 }

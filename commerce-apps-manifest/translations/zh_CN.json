@@ -1,0 +1,38 @@
+{
+  "salesforce-flat-tax": {
+    "name": "Salesforce 固定税",
+    "description": "配置固定税计算。"
+  },
+  "custom-tax": {
+    "name": "自定义税务",
+    "description": "通过提供您自己的 API 来配置自定义税务计算。"
+  },
+  "basic-shipping": {
+    "name": "基本配送",
+    "description": "配置基本配送计算。"
+  },
+  "custom-shipping": {
+    "name": "自定义配送",
+    "description": "通过提供您自己的 API 来配置自定义配送计算。"
+  },
+  "custom-payment": {
+    "name": "自定义支付",
+    "description": "通过提供您自己的 API 来配置自定义支付集成。"
+  },
+  "sf-payments": {
+    "name": "Salesforce Payments",
+    "description": "在 Storefront Next 中原生处理支付。Salesforce Payments 支持多种支付网关和支付方式。"
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "在每个店面页面加载 Noibu 会话监控脚本"
+  },
+  "custom-analytics": {
+    "name": "自定义分析",
+    "description": "通过提供您自己的 API 来配置自定义分析集成。"
+  },
+  "approaching-discounts": {
+    "name": "Approaching Discounts",
+    "description": "向购物者显示他们的购物篮距离解锁订单和配送促销还有多近。"
+  }
+}

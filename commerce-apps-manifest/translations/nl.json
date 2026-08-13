@@ -1,35 +1,39 @@
 {
-    "salesforce-flat-tax": {
-        "name": "Salesforce vast belastingtarief",
-        "description": "Configureer een vaste belastingberekening."
-    },
-    "custom-tax": {
-        "name": "Aangepaste belasting",
-        "description": "Configureer een aangepaste belastingberekening met uw eigen API's."
-    },
-    "basic-shipping": {
-        "name": "Basisverzending",
-        "description": "Configureer een basisverzendberekening."
-    },
-    "custom-shipping": {
-        "name": "Aangepaste verzending",
-        "description": "Configureer een aangepaste verzendberekening met uw eigen API's."
-    },
-    "custom-payment": {
-        "name": "Aangepaste betaling",
-        "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
-    },
-    "sf-payments": {
-        "name": "Salesforce Payments",
-        "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden.",
-        "featuredTagline": "Ontvang snel betalingen met een naadloze end-to-end-oplossing voor Adyen, Stripe en PayPal."
-    },
-    "custom-analytics": {
-        "name": "Aangepaste analyse",
-        "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
-    },
-    "noibu": {
-        "name": "Noibu",
-        "description": "Laadt het Noibu-sessiecontrolescript op elke pagina van de winkel"
-    }
+  "salesforce-flat-tax": {
+    "name": "Salesforce vast belastingtarief",
+    "description": "Configureer een vaste belastingberekening."
+  },
+  "custom-tax": {
+    "name": "Aangepaste belasting",
+    "description": "Configureer een aangepaste belastingberekening met uw eigen API's."
+  },
+  "basic-shipping": {
+    "name": "Basisverzending",
+    "description": "Configureer een basisverzendberekening."
+  },
+  "custom-shipping": {
+    "name": "Aangepaste verzending",
+    "description": "Configureer een aangepaste verzendberekening met uw eigen API's."
+  },
+  "custom-payment": {
+    "name": "Aangepaste betaling",
+    "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."
+  },
+  "sf-payments": {
+    "name": "Salesforce Payments",
+    "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden.",
+    "featuredTagline": "Ontvang snel betalingen met een naadloze end-to-end-oplossing voor Adyen, Stripe en PayPal."
+  },
+  "custom-analytics": {
+    "name": "Aangepaste analyse",
+    "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
+  },
+  "noibu": {
+    "name": "Noibu",
+    "description": "Laadt het Noibu-sessiecontrolescript op elke pagina van de winkel"
+  },
+  "approaching-discounts": {
+    "name": "Approaching Discounts",
+    "description": "Laat shoppers zien hoe dicht hun winkelmandje bij het ontgrendelen van bestel- en verzendpromoties is."
+  }
 }
