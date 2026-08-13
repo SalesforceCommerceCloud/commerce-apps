@@ -57,7 +57,7 @@ assert_passes "empty directory is valid"
 assert_passes "all supported locale filenames are valid" \
   ar-MA de en-US es fr it ja ko nl pl pt zh-CN zh-TW
 assert_passes "additional dash-form locale is valid" en-US fr-CA
-assert_rejects "underscore region separator is rejected" \
+assert_rejects "misformatted region separator is rejected" \
   "use BCP-47 dash form" en-US zh_CN
 
 echo ""

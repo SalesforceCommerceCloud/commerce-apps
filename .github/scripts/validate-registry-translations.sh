@@ -5,7 +5,7 @@
 #
 # Exit codes:
 #   0 - locale filenames are valid
-#   1 - one or more locale filenames use underscore separators
+#   1 - one or more locale filenames are misformatted
 #   2 - usage error (bad args or missing directory)
 
 set -euo pipefail
@@ -22,14 +22,14 @@ if [[ ! -d "$translations_dir" ]]; then
   exit 2
 fi
 
-underscore_locales=()
+misformatted_locales=()
 while IFS= read -r locale_file; do
   locale="$(basename "$locale_file" .json)"
-  [[ "$locale" == *_* ]] && underscore_locales+=("$locale")
+  [[ "$locale" == *_* ]] && misformatted_locales+=("$locale")
 done < <(find "$translations_dir" -mindepth 1 -maxdepth 1 -type f -name '*.json' | sort)
 
-if [[ ${#underscore_locales[@]} -gt 0 ]]; then
-  echo "Registry translation locale file(s) use underscore separators: ${underscore_locales[*]} (use BCP-47 dash form)" >&2
+if [[ ${#misformatted_locales[@]} -gt 0 ]]; then
+  echo "Misformatted registry translation locale file(s): ${misformatted_locales[*]} (use BCP-47 dash form for region separators)" >&2
   exit 1
 fi
 

@@ -504,8 +504,8 @@ Locale filenames are validated against the set of locales supported by Business 
 
 CI enforces this filename set for locale files packaged under
 `app-configuration/translations/`. Registry-level files under
-`commerce-apps-manifest/translations/` may include additional locales, but region
-separators must use dash form rather than underscore form.
+`commerce-apps-manifest/translations/` may include additional locales, but locale
+filenames must use BCP-47 dash form for region separators.
 
 ---
 
