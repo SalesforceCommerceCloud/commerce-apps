@@ -5,7 +5,7 @@
       "id": 1,
       "prompt": "I just packaged avalara-tax v0.2.8. Can you validate it before I submit the PR?",
       "context": "User has packaged app and wants pre-submission validation",
-      "expected_behavior": "Triggers validate-app skill. Identifies app at tax/avalara-tax/avalara-tax-v0.2.8.zip. Checks: ZIP exists, SHA256 matches manifest, manifest has all required fields, ZIP structure (single root, no junk files), detects architecture (Backend-only/UI-only/Fullstack), validates commerce-app.json version matches manifest, checks architecture-specific requirements, validates impex if Backend/Fullstack, verifies icon filename matches, confirms translations in en-US.json, runs security scan, reports PASS or FAIL with specific issues."
+      "expected_behavior": "Triggers validate-app skill. Identifies app at tax/avalara-tax/avalara-tax-v0.2.8.zip. Checks: ZIP exists, SHA256 matches manifest, manifest has all required fields, ZIP structure (single root, no junk files), detects architecture (Backend-only/UI-only/Fullstack), validates commerce-app.json version matches manifest, checks architecture-specific requirements including every cartridge root having a .project file (empty or non-empty both pass), validates impex if Backend/Fullstack, verifies icon filename matches, confirms translations in en-US.json, runs security scan, reports PASS or FAIL with specific issues."
     },
     {
       "id": 2,
@@ -23,7 +23,7 @@
       "id": 4,
       "prompt": "Validate the fullstack app at loyalty/acme-rewards/acme-rewards-v1.5.0.zip. It has both UI and backend components.",
       "context": "Fullstack app validation request",
-      "expected_behavior": "Detects Fullstack architecture (has both storefront-next/ and cartridges/). Validates BOTH UI requirements (target-config.json exists, index.ts exists, locales en-US/en-GB/it-IT present) AND Backend requirements (cartridges/site_cartridges/ exists, package.json has hooks field, impex/install/ and impex/uninstall/ directories present, XML validates with xmllint, services use dotted notation, no hardcoded credentials). Reports architecture detection and validates all applicable rules."
+      "expected_behavior": "Detects Fullstack architecture (has both storefront-next/ and cartridges/). Validates BOTH UI requirements (target-config.json exists, index.ts exists, locales en-US/en-GB/it-IT present) AND Backend requirements (cartridges/site_cartridges/ exists, every cartridge root has a .project file, package.json has hooks field, impex/install/ and impex/uninstall/ directories present, XML validates with xmllint, services use dotted notation, no hardcoded credentials). Reports architecture detection and validates all applicable rules."
     },
     {
       "id": 5,
