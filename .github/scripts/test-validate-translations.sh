@@ -113,10 +113,6 @@ assert_passes "en-US + matching de" \
   "tasks:en-US.json:$EN_BASIC" \
   "tasks:de.json:$DE_BASIC"
 
-assert_passes "app config locale filenames are not dash-case validated" \
-  "tasks:en-US.json:$EN_BASIC" \
-  "tasks:zh_CN.json:$EN_BASIC"
-
 assert_passes "tasksList taskKey present in en-US" \
   "tasks:en-US.json:$EN_BASIC" \
   "tasksList:$TASKS_LIST_OK"
@@ -143,6 +139,11 @@ assert_rejects "missing tasks key is rejected" \
 assert_rejects "empty name in en-US is rejected" \
   "missing/invalid name or description" \
   'tasks:en-US.json:{"tasks":{"setup_account":{"name":"","description":"d"}}}'
+
+assert_rejects "unsupported locale filename is rejected" \
+  "Unsupported locale file" \
+  "tasks:en-US.json:$EN_BASIC" \
+  "tasks:xx-YY.json:$EN_BASIC"
 
 assert_rejects "tasksList taskKey missing from en-US is rejected" \
   "not present in translations/en-US.json" \
