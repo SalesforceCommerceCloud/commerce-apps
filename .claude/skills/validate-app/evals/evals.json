@@ -65,7 +65,7 @@
       "id": 11,
       "prompt": "I just updated the translations for my app but forgot - do I need to update all locale files or just en-US.json?",
       "context": "Translation requirements clarification",
-      "expected_behavior": "This is an informational question, not a validation request. Explains translation requirements: en-US.json is MINIMUM requirement, all 13 locale files should ideally be updated (en-US, de, fr, es, it, ja, ko, nl, pl, pt, zh_CN, zh_TW, ar_MA), can use English as fallback for non-English locales. Translation structure: {appName: {name: displayName, description: description}}. Does NOT run validation unless user specifically requests it."
+      "expected_behavior": "This is an informational question, not a validation request. Explains translation requirements: en-US.json is MINIMUM requirement, all 13 locale files should ideally be updated (en-US, de, fr, es, it, ja, ko, nl, pl, pt, zh-CN, zh-TW, ar-MA), can use English as fallback for non-English locales. Translation structure: {appName: {name: displayName, description: description}}. Does NOT run validation unless user specifically requests it."
     },
     {
       "id": 12,
