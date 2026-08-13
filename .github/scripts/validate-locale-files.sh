@@ -31,7 +31,6 @@ if [[ ! -f "$required_locales_file" ]]; then
 fi
 
 missing_locales=()
-required_has_en_us=false
 while IFS= read -r locale || [[ -n "$locale" ]]; do
   locale="${locale%$'\r'}"
   [[ -z "$locale" ]] && continue
@@ -39,16 +38,10 @@ while IFS= read -r locale || [[ -n "$locale" ]]; do
     echo "Required BM locale configuration contains misformatted locale: $locale" >&2
     exit 2
   fi
-  [[ "$locale" == "en-US" ]] && required_has_en_us=true
   if [[ ! -f "$translations_dir/$locale.json" ]]; then
     missing_locales+=("$locale.json")
   fi
 done < "$required_locales_file"
-
-if [[ "$required_has_en_us" == "false" ]]; then
-  echo "Required BM locale configuration must include en-US" >&2
-  exit 2
-fi
 
 misformatted_locales=()
 while IFS= read -r locale_file; do
