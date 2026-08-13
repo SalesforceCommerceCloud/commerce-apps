@@ -502,9 +502,10 @@ Locale filenames are validated against the set of locales supported by Business 
 | Chinese (Simplified) | `zh-CN.json` |
 | Chinese (Traditional) | `zh-TW.json` |
 
-CI enforces this filename set for both registry-level files under
-`commerce-apps-manifest/translations/` and locale files packaged under
-`app-configuration/translations/`.
+CI enforces this filename set for locale files packaged under
+`app-configuration/translations/`. Registry-level files under
+`commerce-apps-manifest/translations/` may include additional locales, but region
+separators must use dash form rather than underscore form.
 
 ---
 

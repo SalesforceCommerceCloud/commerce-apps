@@ -56,10 +56,9 @@ echo "=== registry translations validator tests ==="
 assert_passes "empty directory is valid"
 assert_passes "all supported locale filenames are valid" \
   ar-MA de en-US es fr it ja ko nl pl pt zh-CN zh-TW
+assert_passes "additional dash-form locale is valid" en-US fr-CA
 assert_rejects "underscore region separator is rejected" \
   "use BCP-47 dash form" en-US zh_CN
-assert_rejects "unknown locale is rejected" \
-  "Unsupported registry translation locale file(s): xx-YY" en-US xx-YY
 
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
