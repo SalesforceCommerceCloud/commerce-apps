@@ -145,6 +145,11 @@ assert_rejects "unsupported locale filename is rejected" \
   "tasks:en-US.json:$EN_BASIC" \
   "tasks:xx-YY.json:$EN_BASIC"
 
+assert_rejects "underscore locale filename is rejected" \
+  "Unsupported locale file" \
+  "tasks:en-US.json:$EN_BASIC" \
+  "tasks:zh_CN.json:$EN_BASIC"
+
 assert_rejects "tasksList taskKey missing from en-US is rejected" \
   "not present in translations/en-US.json" \
   "tasks:en-US.json:$EN_BASIC" \
