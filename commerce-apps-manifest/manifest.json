@@ -63,7 +63,7 @@
             "provider": "thirdParty",
             "version": "1.0.0",
             "zip": "zenkraft-shipping-v1.0.0.zip",
-            "sha256": "f14c1a77b6e1371ac9abfbaee1f914d46d765031854e9edf63cee33d636390ae"
+            "sha256": "6bd9366d853c674b5f3460446240f946d79c2dbf8c0dbc0029be5e2b2e42ecaa"
         }
     ],
     "payment": [
