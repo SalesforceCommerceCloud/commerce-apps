@@ -23,9 +23,17 @@
         "name": "Salesforce Payments",
         "description": "معالجة المدفوعات بشكل أصلي في Storefront Next. يدعم Salesforce Payments بوابات وطرق دفع متعددة."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "يحمّل نص Noibu لمراقبة الجلسة على كل صفحة من صفحات الواجهة"
+    },
     "custom-analytics": {
         "name": "تحليلات مخصصة",
         "description": "تكوين تكامل تحليلات مخصص من خلال توفير واجهات API الخاصة بك."
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "أظهر للمتسوقين مدى قرب سلة التسوق الخاصة بهم من فتح العروض الترويجية للطلب والشحن."
     },
     "zenkraft-shipping": {
         "name": "شحن Zenkraft",

@@ -92,7 +92,9 @@ body:
           required: true
         - label: I am NOT committing extracted directories (only new ZIP and updated manifest.json)
           required: true
-        - label: The ZIP contains no junk files (.DS_Store, __MACOSX, hidden files)
+        - label: The ZIP contains no junk hidden files (.DS_Store, __MACOSX, .env, secrets)
+          required: true
+        - label: Every cartridge root (cartridges/site_cartridges/*/, cartridges/bm_cartridges/*/) includes a .project file (may be empty)
           required: true
         - label: I have deleted the old ZIP version
           required: true

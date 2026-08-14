@@ -161,13 +161,17 @@ Your response:
 
 ### 6. ZIP Contents
 - Single root folder: `commerce-{app-name}-app-v{version}/`
-- NO junk files: `.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files
+- NO junk hidden files: `.DS_Store`, `__MACOSX`, `Thumbs.db`, `.env`, secrets
 - NO `node_modules`, `.git`, IDE files
 - NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`)
+- **REQUIRED:** Every cartridge root (each immediate child of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/`) MUST include a `.project` file — may be empty, but must be present (required for b2c cartridge discovery)
 - Optional: `icons/` directory with ISV icon(s)
-- Use exclusions when creating ZIP:
+- Use exclusions when creating ZIP — do NOT use a blanket `-x "*/.*"`, it strips `.project`:
   ```bash
-  zip -r app.zip folder/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+  zip -r app.zip folder/ \
+    -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+    -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+    -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
   ```
 
 ### 7. Icons (Optional)
@@ -184,12 +188,12 @@ Your response:
 ### 8. Storefront Support (Optional)
 - `storefrontSupport` must be present in **both** the root manifest entry and `commerce-app.json` inside the ZIP
 - Use semver format (`X.Y.Z` or `X.Y.Z-prerelease`) for all `minVersion` and `maxVersion` fields
-- Apps may declare `sfnext`, `sfra`, or both
+- Apps may declare `sfnext` alone, or `sfnext` + `sfra`. Declaring `sfra` without `sfnext` is invalid.
 - `minVersion` is required when the storefront key is present; `maxVersion` is optional and inclusive
 - Use `maxVersion` only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); absence means "no upper bound"
 - If absent, no version gating is applied at install time
 - Values must match exactly between root manifest and `commerce-app.json`
-- Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object
+- Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object, and `sfra` requires `sfnext` to also be present.
 
 **Icon validation examples:**
 ```
@@ -359,8 +363,14 @@ tax/avalara-tax/catalog.json
 # WRONG - Creates junk files
 zip -r app.zip folder/
 
-# RIGHT - Excludes junk files
+# WRONG - Blanket "*/.*" also strips the REQUIRED .project files from cartridges
 zip -r app.zip folder/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+
+# RIGHT - Excludes junk explicitly, keeps .project
+zip -r app.zip folder/ \
+  -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+  -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+  -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
 ```
 
 ## Understanding the Domain
@@ -468,7 +478,8 @@ Before suggesting `/submit-app-pr`, verify:
 
 **ZIP Contents:**
 - [ ] Single root folder: `commerce-{app-name}-app-v{version}/`
-- [ ] No junk files (`.DS_Store`, `__MACOSX`, hidden files)
+- [ ] No junk hidden files (`.DS_Store`, `__MACOSX`, `.env`, secrets)
+- [ ] Every cartridge root has a `.project` file (may be empty)
 - [ ] All required files present (commerce-app.json, README.md, etc.)
 
 **Manifest Validation:**

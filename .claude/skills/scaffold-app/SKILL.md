@@ -56,10 +56,10 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 - Publisher name and URL
 - Minimum SFNext version (optional - semver `X.Y.Z` or `X.Y.Z-prerelease`, if the app requires a minimum Storefront Next version)
 - Maximum SFNext version (optional - semver, inclusive; only set if you've confirmed an incompatibility — e.g., a known-breaking future major release)
-- Minimum SFRA version (optional - semver `X.Y.Z` or `X.Y.Z-prerelease`, if the app requires a minimum SFRA version)
-- Maximum SFRA version (optional - semver, inclusive; same guidance as above)
+- Minimum SFRA version (optional - semver `X.Y.Z` or `X.Y.Z-prerelease`, if the app requires a minimum SFRA version) — **only ask this if a minimum SFNext version was provided above.** SFRA is additive to SFNext and may never be declared alone; don't offer an SFRA-only path.
+- Maximum SFRA version (optional - semver, inclusive; same guidance as above; only applicable if SFRA min version was set)
 
-> When provided, add `storefrontSupport` to both `commerce-app.json` (inside the ZIP) and the root manifest entry. Values must match. Each storefront key (`sfnext`, `sfra`) accepts `minVersion` (required when the key is present) and an optional `maxVersion`.
+> When provided, add `storefrontSupport` to both `commerce-app.json` (inside the ZIP) and the root manifest entry. Values must match. Each storefront key (`sfnext`, `sfra`) accepts `minVersion` (required when the key is present) and an optional `maxVersion`. `sfra` requires `sfnext` to also be present — never generate a `storefrontSupport` object with `sfra` but no `sfnext`.
 - Additional context (optional - docs, requirements, API details)
 
 **Folder Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. Installation URL: `https://raw.githubusercontent.com/{owner}/{repo}/{tag}/{domain}/{appName}/{zipFileName}`
@@ -105,7 +105,13 @@ mkdir -p impex/{install/meta,install/sites/SITEID,uninstall}
 
 # Fullstack only: Add Business Manager cartridge
 mkdir -p cartridges/bm_cartridges/bm_<appName>
+
+# Every cartridge root needs an empty .project file (required for b2c cartridge discovery)
+touch cartridges/site_cartridges/<cartridgeName>/.project
+touch cartridges/bm_cartridges/bm_<appName>/.project
 ```
+
+**`.project` files:** Every cartridge root (each immediate child of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/`) MUST contain a `.project` file — required for b2c cartridge discovery. `create_structure.sh` creates these empty automatically. If a developer later imports a real Eclipse-generated `.project` file (non-empty), leave it as-is — don't overwrite it.
 
 This structure enables the installation URL pattern and allows side-by-side development of different versions.
 
@@ -227,6 +233,7 @@ Check:
 - [ ] **app-configuration/tasksList.json created** with merchant post-installation tasks
 - [ ] Backend apps: cartridge files, hooks.json (with explicit script paths), **both install/ and uninstall/ impex directories**
 - [ ] Backend apps: package.json includes `"hooks": "cartridge/scripts/hooks.json"` field
+- [ ] Backend/Fullstack apps: every cartridge root (`cartridges/site_cartridges/<cartridgeName>/`, `cartridges/bm_cartridges/bm_<appName>/`) has a `.project` file (empty is fine)
 - [ ] Backend apps: Hook implementations use `require()` not `importPackage()`, always return dw.system.Status
 - [ ] All apps: If app depends on an external connection, `checkConnectionHealth` hook is registered and implemented (optional but recommended)
 - [ ] UI apps: storefront-next structure with target-config.json, TypeScript components, tests

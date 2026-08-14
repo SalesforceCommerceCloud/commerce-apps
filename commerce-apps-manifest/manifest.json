@@ -12,6 +12,18 @@
             "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
         },
         {
+            "id": "avalara-tax",
+            "name": "Avalara Tax",
+            "description": "Automated tax compliance solution by Avalara",
+            "iconName": "avalara.png",
+            "domain": "tax",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "avalara-tax-v1.0.0.zip",
+            "sha256": "a54104de4c7072999107717d4f07a52ab13406361a207023dd0f5aaa61d8ff98"
+        },
+        {
             "id": "custom-tax",
             "name": "Custom Tax",
             "description": "Configure a custom tax calculation by providing your own APIs.",
@@ -90,6 +102,18 @@
     "fraud": [],
     "analytics": [
         {
+            "id": "noibu",
+            "name": "Noibu",
+            "description": "Loads Noibu session monitoring script on every storefront page",
+            "iconName": "noibu.png",
+            "domain": "analytics",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "1.0.0",
+            "zip": "noibu-v1.0.0.zip",
+            "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852"
+        },
+        {
             "id": "custom-analytics",
             "name": "Custom Analytics",
             "description": "Configure a custom analytics integration by providing your own APIs.",
@@ -97,6 +121,25 @@
             "domain": "analytics",
             "type": "custom",
             "provider": "custom"
+        }
+    ],
+    "merchandising": [
+        {
+            "id": "approaching-discounts",
+            "name": "Approaching Discounts",
+            "description": "Show shoppers how close their basket is to unlocking order and shipping promotions.",
+            "iconName": "salesforce.svg",
+            "domain": "merchandising",
+            "type": "app",
+            "provider": "salesforce",
+            "version": "1.0.0",
+            "zip": "approaching-discounts-v1.0.0.zip",
+            "sha256": "6f3b922ec16c2e79eaf59ac60f85896ee39e422bb46990fe3981658491a5f7a8",
+            "storefrontSupport": {
+                "sfnext": {
+                    "minVersion": "1.2.0"
+                }
+            }
         }
     ]
 }

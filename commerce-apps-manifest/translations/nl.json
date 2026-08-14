@@ -23,9 +23,17 @@
         "name": "Salesforce Payments",
         "description": "Verwerk betalingen native in Storefront Next. Salesforce Payments ondersteunt meerdere betalingsgateways en -methoden."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Laadt het Noibu-sessiecontrolescript op elke pagina van de winkel"
+    },
     "custom-analytics": {
         "name": "Aangepaste analyse",
         "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "Laat shoppers zien hoe dicht hun winkelmandje bij het ontgrendelen van bestel- en verzendpromoties is."
     },
     "zenkraft-shipping": {
         "name": "Zenkraft Verzending",

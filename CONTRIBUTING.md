@@ -37,6 +37,10 @@ These skills automate many of the manual steps described below and help catch co
 
 ---
 
+## ISV Partnership Requirement
+
+Every published app must be covered by an appropriate ISV partnership agreement with Salesforce. This applies regardless of app architecture (UI-only, backend-only, or fullstack) or domain. PRs from ISVs without a current, applicable partnership agreement will not be merged. If you're unsure whether your agreement covers the app you're submitting, contact your partner account manager or file a support case in the partner portal before opening a PR.
+
 ## Pull Request Requirements
 
 Each PR **must** include the following items:
@@ -58,7 +62,7 @@ avalara-tax-v1.0.0.zip
 
 #### How to Generate the ZIP File
 
-When creating your ZIP file, it's important to exclude system files and hidden files that shouldn't be included in the archive. Use the following commands based on your operating system:
+When creating your ZIP file, it's important to exclude system files and other junk that shouldn't be included in the archive — but **every cartridge root MUST include a `.project` file** (see [Cartridge `.project` files](#cartridge-project-files) below), so don't reach for a blanket "exclude all hidden files" pattern. Use the following commands based on your operating system:
 
 ##### macOS & Linux (Terminal)
 
@@ -66,15 +70,21 @@ Both macOS and Linux use the `zip` utility. The `-x` flag is your best friend he
 
 **The Command:**
 ```bash
-zip -r my_archive.zip folder_to_zip/ -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+zip -r my_archive.zip folder_to_zip/ \
+  -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+  -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+  -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
 ```
 
 **Breakdown of the flags:**
 - `-r`: Stands for "recursive." It tells the computer to look inside every subfolder.
-- `"*.DS_Store"`: Excludes the macOS folder settings file.
-- `"__MACOSX/*"`: Prevents the creation of those annoying resource fork folders.
-- `"*/.*"`: The "nuclear option"—this excludes all hidden files (anything starting with a dot).
+- `"*.DS_Store"` / `"*/*.DS_Store"`: Excludes the macOS folder settings file.
+- `"__MACOSX/*"` / `"*/__MACOSX/*"`: Prevents the creation of those annoying resource fork folders.
+- `"*/.git/*"`, `"*/.env"`, `"*/.env.*"`: Excludes VCS metadata and env/secret files.
 - `"Thumbs.db"`: Excludes the Windows thumbnail cache.
+- `"*.key"`, `"*.pem"`, `"*.p12"`, `"*.pfx"`, `"*.jks"`: Excludes common secret/keystore file types.
+
+**Do NOT use `-x "*/.*"`** (the old "nuclear option" that excludes every dotfile) — it also strips the `.project` files that every cartridge root is required to ship.
 
 ##### Windows (PowerShell)
 
@@ -85,15 +95,21 @@ Windows doesn't have a native "exclude" flag built into its basic `Compress-Arch
 Get-ChildItem -Path ".\folder_name" -Recurse -File | Where-Object { 
     $_.FullName -notmatch '\\\.DS_Store$' -and 
     $_.FullName -notmatch '__MACOSX' -and 
-    $_.Name -notmatch '^\.' -and
-    $_.Name -notmatch 'Thumbs\.db'
+    $_.FullName -notmatch '\\\.git\\' -and
+    $_.Name -notmatch '^\.env' -and
+    $_.Name -notmatch 'Thumbs\.db' -and
+    $_.Name -notmatch '\.(key|pem|p12|pfx|jks)$'
 } | Compress-Archive -DestinationPath "my_archive.zip"
 ```
 
 **How this works:**
 - `Get-ChildItem`: Grabs every file in your folder.
-- `Where-Object`: This acts as a filter. We tell it to only keep files that do not match our "junk" patterns (no .DS_Store, no __MACOSX, no files starting with a dot, and no Thumbs.db).
+- `Where-Object`: This acts as a filter. We tell it to only keep files that do not match our "junk" patterns (no .DS_Store, no __MACOSX, no .git metadata, no .env/secret files, and no Thumbs.db). Note this deliberately does NOT filter out `.project` — every cartridge root must ship one.
 - `Compress-Archive`: Takes that filtered list and zips it up.
+
+##### Cartridge `.project` files
+
+Every cartridge root — each immediate child directory of `cartridges/site_cartridges/` and `cartridges/bm_cartridges/` — MUST contain a `.project` file. This is required for b2c cartridge discovery. An empty file is fine (the `/scaffold-app` and `/package-app` skills create these automatically); if you're importing an existing Eclipse-generated cartridge with a real (non-empty) `.project` file, leave it as-is. `/validate-app` and CI (`verify-zip.yml`) both fail the build if a cartridge root is missing this file.
 
 #### Delete Old ZIP Versions
 
@@ -151,8 +167,9 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
   - `sfra` - (Object) SFRA compatibility
     - `minVersion` - (String) Minimum SFRA version the app requires (semver format: `X.Y.Z` or `X.Y.Z-prerelease`)
     - `maxVersion` - (String, optional) Maximum SFRA version the app supports, inclusive (semver format: `X.Y.Z` or `X.Y.Z-prerelease`).
+    - `sfra` may only be declared alongside `sfnext`. An app may not declare `sfra` support without also declaring `sfnext` support.
 
-An app may declare support for one or both storefront types. If the `storefrontSupport` field is absent or a specific storefront key is omitted, no version gating is applied for that storefront. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
+An app may declare `sfnext` alone, or `sfnext` and `sfra` together. An app may **not** declare `sfra` alone — SFRA support is always additive to SFNext. If `storefrontSupport` is absent (e.g., a backend-only app), no version gating is applied. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
 
 When present, the `storefrontSupport` field in the root manifest must match the `storefrontSupport` field in the app's `commerce-app.json` inside the ZIP.
 
@@ -471,7 +488,7 @@ Locale filenames are validated against the set of locales supported by Business 
 
 | Locale | Filename |
 |:--|:--|
-| Arabic (Morocco) | `ar_MA.json` |
+| Arabic (Morocco) | `ar-MA.json` |
 | German | `de.json` |
 | English (United States) | `en-US.json` |
 | Spanish | `es.json` |
@@ -482,8 +499,8 @@ Locale filenames are validated against the set of locales supported by Business 
 | Dutch | `nl.json` |
 | Polish | `pl.json` |
 | Portuguese | `pt.json` |
-| Chinese (Simplified) | `zh_CN.json` |
-| Chinese (Traditional) | `zh_TW.json` |
+| Chinese (Simplified) | `zh-CN.json` |
+| Chinese (Traditional) | `zh-TW.json` |
 
 CI will reject locale files whose filenames are outside this set.
 
@@ -614,7 +631,8 @@ Before submitting your PR, please verify:
 - [ ] SHA256 hash verified with: `shasum -a 256 [path-to-zip]`
 
 ### ZIP Content Validation
-- [ ] No junk files (`.DS_Store`, `__MACOSX`, `Thumbs.db`, hidden files)
+- [ ] No junk hidden files (`.DS_Store`, `__MACOSX`, `.env`, secrets)
+- [ ] Every cartridge root (`cartridges/site_cartridges/*/`, `cartridges/bm_cartridges/*/`) has a `.project` file (empty is fine — see [Cartridge `.project` files](#cartridge-project-files))
 - [ ] No registry path prefixes in ZIP (no `tax/`, `domain/`, etc.)
 - [ ] All required files present (commerce-app.json, README.md, tasksList.json, services.xml)
 - [ ] All referenced scripts/files exist
@@ -670,13 +688,25 @@ shasum -a 256 [domain]/[appName]/[appName]-v[version].zip
 ```
 
 ### Junk Files in ZIP
-**Problem:** CI detects `.DS_Store`, `__MACOSX`, or hidden files.
+**Problem:** CI detects `.DS_Store`, `__MACOSX`, `.env`, or other junk files.
 
-**Solution:** Recreate the ZIP with proper exclusions:
+**Solution:** Recreate the ZIP with proper exclusions. Do NOT use a blanket `-x "*/.*"` — it also strips the `.project` files every cartridge root is required to ship:
 ```bash
 zip -r [appName]-v[version].zip commerce-[appName]-app-v[version]/ \
-  -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+  -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+  -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+  -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
 ```
+
+### Missing `.project` File in Cartridge
+**Problem:** CI reports a cartridge root is missing a required `.project` file.
+
+**Solution:** Create an empty `.project` file in the cartridge root (don't overwrite one that already exists):
+```bash
+touch cartridges/site_cartridges/<cartridgeName>/.project
+touch cartridges/bm_cartridges/bm_<appName>/.project
+```
+Then regenerate the ZIP — see [Cartridge `.project` files](#cartridge-project-files).
 
 ### Version Mismatch
 **Problem:** `commerce-app.json` version doesn't match `manifest.json`.

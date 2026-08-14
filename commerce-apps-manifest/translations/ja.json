@@ -23,9 +23,17 @@
         "name": "Salesforce Payments",
         "description": "Storefront Nextでネイティブに決済を処理します。Salesforce Paymentsは複数の決済ゲートウェイと決済方法をサポートしています。"
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "すべてのストアフロントページにNoibuセッション監視スクリプトを読み込みます"
+    },
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "注文および配送のプロモーションのロック解除まで、バスケットがどれだけ近づいているかを買い物客に表示します。"
     },
     "zenkraft-shipping": {
         "name": "Zenkraft 配送",

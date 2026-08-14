@@ -23,9 +23,17 @@
         "name": "Salesforce Payments",
         "description": "Procese pagos de forma nativa en Storefront Next. Salesforce Payments admite múltiples pasarelas y métodos de pago."
     },
+    "noibu": {
+        "name": "Noibu",
+        "description": "Carga el script de monitorización de sesiones de Noibu en cada página de la tienda"
+    },
     "custom-analytics": {
         "name": "Analítica personalizada",
         "description": "Configure una integración de analítica personalizada proporcionando sus propias API."
+    },
+    "approaching-discounts": {
+        "name": "Approaching Discounts",
+        "description": "Muestre a los compradores lo cerca que está su cesta de desbloquear promociones de pedido y envío."
     },
     "zenkraft-shipping": {
         "name": "Zenkraft Envío",

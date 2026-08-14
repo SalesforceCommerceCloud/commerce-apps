@@ -28,7 +28,7 @@ Build a registry-ready Commerce App Package (CAP) ZIP from an app directory.
 | Publisher URL | `https://developer.avalara.com/` | Yes |
 | SFNext min version | `1.0.0` | No |
 | SFNext max version | `2.0.0` | No |
-| SFRA min version | `7.0.0` | No |
+| SFRA min version | `7.0.0` | No — only valid if SFNext min version is also set |
 | SFRA max version | `8.0.0` | No |
 
 **Valid domains:** `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
@@ -76,7 +76,7 @@ Ensure version matches throughout:
 }
 ```
 
-> **Note:** `storefrontSupport` is optional. Include only if the app declares a minimum storefront version. Omit the entire object if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); omit it for "no upper bound." When present, the values here must match the root manifest entry exactly.
+> **Note:** `storefrontSupport` is optional. Include only if the app declares a minimum storefront version. Omit the entire object if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version (e.g., a major release that removes target IDs the app depends on); omit it for "no upper bound." An `sfra` key without an `sfnext` key will fail validation — SFRA support is always additive to SFNext. When present, the values here must match the root manifest entry exactly.
 
 ## Step 4: Run validation
 
@@ -95,12 +95,30 @@ cd <domain>/<appName>/
 rm -f <appName>-v*.zip
 ```
 
-## Step 6: Generate ZIP
+## Step 6: Ensure cartridge `.project` files, then generate ZIP
+
+**Backend/Fullstack apps only:** Before zipping, every immediate child directory under `cartridges/site_cartridges/` and `cartridges/bm_cartridges/` MUST have a `.project` file — required for b2c cartridge discovery. If missing, create an empty one. **Never overwrite an existing (possibly non-empty, Eclipse-generated) `.project` file.**
+
+```bash
+cd commerce-<appName>-app-v<version>/
+for group in site_cartridges bm_cartridges; do
+  dir="cartridges/$group"
+  [[ -d "$dir" ]] || continue
+  for cartridge in "$dir"/*/; do
+    [[ -e "$cartridge/.project" ]] || touch "$cartridge/.project"
+  done
+done
+cd ..
+```
+
+Generate the ZIP. **Do NOT use a blanket `-x "*/.*"` exclusion** — it strips the `.project` files just created. Exclude junk explicitly instead:
 
 ```bash
 cd <domain>/<appName>/
 zip -r <appName>-v<version>.zip commerce-<appName>-app-v<version>/ \
-  -x "*.DS_Store" -x "__MACOSX/*" -x "*/.*" -x "Thumbs.db"
+  -x "*.DS_Store" -x "*/*.DS_Store" -x "__MACOSX/*" -x "*/__MACOSX/*" \
+  -x "*/.git/*" -x "*/.env" -x "*/.env.*" -x "Thumbs.db" \
+  -x "*.key" -x "*.pem" -x "*.p12" -x "*.pfx" -x "*.jks"
 ```
 
 Verify structure:
@@ -110,7 +128,8 @@ unzip -l <appName>-v<version>.zip | head -20
 
 Confirm:
 - Single root: `commerce-<appName>-app-v<version>/`
-- No junk files
+- No junk files (`.DS_Store`, `__MACOSX`, `.env`, secrets)
+- **`.project` files ARE present** for every cartridge root (Backend/Fullstack apps) — verify with `unzip -l <appName>-v<version>.zip | grep '\.project$'`
 - Architecture-specific directories present
 
 ## Step 7: Compute hash
@@ -141,7 +160,7 @@ Update `commerce-apps-manifest/manifest.json`:
 }
 ```
 
-> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." Values must match the corresponding fields in `commerce-app.json` exactly.
+> **Note:** Include `storefrontSupport` only if the app declares a minimum storefront version. Omit the entire field if no version gating is needed. `maxVersion` is optional within each storefront key — include it only to guard against a known-incompatible future version; omit it for "no upper bound." An `sfra` key without an `sfnext` key will fail validation — SFRA support is always additive to SFNext. Values must match the corresponding fields in `commerce-app.json` exactly.
 
 **Icon:** Must match filename in ZIP's `icons/` directory. CI extracts automatically.
 
