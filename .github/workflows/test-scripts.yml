@@ -5,6 +5,7 @@ on:
     types: [opened, reopened, synchronize]
     paths:
       - '.github/scripts/**'
+      - '.github/config/**'
 
 jobs:
   test-scripts:
