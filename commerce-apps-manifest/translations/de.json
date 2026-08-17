@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "Benutzerdefinierte Analyse",
         "description": "Konfigurieren Sie eine benutzerdefinierte Analyseintegration mit Ihren eigenen APIs."
+    },
+    "custom-translations": {
+        "name": "Benutzerdefinierte Übersetzungen",
+        "description": "Konfigurieren Sie eine benutzerdefinierte Übersetzungsintegration mit Ihren eigenen APIs."
     }
 }

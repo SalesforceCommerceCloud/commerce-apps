@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "Aangepaste analyse",
         "description": "Configureer een aangepaste analyse-integratie met uw eigen API's."
+    },
+    "custom-translations": {
+        "name": "Aangepaste vertalingen",
+        "description": "Configureer een aangepaste vertalingsintegratie met uw eigen API's."
     }
 }

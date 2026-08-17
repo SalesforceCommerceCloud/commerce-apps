@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "カスタムアナリティクス",
         "description": "独自のAPIを使用してカスタムアナリティクス統合を設定します。"
+    },
+    "custom-translations": {
+        "name": "カスタム翻訳",
+        "description": "独自のAPIを使用してカスタム翻訳統合を設定します。"
     }
 }

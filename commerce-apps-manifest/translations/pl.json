@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "Analityka niestandardowa",
         "description": "Skonfiguruj niestandardową integrację analityki, podając własne interfejsy API."
+    },
+    "custom-translations": {
+        "name": "Tłumaczenia niestandardowe",
+        "description": "Skonfiguruj niestandardową integrację tłumaczeń, podając własne interfejsy API."
     }
 }

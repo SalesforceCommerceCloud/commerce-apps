@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "Analytique personnalisée",
         "description": "Configurez une intégration d'analytique personnalisée en fournissant vos propres API."
+    },
+    "custom-translations": {
+        "name": "Traductions personnalisées",
+        "description": "Configurez une intégration de traductions personnalisée en fournissant vos propres API."
     }
 }

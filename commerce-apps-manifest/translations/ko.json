@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "맞춤 분석",
         "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
+    },
+    "custom-translations": {
+        "name": "맞춤 번역",
+        "description": "자체 API를 제공하여 맞춤 번역 통합을 구성합니다."
     }
 }

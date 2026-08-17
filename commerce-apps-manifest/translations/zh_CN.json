@@ -30,5 +30,9 @@
     "custom-analytics": {
         "name": "自定义分析",
         "description": "通过提供您自己的 API 来配置自定义分析集成。"
+    },
+    "custom-translations": {
+        "name": "自定义翻译",
+        "description": "通过提供您自己的 API 来配置自定义翻译集成。"
     }
 }
