@@ -50,6 +50,36 @@ strip_comments() {
   grep -vE '^[0-9]+:\s*//' | grep -vE '^[0-9]+:\s*\*' | grep -vE '^[0-9]+:\s*/\*'
 }
 
+# Remove full-line and multiline JavaScript comments while preserving line count.
+# This intentionally stays line-oriented; semantic review handles complex cases.
+sanitize_code() {
+  awk '
+    BEGIN { block = 0 }
+    {
+      if (block) {
+        if ($0 ~ /\*\//) block = 0
+        print ""
+        next
+      }
+      if ($0 ~ /^[[:space:]]*\/\*/) {
+        if ($0 !~ /\*\//) block = 1
+        print ""
+        next
+      }
+      if ($0 ~ /^[[:space:]]*\/\//) {
+        print ""
+        next
+      }
+      print
+    }
+  ' "$1"
+}
+
+if ! command -v xmllint >/dev/null 2>&1; then
+  echo "::error::xmllint is required for Site preference security checks"
+  exit 1
+fi
+
 # Collect JS/DS files (cartridge server-side scripts + storefront-next TS)
 # Using while-read for macOS bash 3 compatibility (no mapfile)
 JS_FILES=()
@@ -169,7 +199,18 @@ for f in ${JS_FILES[@]+"${JS_FILES[@]}"}; do
   [[ -z "$f" ]] && continue
   while IFS= read -r line; do
     block "$f" "Inline Authorization header — use service framework instead: $line"
-  done < <(grep -nE 'setRequestHeader\s*\(\s*['\''"]Authorization' "$f" 2>/dev/null | head -3)
+  done < <(sanitize_code "$f" | awk '
+    {
+      if (statement == "") start = NR
+      statement = statement " " $0
+      if (statement ~ /setRequestHeader[[:space:]]*\([[:space:]]*["\047]Authorization["\047]/) {
+        print start ":" statement
+        statement = ""
+      } else if ($0 ~ /;/) {
+        statement = ""
+      }
+    }
+  ' | head -3)
 done
 
 # S8: Additional DOM sinks — outerHTML, document.write, insertAdjacentHTML (BLOCK)
@@ -319,6 +360,45 @@ for f in ${ALL_CODE_FILES[@]+"${ALL_CODE_FILES[@]}"}; do
   while IFS= read -r line; do
     warn "$f" "encodeURI() with concatenation or template-literal argument — preserves URL delimiters; use encodeURIComponent per segment: $line"
   done < <(grep -nE '\bencodeURI\s*\([^)]*(\+|\$\{)' "$f" 2>/dev/null | strip_comments | head -5)
+done
+
+# S20: Secret values stored in or read from Site preferences (BLOCK)
+S20_MESSAGE="Secret value stored in or read from Site preferences — remove it; use ecom service credentials/LocalServiceRegistry for authentication secrets"
+
+s20_secret_site_preference_ids() {
+  xmllint --xpath '
+    //*[local-name()="type-extension" and @type-id="SitePreferences"]
+      //*[local-name()="attribute-definition"]
+        [*[local-name()="type" and normalize-space(.)="password"]]
+      /@attribute-id
+  ' "$1" 2>/dev/null |
+    grep -oE 'attribute-id="[^"]+"' |
+    cut -d'"' -f2 |
+    awk '{
+      lower = tolower($0)
+      if (lower ~ /(api[_-]?key|secret|password|passwd|credential)/ || lower ~ /token$/) print
+    }'
+}
+
+# Inspect password-typed attributes only within the SitePreferences type extension.
+for f in ${XML_FILES[@]+"${XML_FILES[@]}"}; do
+  [[ -z "$f" ]] && continue
+  while IFS= read -r preference_id; do
+    block "$f" "$S20_MESSAGE: $preference_id"
+  done < <(s20_secret_site_preference_ids "$f" | head -5)
+done
+
+# Detect literal reads of secret Site preference IDs.
+s20_secret_site_preference_reads() {
+  sanitize_code "$1" |
+    grep -niE "getCustomPreferenceValue[[:space:]]*\\([[:space:]]*['\"]([^'\"]*(api[_-]?key|secret|password|passwd|credential)[^'\"]*|[^'\"]*token)['\"]"
+}
+
+for f in ${JS_FILES[@]+"${JS_FILES[@]}"}; do
+  [[ -z "$f" ]] && continue
+  while IFS= read -r line; do
+    block "$f" "$S20_MESSAGE: $line"
+  done < <(s20_secret_site_preference_reads "$f" | head -5)
 done
 
 echo ""

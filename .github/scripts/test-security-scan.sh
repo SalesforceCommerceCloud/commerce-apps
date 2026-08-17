@@ -36,6 +36,18 @@ assert_blocks() {
   fi
 }
 
+assert_blocks_with() {
+  local desc="$1" needle="$2"; shift 2
+  run_scan "$@"
+  if [[ "$LAST_RC" -eq 1 ]] && echo "$LAST_OUTPUT" | grep -qF "$needle"; then
+    echo "  PASS: $desc"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL: $desc (expected exit 1 + finding containing '$needle', got exit $LAST_RC)"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
 assert_passes() {
   local desc="$1"; shift
   run_scan "$@"
@@ -232,6 +244,12 @@ echo "--- S7: Inline Authorization ---"
 
 cap="$(mkcap)"; printf "req.setRequestHeader('Authorization', token);\n" > "$cap/app.js"
 assert_blocks "setRequestHeader Authorization blocks" "$cap"
+
+cap="$(mkcap)"; printf "// req.setRequestHeader('Authorization', token);\n" > "$cap/app.js"
+assert_passes "commented Authorization header is ignored" "$cap"
+
+cap="$(mkcap)"; printf "/*\nreq.setRequestHeader('Authorization', token);\n*/\n" > "$cap/app.js"
+assert_passes "multiline-commented Authorization header is ignored" "$cap"
 
 echo ""
 
@@ -678,6 +696,151 @@ assert_no_warning "encodeURIComponent (not encodeURI) does not warn" "encodeURI(
 
 cap="$(mkcap)"; printf "// var u = encodeURI('/api/' + userInput);\n" > "$cap/app.js"
 assert_no_warning "commented encodeURI is ignored" "encodeURI()" "$cap"
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# S20: Site preference credentials used for authentication (BLOCK)
+# ---------------------------------------------------------------------------
+echo "--- S20: Site preference credentials ---"
+
+S20_MSG="Secret value stored in or read from Site preferences — remove it; use ecom service credentials/LocalServiceRegistry for authentication secrets"
+
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="SitePreferences">
+    <custom-attribute-definitions>
+      <attribute-definition attribute-id="zenkraftMasterAPIKey">
+        <type>password</type>
+      </attribute-definition>
+    </custom-attribute-definitions>
+  </type-extension>
+</metadata>
+EOF
+cat > "$cap/service.js" <<'EOF'
+var apiKey = Site.current.getCustomPreferenceValue('zenkraftMasterAPIKey');
+svc.addHeader('zkkey', apiKey);
+EOF
+assert_blocks_with "Zenkraft-shaped password preference and zkkey use blocks" "$S20_MSG" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.ds" <<'EOF'
+var token = Site.current.getCustomPreferenceValue("vendorAuthToken");
+EOF
+assert_blocks_with "literal secret Site preference read blocks" "$S20_MSG" "$cap"
+
+cap="$(mkcap)"; printf "var mode = Site.current.getCustomPreferenceValue('vendorTokenMode');\n" > "$cap/service.js"
+assert_passes "Site preference with token in the middle does not block" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+svc.setHeader('Authorization', Site.current.getCustomPreferenceValue('vendorMode'));
+EOF
+assert_passes "ordinary preference used in Authorization does not match S20" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+var value = Site.current.getCustomPreferenceValue('vendorMode');
+svc.addHeader('X-API-Key', value);
+EOF
+assert_passes "ordinary preference used in API key header does not match S20" "$cap"
+
+for preference_id in \
+  vendorSecret vendorToken vendorPassword vendorPasswd vendorCredential \
+  vendorApiKey vendorAPISecret vendorClientSecret; do
+  cap="$(mkcap)"
+  printf '<metadata><type-extension type-id="SitePreferences"><attribute-definition attribute-id="%s"><type>password</type></attribute-definition></type-extension></metadata>\n' "$preference_id" > "$cap/preferences.xml"
+  assert_blocks_with "password SitePreferences attribute '$preference_id' blocks" "$S20_MSG" "$cap"
+done
+
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension
+      custom-flag='ignored'
+      type-id='SitePreferences'>
+    <attribute-definition
+        mandatory-flag='false'
+        attribute-id='vendorSigningSecret'>
+      <display-name>Signing secret</display-name>
+      <type>
+        password
+      </type>
+    </attribute-definition>
+  </type-extension>
+</metadata>
+EOF
+assert_blocks_with "multiline reordered single-quoted SitePreferences XML blocks" "$S20_MSG" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="Product">
+    <attribute-definition attribute-id="vendorApiSecret"><type>password</type></attribute-definition>
+  </type-extension>
+  <type-extension type-id="SitePreferences">
+    <attribute-definition attribute-id="vendorEnabled"><type>boolean</type></attribute-definition>
+  </type-extension>
+</metadata>
+EOF
+assert_passes "password attribute outside SitePreferences does not block" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <!--
+  <type-extension type-id="SitePreferences">
+    <attribute-definition attribute-id="vendorApiSecret"><type>password</type></attribute-definition>
+  </type-extension>
+  -->
+</metadata>
+EOF
+assert_passes "credential preference in XML comment is ignored" "$cap"
+
+for preference_id in vendorPublicKey vendorKey vendorTokenMode vendorTokenizationId vendorTokenizationEnabled vendorMonkey vendorKeynote; do
+  cap="$(mkcap)"
+  printf '<metadata><type-extension type-id="SitePreferences"><attribute-definition attribute-id="%s"><type>password</type></attribute-definition></type-extension></metadata>\n' "$preference_id" > "$cap/preferences.xml"
+  assert_passes "non-secret password preference '$preference_id' does not block" "$cap"
+done
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+// var key = Site.current.getCustomPreferenceValue('vendorApiKey');
+// svc.addHeader('zkkey', key);
+/*
+var token = Site.current.getCustomPreferenceValue('vendorAuthToken');
+svc.setHeader('Authorization', token);
+*/
+EOF
+assert_passes "commented getter and authentication sinks are ignored" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+var color = Site.current.getCustomPreferenceValue('vendorThemeColor');
+svc.addHeader('X-Theme', color);
+EOF
+assert_passes "ordinary preference in ordinary header does not block" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+var key = Site.current.getCustomPreferenceValue('vendorApiKey');
+svc.addHeader('X-Correlation-Key', key);
+EOF
+assert_blocks_with "secret preference read blocks regardless of later use" "$S20_MSG" "$cap"
+
+cap="$(mkcap)"
+cat > "$cap/service.js" <<'EOF'
+var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
+var service = LocalServiceRegistry.createService('vendor.api', {
+    createRequest: function (svc) {
+        var user = svc.configuration.credential.getUser();
+        var password = svc.configuration.credential.getPassword();
+        svc.addHeader('Authorization', user + ':' + password);
+    }
+});
+EOF
+assert_passes "LocalServiceRegistry service credentials are allowed" "$cap"
 
 echo ""
 
