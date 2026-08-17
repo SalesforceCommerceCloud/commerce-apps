@@ -110,5 +110,6 @@
             "type": "custom",
             "provider": "custom"
         }
-    ]
+    ],
+    "translations": []
 }
