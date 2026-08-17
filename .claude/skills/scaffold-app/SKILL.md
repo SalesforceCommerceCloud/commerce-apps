@@ -136,8 +136,8 @@ Generate merchant-facing tasks that guide post-installation setup and verificati
 [
   {
     "name": "Configure API Credentials",
-    "description": "Add your [vendor] API key in Business Manager > Merchant Tools > Custom Site Preferences.",
-    "link": "/on/demandware.store/Sites-Site/default/ViewApplication-BM?SelectedMenuItem=site-prefs_custom_prefs",
+    "description": "Add your [vendor] API credentials in Business Manager > Administration > Operations > Services > Credentials.",
+    "link": "/on/demandware.store/Sites-Site/default/ViewApplication-BM?SelectedMenuItem=service_credentials",
     "taskNumber": "1"
   },
   {
@@ -149,7 +149,7 @@ Generate merchant-facing tasks that guide post-installation setup and verificati
 ```
 
 Tailor tasks to domain for merchant post-installation:
-- **Tax/Shipping/Payment:** Add API credentials, configure service settings, test checkout transactions
+- **Tax/Shipping/Payment:** Add API credentials to ecom service credentials, configure service settings, test checkout transactions
 - **Loyalty/Gift Cards:** Configure points rules, test balance lookups, verify redemption
 - **UI-only apps:** Verify components appear on storefront, check responsive behavior
 - **Fullstack:** Both UI verification and backend configuration steps
