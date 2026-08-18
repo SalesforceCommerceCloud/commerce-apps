@@ -142,7 +142,7 @@ Your response:
 ### 4. Security
 - NO hardcoded production credentials in impex
 - Use placeholders for API keys/secrets
-- Use `<password>` type for sensitive site preferences
+- Do not store secret values in Site preferences; store authentication secrets in ecom service credentials and access them through `LocalServiceRegistry`
 - Mark sensitive data clearly in documentation
 - NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`) in packages
 - NO direct `HTTPClient` usage — must use service framework
@@ -505,8 +505,8 @@ Before suggesting `/submit-app-pr`, verify:
 
 **Security:**
 - [ ] No sensitive data in XML
-- [ ] Passwords use `<password>` type
-- [ ] API keys are placeholders
+- [ ] No secret values are stored in Site preferences; authentication secrets use ecom service credentials/`LocalServiceRegistry`
+- [ ] API keys in service impex are placeholders
 - [ ] No direct HTTPClient usage (use service framework)
 - [ ] No secret files in package (.env, .key, .pem, .p12, .pfx, .jks)
 - [ ] No eval/innerHTML/outerHTML/insertAdjacentHTML/document write

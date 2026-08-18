@@ -724,7 +724,7 @@ Before opening the PR:
 
 **Security:**
 - [ ] No hardcoded production credentials anywhere
-- [ ] Sensitive site preferences use `<password>` type
+- [ ] No secret values are stored in Site preferences; authentication secrets use ecom service credentials/`LocalServiceRegistry`
 - [ ] Error messages don't leak internal details
 - [ ] Input validation at trust boundaries
 
