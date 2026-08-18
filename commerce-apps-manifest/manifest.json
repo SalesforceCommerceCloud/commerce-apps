@@ -1,114 +1,133 @@
 {
-    "defaultLocale": "en-US",
-    "tax": [
-        {
-            "id": "salesforce-flat-tax",
-            "name": "Salesforce Flat Tax",
-            "description": "Configure a flat tax calculation.",
-            "iconName": "salesforce.svg",
-            "domain": "tax",
-            "type": "feature",
-            "provider": "salesforce",
-            "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
-        },
-        {
-            "id": "avalara-tax",
-            "name": "Avalara Tax",
-            "description": "Automated tax compliance solution by Avalara",
-            "iconName": "avalara.png",
-            "domain": "tax",
-            "type": "app",
-            "provider": "thirdParty",
-            "version": "1.0.1",
-            "zip": "avalara-tax-v1.0.1.zip",
-            "sha256": "ff76d5c64f2c3779d1b3cc9af1500ce514d4c8c308b090bbe09fd942d84a615d"
-        },
-        {
-            "id": "custom-tax",
-            "name": "Custom Tax",
-            "description": "Configure a custom tax calculation by providing your own APIs.",
-            "iconName": "custom.svg",
-            "domain": "tax",
-            "type": "custom",
-            "provider": "custom"
+  "defaultLocale": "en-US",
+  "tax": [
+    {
+      "id": "salesforce-flat-tax",
+      "name": "Salesforce Flat Tax",
+      "description": "Configure a flat tax calculation.",
+      "iconName": "salesforce.svg",
+      "domain": "tax",
+      "type": "feature",
+      "provider": "salesforce",
+      "configurationUrl": "/on/demandware.store/Sites-Site/default/ViewTaxPreferences_52-Start"
+    },
+    {
+      "id": "avalara-tax",
+      "name": "Avalara Tax",
+      "description": "Automated tax compliance solution by Avalara",
+      "iconName": "avalara.png",
+      "domain": "tax",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.1",
+      "zip": "avalara-tax-v1.0.1.zip",
+      "sha256": "ff76d5c64f2c3779d1b3cc9af1500ce514d4c8c308b090bbe09fd942d84a615d"
+    },
+    {
+      "id": "custom-tax",
+      "name": "Custom Tax",
+      "description": "Configure a custom tax calculation by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "tax",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "shipping": [
+    {
+      "id": "basic-shipping",
+      "name": "Basic Shipping",
+      "description": "Configure a basic shipping calculation.",
+      "iconName": "salesforce.svg",
+      "domain": "shipping",
+      "type": "feature",
+      "provider": "salesforce",
+      "configurationUrl": "/on/demandware.store/Sites-Site/default/ShippingMethodList-ListAll"
+    },
+    {
+      "id": "custom-shipping",
+      "name": "Custom Shipping",
+      "description": "Configure a custom shipping calculation by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "shipping",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "payment": [
+    {
+      "id": "custom-payment",
+      "name": "Custom Payment",
+      "description": "Configure a custom payment integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "payment",
+      "type": "custom",
+      "provider": "custom"
+    },
+    {
+      "id": "sf-payments",
+      "name": "Salesforce Payments",
+      "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
+      "iconName": "salesforce.svg",
+      "domain": "payment",
+      "type": "app",
+      "provider": "salesforce",
+      "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+      "version": "1.0.1",
+      "zip": "sf-payments-v1.0.1.zip",
+      "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
+      "configurationComponents": [
+        "ccbm_payments/multiStepPaymentMethods",
+        "ccbm_payments/expressPaymentMethods",
+        "ccbm_payments/expressCheckoutDisplay",
+        "ccbm_payments/paymentAdvancedSettings"
+      ],
+      "connectionDetailsComponents": [
+        "ccbm_payments/merchantAccountDetails"
+      ]
+    }
+  ],
+  "fraud": [],
+  "analytics": [
+    {
+      "id": "noibu",
+      "name": "Noibu",
+      "description": "Loads Noibu session monitoring script on every storefront page",
+      "iconName": "noibu.png",
+      "domain": "analytics",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.0",
+      "zip": "noibu-v1.0.0.zip",
+      "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852"
+    },
+    {
+      "id": "custom-analytics",
+      "name": "Custom Analytics",
+      "description": "Configure a custom analytics integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "analytics",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "merchandising": [
+    {
+      "id": "approaching-discounts",
+      "name": "Approaching Discounts",
+      "description": "Show shoppers how close their basket is to unlocking order and shipping promotions.",
+      "iconName": "salesforce.svg",
+      "domain": "merchandising",
+      "type": "app",
+      "provider": "salesforce",
+      "version": "1.0.0",
+      "zip": "approaching-discounts-v1.0.0.zip",
+      "sha256": "6f3b922ec16c2e79eaf59ac60f85896ee39e422bb46990fe3981658491a5f7a8",
+      "storefrontSupport": {
+        "sfnext": {
+          "minVersion": "1.2.0"
         }
-    ],
-    "shipping": [
-        {
-            "id": "basic-shipping",
-            "name": "Basic Shipping",
-            "description": "Configure a basic shipping calculation.",
-            "iconName": "salesforce.svg",
-            "domain": "shipping",
-            "type": "feature",
-            "provider": "salesforce",
-            "configurationUrl": "/on/demandware.store/Sites-Site/default/ShippingMethodList-ListAll"
-        },
-        {
-            "id": "custom-shipping",
-            "name": "Custom Shipping",
-            "description": "Configure a custom shipping calculation by providing your own APIs.",
-            "iconName": "custom.svg",
-            "domain": "shipping",
-            "type": "custom",
-            "provider": "custom"
-        }
-    ],
-    "payment": [
-        {
-            "id": "custom-payment",
-            "name": "Custom Payment",
-            "description": "Configure a custom payment integration by providing your own APIs.",
-            "iconName": "custom.svg",
-            "domain": "payment",
-            "type": "custom",
-            "provider": "custom"
-        },
-        {
-            "id": "sf-payments",
-            "name": "Salesforce Payments",
-            "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
-            "iconName": "salesforce.svg",
-            "domain": "payment",
-            "type": "app",
-            "provider": "salesforce",
-            "requiredFeatureToggle": "SalesforcePaymentsAllowed",
-            "version": "1.0.1",
-            "zip": "sf-payments-v1.0.1.zip",
-            "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
-            "configurationComponents": [
-                "ccbm_payments/multiStepPaymentMethods",
-                "ccbm_payments/expressPaymentMethods",
-                "ccbm_payments/expressCheckoutDisplay",
-                "ccbm_payments/paymentAdvancedSettings"
-            ],
-            "connectionDetailsComponents": [
-                "ccbm_payments/merchantAccountDetails"
-            ]
-        }
-    ],
-    "fraud": [],
-    "analytics": [
-        {
-            "id": "noibu",
-            "name": "Noibu",
-            "description": "Loads Noibu session monitoring script on every storefront page",
-            "iconName": "noibu.png",
-            "domain": "analytics",
-            "type": "app",
-            "provider": "thirdParty",
-            "version": "1.0.0",
-            "zip": "noibu-v1.0.0.zip",
-            "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852"
-        },
-        {
-            "id": "custom-analytics",
-            "name": "Custom Analytics",
-            "description": "Configure a custom analytics integration by providing your own APIs.",
-            "iconName": "custom.svg",
-            "domain": "analytics",
-            "type": "custom",
-            "provider": "custom"
-        }
-    ]
+      }
+    }
+  ]
 }
