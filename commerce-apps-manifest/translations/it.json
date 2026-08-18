@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "Mostra ai clienti quanto il loro carrello è vicino a sbloccare promozioni su ordini e spedizioni."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft Spedizione",
+        "description": "Calcolo delle tariffe di spedizione e date di consegna stimate powered by Zenkraft."
     }
 }
