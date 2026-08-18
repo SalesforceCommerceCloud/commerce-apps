@@ -1,9 +1,9 @@
 {
   "evals": [
     {
-      "prompt": "Merchants need to configure API keys and select sandbox vs production. Can you create the site preferences?",
-      "context": "User needs configurable merchant settings",
-      "expected_behavior": "Should trigger generate-site-preferences-impex skill, create attribute definitions with API key (string), secret (password), environment (enum)"
+      "prompt": "Merchants need to select sandbox vs production and enable the integration. Can you create the site preferences?",
+      "context": "User needs non-secret configurable merchant settings",
+      "expected_behavior": "Should trigger generate-site-preferences-impex skill and create environment (enum) and enabled (boolean) attributes; no secret values are stored in Site preferences, and authentication secrets remain in ecom service credentials"
     },
     {
       "prompt": "I need to add some settings that merchants can configure in Business Manager for my tax app",
