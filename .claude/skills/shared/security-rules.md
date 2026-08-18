@@ -19,7 +19,7 @@ Must fix before packaging or submission:
 - S13: setTimeout/setInterval in hook scripts — blocking calls
 - S14: Unbounded loops (while(true)/for(;;)) without break/return
 - S15: Service profiles missing rate-limit-enabled AND circuit-breaker-enabled
-- S20: Secret values stored in password-typed Site preferences or read through `getCustomPreferenceValue(...)`. Secret IDs include API keys, secrets, passwords, credentials, and IDs ending in `Token`. CI detects password-typed secret IDs and same-line literal secret-ID reads. Multiline, computed, or semantically hidden IDs require manual review. **Suggested fix:** remove secret values from Site preferences; store authentication secrets in ecom service credentials and access them through `LocalServiceRegistry` (`svc.configuration.credential.getUser()` / `getPassword()`).
+- S20: Secret values stored in Site preferences (any attribute type) or read through `getCustomPreferenceValue(...)`. Secret IDs include API keys, secrets, passwords, credentials, and IDs ending in `Token`. CI flags secret-like `SitePreferences` attribute IDs regardless of declared type and same-line literal secret-ID reads, and fails closed on malformed `SitePreferences` XML. Multiline, computed, or semantically hidden IDs require manual review. **Suggested fix:** remove secret values from Site preferences; store authentication secrets in ecom service credentials and access them through `LocalServiceRegistry` (`svc.configuration.credential.getUser()` / `getPassword()`).
 - P1: Service profile XML missing timeout-millis
 - Q1: Hook scripts referenced in hooks.json that don't exist
 - Q2: Hook scripts missing expected function exports
