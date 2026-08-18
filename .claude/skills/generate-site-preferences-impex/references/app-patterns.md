@@ -45,6 +45,11 @@ This reference contains pre-built site preference patterns for common commerce a
 
 ## Payment App Preferences
 
+Secret values are intentionally absent from this pattern. Do not store keys, tokens,
+passwords, or credentials in Site preferences. Configure authentication secrets as ecom service
+credentials and read them through `LocalServiceRegistry`. Public identifiers such as a
+publishable key may remain Site preferences.
+
 ```xml
 <custom-attribute-definitions>
     <attribute-definition attribute-id="paymentEnabled">
@@ -62,12 +67,6 @@ This reference contains pre-built site preference patterns for common commerce a
     <attribute-definition attribute-id="paymentPublicKey">
         <display-name xml:lang="x-default">Public API Key</display-name>
         <type>string</type>
-        <min-length>0</min-length>
-    </attribute-definition>
-
-    <attribute-definition attribute-id="paymentSecretKey">
-        <display-name xml:lang="x-default">Secret API Key</display-name>
-        <type>password</type>
         <min-length>0</min-length>
     </attribute-definition>
 
