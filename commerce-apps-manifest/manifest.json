@@ -21,7 +21,7 @@
             "provider": "thirdParty",
             "version": "1.0.1",
             "zip": "avalara-tax-v1.0.1.zip",
-            "sha256": "78145b8bd9a0dc1ea1704192f8a493aaf7b010a6129a81a1f30b28e00ebc8d52"
+            "sha256": "5d5181c9bf0062f9c1c728f90198c4365255fab12194d9ae2140be2644775965"
         },
         {
             "id": "custom-tax",
