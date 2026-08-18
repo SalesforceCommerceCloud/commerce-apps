@@ -842,6 +842,52 @@ var service = LocalServiceRegistry.createService('vendor.api', {
 EOF
 assert_passes "LocalServiceRegistry service credentials are allowed" "$cap"
 
+# String-typed secret preference — the shape the old site-preferences skill
+# generated. BM won't mask it, so a secret-like ID must block regardless of type.
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="SitePreferences">
+    <attribute-definition attribute-id="vendorApiKey"><type>string</type></attribute-definition>
+  </type-extension>
+</metadata>
+EOF
+assert_blocks_with "string-typed secret SitePreferences attribute blocks" "$S20_MSG" "$cap"
+
+# Non-secret string-typed preference must still pass (type is no longer the gate).
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="SitePreferences">
+    <attribute-definition attribute-id="vendorThemeColor"><type>string</type></attribute-definition>
+  </type-extension>
+</metadata>
+EOF
+assert_passes "non-secret string-typed SitePreferences attribute does not block" "$cap"
+
+# Malformed SitePreferences XML must fail closed — xmllint cannot parse it, so a
+# secret pref would otherwise slip through the xpath silently.
+cap="$(mkcap)"
+cat > "$cap/preferences.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="SitePreferences">
+    <attribute-definition attribute-id="vendorApiSecret"><type>password</type>
+  </type-extension>
+</metadata>
+EOF
+assert_blocks_with "malformed SitePreferences XML fails closed" "$S20_MSG" "$cap"
+
+# Malformed XML that does not mention SitePreferences is not S20's concern.
+cap="$(mkcap)"
+cat > "$cap/random.xml" <<'EOF'
+<metadata>
+  <type-extension type-id="Product">
+    <attribute-definition attribute-id="color"><type>string</type>
+  </type-extension>
+</metadata>
+EOF
+assert_passes "malformed non-SitePreferences XML does not trigger S20" "$cap"
+
 echo ""
 
 # ---------------------------------------------------------------------------

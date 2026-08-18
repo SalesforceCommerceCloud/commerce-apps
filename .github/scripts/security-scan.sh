@@ -366,10 +366,14 @@ done
 S20_MESSAGE="Secret value stored in or read from Site preferences — remove it; use ecom service credentials/LocalServiceRegistry for authentication secrets"
 
 s20_secret_site_preference_ids() {
+  # Match secret-like attribute IDs on SitePreferences regardless of <type>.
+  # Password-typed prefs are the obvious case, but string-typed secrets (the
+  # shape the old site-preferences skill generated, e.g. vendorApiKey) are
+  # just as dangerous and BM won't even mask them — so the ID heuristic, not
+  # the declared type, is the gate here.
   xmllint --xpath '
     //*[local-name()="type-extension" and @type-id="SitePreferences"]
       //*[local-name()="attribute-definition"]
-        [*[local-name()="type" and normalize-space(.)="password"]]
       /@attribute-id
   ' "$1" 2>/dev/null |
     grep -oE 'attribute-id="[^"]+"' |
@@ -380,9 +384,17 @@ s20_secret_site_preference_ids() {
     }'
 }
 
-# Inspect password-typed attributes only within the SitePreferences type extension.
+# Inspect secret-like attribute IDs within the SitePreferences type extension.
+# A malformed SitePreferences XML must fail closed: xmllint cannot parse it, so
+# the xpath above would silently return nothing and a file carrying secret prefs
+# would slip through. Block any SitePreferences-declaring XML that is not
+# well-formed rather than skipping it.
 for f in ${XML_FILES[@]+"${XML_FILES[@]}"}; do
   [[ -z "$f" ]] && continue
+  if grep -q 'SitePreferences' "$f" 2>/dev/null && ! xmllint --noout "$f" 2>/dev/null; then
+    block "$f" "$S20_MESSAGE: malformed SitePreferences XML could not be parsed — failing closed"
+    continue
+  fi
   while IFS= read -r preference_id; do
     block "$f" "$S20_MESSAGE: $preference_id"
   done < <(s20_secret_site_preference_ids "$f" | head -5)
