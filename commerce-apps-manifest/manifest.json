@@ -28,9 +28,13 @@
       "domain": "tax",
       "type": "app",
       "provider": "thirdParty",
+      "companyName": "Avalara",
       "version": "1.0.1",
       "zip": "avalara-tax-v1.0.1.zip",
-      "sha256": "ff76d5c64f2c3779d1b3cc9af1500ce514d4c8c308b090bbe09fd942d84a615d"
+      "sha256": "ff76d5c64f2c3779d1b3cc9af1500ce514d4c8c308b090bbe09fd942d84a615d",
+      "badge": "popular",
+      "isFeatured": true,
+      "featuredLearnMoreUrl": "https://www.avalara.com/us/en/products/calculations.html"
     }
   ],
   "shipping": [
@@ -72,7 +76,12 @@
       "domain": "payment",
       "type": "app",
       "provider": "salesforce",
+      "badge": "new",
       "requiredFeatureToggle": "SalesforcePaymentsAllowed",
+      "isFeatured": true,
+      "featuredTagline": "Collect payments fast with a seamless end-to-end solution for Adyen, Stripe, and PayPal.",
+      "featuredLearnMoreUrl": "https://help.salesforce.com/s/articleView?id=cc.b2c_salesforce_payments.htm",
+      "featuredImageName": "sf-payments-featured.png",
       "version": "1.0.1",
       "zip": "sf-payments-v1.0.1.zip",
       "sha256": "4074a4385da0493fce66c8aab87f86d14a6cf22a376c2668149df6ccdff1c2e4",
@@ -108,7 +117,11 @@
       "provider": "thirdParty",
       "version": "1.0.0",
       "zip": "noibu-v1.0.0.zip",
-      "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852"
+      "sha256": "f8f4aef7e920e8921ccf9c55aca2f27f1885eaa21851a1b21c1e622ed6747852",
+      "companyName": "Noibu",
+      "badge": "popular",
+      "isFeatured": true,
+      "featuredLearnMoreUrl": "https://www.noibu.com/"
     }
   ],
   "merchandising": [
