@@ -207,16 +207,20 @@ jobs:
   #
   # When a ZIP lands on a release branch, open a self-contained promotion PR
   # into the next branch in the chain
-  #   release/<older> -> release/<newer> -> main
-  # carrying the ZIP, its manifest entry, the merged catalog.json, and icons.
+  #   release/<older> -> release/<newer>
+  # carrying the ZIP, its manifest entry, an INIT catalog.json only for
+  # brand-new apps, and icons. Pre-existing apps' catalog.json is left for the
+  # target branch's update-catalog-pr job.
   #
   # Because the PR carries a ZIP, merging it re-fires THIS workflow on the next
   # branch, which advances the chain one hop further. The chain is therefore
   # self-propagating with one gated (human/App-reviewed) merge per hop and no
   # cross-workflow wiring. The `update-catalog-pr` job on the next branch sees
-  # no diff (catalog merge is idempotent, tag is immutable) and is a no-op.
+  # the new ZIP and writes version history into catalog.json (and is a no-op
+  # when no ZIP changed).
   #
-  # Runs only on release branches; `main` is the end of the chain.
+  # Runs only on release branches. The newest release branch is the end of the
+  # chain; auto-promote never opens a PR into main.
   # ---------------------------------------------------------------------------
   promote-forward:
     runs-on: ubuntu-latest
@@ -299,7 +303,7 @@ jobs:
 
           # 2) Determine the next hop from the live remote branch list. Fail loud
           #    if the remote returned nothing: an empty list would make
-          #    next_release_branch fall through to "main" and skip release hops.
+          #    next_release_branch print nothing and skip every hop.
           branch_list="$(git ls-remote --heads origin | awk '{print $2}')"
           if [[ -z "$branch_list" ]]; then
             echo "::error::git ls-remote returned no branches; cannot determine next hop"
@@ -319,37 +323,16 @@ jobs:
           #    working tree.
           cp "$manifest_path" "$stash/source-manifest.json"
           [[ -d commerce-apps-manifest/translations ]] && cp -r commerce-apps-manifest/translations "$stash/source-translations"
-          : > "$stash/items.tsv"
-
-          for zip_path in "${changed_zips[@]}"; do
-            [[ -f "$zip_path" ]] || continue   # skip deletions
-            zip_file="$(basename "$zip_path")"
-            entry="$(lookup_manifest_entry_for_zip "$zip_file" "$stash/source-manifest.json")"
-
-            # No manifest entry on the source branch: a back-ported (older) ZIP
-            # the monotonic guard left unreferenced. It is not the pinned
-            # artifact here and the newer version already cascaded forward on its
-            # own, so do not carry it to the next branch.
-            if [[ -z "$entry" ]]; then
-              echo "No manifest entry for $zip_file on $SOURCE_REF; not promoting (back-ported/unpinned artifact)."
-              continue
-            fi
-
-            version="$(jq -r '.version // empty' <<< "$entry")"
-            category="$(jq -r --arg z "$zip_file" '
-              to_entries[]
-              | select(.value | type == "array")
-              | select(any(.value[]?; .zip? == $z))
-              | .key
-            ' "$stash/source-manifest.json")"
-            if [[ -z "$version" || "$version" == "null" || -z "$category" ]]; then
-              echo "::error file=$manifest_path::Missing version/category for ZIP $zip_file"
-              exit 1
-            fi
+          : > "$stash/changed-zips.txt"
+          if [[ ${#changed_zips[@]} -gt 0 ]]; then
+            printf '%s\n' "${changed_zips[@]}" > "$stash/changed-zips.txt"
+          fi
+          collect_promotable_zips "." "$stash/source-manifest.json" "$stash/changed-zips.txt" > "$stash/items.tsv"
+          while IFS=$'\t' read -r zip_path version category; do
+            [[ -z "$zip_path" ]] && continue
             mkdir -p "$stash/zips/$(dirname "$zip_path")"
             cp "$zip_path" "$stash/zips/$zip_path"
-            printf '%s\t%s\t%s\n' "$zip_path" "$version" "$category" >> "$stash/items.tsv"
-          done
+          done < "$stash/items.tsv"
 
           if [[ ! -s "$stash/items.tsv" && "$manifest_changed" == "false" && "$translations_changed" == "false" && "$non_cap_changed" == "false" ]]; then
             echo "No promotable ZIPs (all deletions) and no manifest/translations/non-CAP changes. Nothing to promote."
@@ -376,37 +359,18 @@ jobs:
           # 5) Apply each stashed artifact onto the target branch.
           while IFS=$'\t' read -r zip_path version category; do
             [[ -z "$zip_path" ]] && continue
-            zip_file="$(basename "$zip_path")"
-            tag_name="${zip_file%.zip}"
-            entry="$(get_manifest_entry_for_zip "$zip_file" "$stash/source-manifest.json")"
 
-            # 5a) ZIP bytes (creates the app directory on the target if new).
-            mkdir -p "$(dirname "$zip_path")"
-            cp "$stash/zips/$zip_path" "$zip_path"
+            # 5a–5c) ZIP bytes, monotonic manifest overlay, INIT catalog only
+            #     when the target has no catalog.json yet. Unlisted apps (e.g.
+            #     Avalara when only a new app ZIP changed) are not copied.
+            catalog_result="$(apply_promoted_zip_onto_target "." "$stash/zips/$zip_path" "$zip_path" "$stash/source-manifest.json" "$category")"
             git add "$zip_path"
-
-            # 5b) Manifest entry (monotonic upsert keyed by app id).
-            tmp="$(mktemp)"
-            merge_manifest_entry "$manifest_path" "$entry" "$category" > "$tmp"
-            mv "$tmp" "$manifest_path"
             git add "$manifest_path"
-
-            # 5c) catalog.json next to the ZIP (union versions, monotonic latest).
-            #     A brand-new app on the target has no catalog.json yet - seed
-            #     it with the INIT template and skip merge_catalog_json so the
-            #     target branch's own post-merge update-catalog run is what
-            #     first populates version history (the CONTRIBUTING.md
-            #     contract for new apps), instead of the promotion writing a
-            #     concrete version here and duplicating that work.
-            catalog_path="$(dirname "$zip_path")/catalog.json"
-            if [[ -f "$catalog_path" ]]; then
-              tmp="$(mktemp)"
-              merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
-              mv "$tmp" "$catalog_path"
+            if [[ "$catalog_result" == "seeded" ]]; then
+              git add "$(dirname "$zip_path")/catalog.json"
             else
-              printf '{\n  "latest": {\n    "version": "INIT",\n    "tag": "INIT"\n  },\n  "versions": []\n}\n' > "$catalog_path"
+              echo "Existing catalog.json at $(dirname "$zip_path")/catalog.json; leaving it for the target branch catalog CI job."
             fi
-            git add "$catalog_path"
 
             # 5d) Icons: copy from the ZIP into the shared icons dir.
             isv_name="$(echo "$zip_path" | cut -d'/' -f2)"
@@ -516,7 +480,8 @@ jobs:
 
             - Any app ZIP(s)
             - The matching `commerce-apps-manifest/manifest.json` entry/entries (monotonic upsert keyed by app id)
-            - The merged `catalog.json` (union `versions`, monotonic `latest`)
+            - An INIT `catalog.json` only when promoting a brand-new app (existing
+              apps' catalogs are left to the target branch's catalog CI job)
             - Any app icons under `commerce-apps-manifest/icons/`
             - Any `commerce-apps-manifest/translations/*.json` changes (additive per-key merge, keyed by app id)
             - Any other non-CAP file changes (docs, skills, etc. - excluding `.github/workflows/**`, which
