@@ -207,16 +207,20 @@ jobs:
   #
   # When a ZIP lands on a release branch, open a self-contained promotion PR
   # into the next branch in the chain
-  #   release/<older> -> release/<newer> -> main
-  # carrying the ZIP, its manifest entry, the merged catalog.json, and icons.
+  #   release/<older> -> release/<newer>
+  # carrying the ZIP, its manifest entry, an INIT catalog.json only for
+  # brand-new apps, and icons. Pre-existing apps' catalog.json is left for the
+  # target branch's update-catalog-pr job.
   #
   # Because the PR carries a ZIP, merging it re-fires THIS workflow on the next
   # branch, which advances the chain one hop further. The chain is therefore
   # self-propagating with one gated (human/App-reviewed) merge per hop and no
   # cross-workflow wiring. The `update-catalog-pr` job on the next branch sees
-  # no diff (catalog merge is idempotent, tag is immutable) and is a no-op.
+  # the new ZIP and writes version history into catalog.json (and is a no-op
+  # when no ZIP changed).
   #
-  # Runs only on release branches; `main` is the end of the chain.
+  # Runs only on release branches. The newest release branch is the end of the
+  # chain; auto-promote never opens a PR into main.
   # ---------------------------------------------------------------------------
   promote-forward:
     runs-on: ubuntu-latest
@@ -299,7 +303,7 @@ jobs:
 
           # 2) Determine the next hop from the live remote branch list. Fail loud
           #    if the remote returned nothing: an empty list would make
-          #    next_release_branch fall through to "main" and skip release hops.
+          #    next_release_branch print nothing and skip every hop.
           branch_list="$(git ls-remote --heads origin | awk '{print $2}')"
           if [[ -z "$branch_list" ]]; then
             echo "::error::git ls-remote returned no branches; cannot determine next hop"
@@ -391,22 +395,19 @@ jobs:
             mv "$tmp" "$manifest_path"
             git add "$manifest_path"
 
-            # 5c) catalog.json next to the ZIP (union versions, monotonic latest).
-            #     A brand-new app on the target has no catalog.json yet - seed
-            #     it with the INIT template and skip merge_catalog_json so the
-            #     target branch's own post-merge update-catalog run is what
-            #     first populates version history (the CONTRIBUTING.md
-            #     contract for new apps), instead of the promotion writing a
-            #     concrete version here and duplicating that work.
+            # 5c) catalog.json next to the ZIP. Brand-new apps (no catalog.json
+            #     on the target) get the INIT template so the target branch's
+            #     post-merge update-catalog-pr job can populate version history
+            #     (CONTRIBUTING.md contract). Version bumps of apps that already
+            #     have catalog.json are left untouched — that file must not
+            #     appear in the auto-promo PR.
             catalog_path="$(dirname "$zip_path")/catalog.json"
-            if [[ -f "$catalog_path" ]]; then
-              tmp="$(mktemp)"
-              merge_catalog_json "$catalog_path" "$version" "$tag_name" > "$tmp"
-              mv "$tmp" "$catalog_path"
+            catalog_result="$(seed_init_catalog_if_absent "$catalog_path")"
+            if [[ "$catalog_result" == "seeded" ]]; then
+              git add "$catalog_path"
             else
-              printf '{\n  "latest": {\n    "version": "INIT",\n    "tag": "INIT"\n  },\n  "versions": []\n}\n' > "$catalog_path"
+              echo "Existing catalog.json at $catalog_path; leaving it for the target branch catalog CI job."
             fi
-            git add "$catalog_path"
 
             # 5d) Icons: copy from the ZIP into the shared icons dir.
             isv_name="$(echo "$zip_path" | cut -d'/' -f2)"
@@ -516,7 +517,8 @@ jobs:
 
             - Any app ZIP(s)
             - The matching `commerce-apps-manifest/manifest.json` entry/entries (monotonic upsert keyed by app id)
-            - The merged `catalog.json` (union `versions`, monotonic `latest`)
+            - An INIT `catalog.json` only when promoting a brand-new app (existing
+              apps' catalogs are left to the target branch's catalog CI job)
             - Any app icons under `commerce-apps-manifest/icons/`
             - Any `commerce-apps-manifest/translations/*.json` changes (additive per-key merge, keyed by app id)
             - Any other non-CAP file changes (docs, skills, etc. - excluding `.github/workflows/**`, which

@@ -2,19 +2,23 @@
 
 # Helpers for forward-integration (auto-promotion) of app artifacts across
 # release branches. Promotion is forward-only along the chain
-#   release/<oldest> -> ... -> release/<newest> -> main
+#   release/<oldest> -> ... -> release/<newest>
+# The newest release branch is the end of the chain; auto-promote never opens
+# a PR into main.
 # Each function is pure (reads args / files, writes stdout) so it can be unit
 # tested by test-promotion-utils.sh without a live checkout.
 
 # Prints the next branch in the forward-integration chain for a given ref, or
-# nothing when the ref is the end of the chain (main) or not a release branch.
+# nothing when the ref is the end of the chain or not a release branch.
 #
 #   next_release_branch <current_ref> <newline_separated_branch_list>
 #
 # Rules:
 #   - "main"            -> chain terminates, prints nothing.
 #   - "release/X.Y"     -> the smallest release/X'.Y' strictly greater than the
-#                          current version; if none exists, "main".
+#                          current version; if none exists, prints nothing
+#                          (newest release is the end of the chain — never hops
+#                          to main).
 #   - anything else     -> prints nothing (feature branches are not promoted).
 #
 # Version comparison is numeric on (major, minor); no dependency on `sort -V`
@@ -50,8 +54,6 @@ next_release_branch() {
 
   if [[ -n "$best" ]]; then
     echo "$best"
-  else
-    echo "main"
   fi
 }
 
@@ -109,14 +111,50 @@ merge_catalog_json() {
   ' "$catalog_path"
 }
 
+# INIT catalog.json template used when promoting a brand-new app onto a target
+# that has no catalog.json yet. Version history is then populated by the
+# target branch's own update-catalog-pr job (CONTRIBUTING.md contract).
+INIT_CATALOG_JSON='{
+  "latest": {
+    "version": "INIT",
+    "tag": "INIT"
+  },
+  "versions": []
+}'
+
+# Seeds catalog.json with the INIT template iff the file does not already
+# exist. Prints "seeded" when a new file is written, or "skipped" when an
+# existing catalog.json is left untouched. Version bumps of pre-existing apps
+# must not rewrite catalog.json in the auto-promo PR — that file is owned by
+# the target branch's catalog CI job.
+#
+#   seed_init_catalog_if_absent <catalog_path>
+seed_init_catalog_if_absent() {
+  local catalog_path="${1:?catalog path is required}"
+  if [[ -f "$catalog_path" ]]; then
+    echo "skipped"
+    return 0
+  fi
+  mkdir -p "$(dirname "$catalog_path")"
+  printf '%s\n' "$INIT_CATALOG_JSON" > "$catalog_path"
+  echo "seeded"
+}
+
 # Upserts a manifest entry into a category array of the target branch's
 # manifest and prints the merged JSON. The manifest holds exactly one entry per
 # app, pinned to its latest version, keyed by `.id` (e.g. loqate carries nine
 # catalog versions but a single manifest entry). So the upsert:
 #   - matches the existing entry by `.id` (app identity), not by zip filename;
-#   - is monotonic on version: it replaces the entry only when the incoming
-#     version is >= the existing pinned version, so promoting an OLDER artifact
-#     forward (a back-port hop) never regresses the target's pinned version;
+#   - is monotonic on version: it overlays the incoming entry onto the existing
+#     one only when the incoming version is >= the existing pinned version, so
+#     promoting an OLDER artifact forward (a back-port hop) never regresses the
+#     target's pinned version;
+#   - overlays rather than replaces: keys present only on the target (e.g.
+#     workspace-carousel fields added on a newer release branch) are preserved
+#     even when the source entry at the same or newer version lacks them.
+#     Overlapping keys still take the incoming value, so version/zip/sha256
+#     advance and an intentional source-side metadata edit still promotes;
+#   - updates in place (no remove-and-append), so category order is stable;
 #   - appends when the app is not yet present on the target;
 #   - creates the category array when the target manifest lacks it.
 # A release ranks above a pre-release of the same major.minor.patch.
@@ -146,15 +184,15 @@ merge_manifest_entry() {
         .[$cat] = ($arr + [$entry])
       elif ($existing == $entry) then
         # Byte-for-byte identical already -> true no-op. Without this branch,
-        # the "replace" branch below would still fire (equal version compares
-        # >= 0) and re-append the entry at the end of the array, reordering
-        # every other promoted entry for zero effect and producing a
-        # spurious diff on an otherwise fully-idempotent re-promotion.
+        # jq would still rewrite the whole file (indent/key order) for zero
+        # effect on an otherwise fully-idempotent re-promotion.
         .
       elif (semver_cmp($entry.version; ($existing.version // "0.0.0")) >= 0) then
-        # Incoming version is newer, or equal but with changed metadata ->
-        # replace the pinned entry.
-        .[$cat] = ((($arr | map(select((.id? // "") != $id)))) + [$entry])
+        # Incoming version is newer, or equal with changed/additional fields.
+        # Overlay source keys onto the existing entry IN PLACE so target-only
+        # keys (isFeatured, badge, featured*, companyName, …) are never dropped
+        # just because the older branch lacks them.
+        .[$cat] = ($arr | map(if (.id? // "") == $id then . + $entry else . end))
       else
         # Target already pins a newer version -> leave it untouched (monotonic).
         .
@@ -163,12 +201,15 @@ merge_manifest_entry() {
 }
 
 # Merges every entry across every category of a source manifest.json into a
-# target manifest.json, applying the same per-id monotonic upsert as
+# target manifest.json, applying the same per-id monotonic overlay as
 # merge_manifest_entry (above) to each entry individually. This is what lets a
 # manual, hand-edited manifest.json change (not tied to any ZIP push) promote
 # forward: the edited entry is MERGED into the target - respecting the
-# monotonic, id-keyed guard - rather than the whole file being overwritten,
-# so it can never regress an entry the target already pins to a newer version.
+# monotonic, id-keyed guard - rather than the whole file being overwritten.
+# Equal-or-newer source entries overlay onto the target (source wins on
+# overlapping keys; target-only keys are preserved), so a newer-branch field
+# such as isFeatured cannot be wiped by an older-branch promote that simply
+# lacks the key. An older source version never regresses the target's pin.
 #
 # A single malformed entry (e.g. a non-semver version string) must not abort
 # the whole merge under the caller's `set -e` - that would silently discard

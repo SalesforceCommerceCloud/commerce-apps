@@ -126,7 +126,7 @@ echo "--- next_release_branch ---"
 
 assert_eq "26.8 -> 26.9"                 "release/26.9" next_release_branch "release/26.8" "$BRANCHES"
 assert_eq "26.9 -> 27.0"                 "release/27.0" next_release_branch "release/26.9" "$BRANCHES"
-assert_eq "highest release -> main"      "main"         next_release_branch "release/27.0" "$BRANCHES"
+assert_eq "highest release terminates"   ""             next_release_branch "release/27.0" "$BRANCHES"
 assert_eq "refs/heads/ prefix accepted"  "release/26.9" next_release_branch "refs/heads/release/26.8" "$BRANCHES"
 assert_eq "major rollover picks minimal" "release/27.0" next_release_branch "release/26.9" \
   "$(printf '%s\n' refs/heads/release/27.5 refs/heads/release/27.0 refs/heads/release/28.0)"
@@ -184,6 +184,29 @@ assert_json_eq "empty catalog seeds first entry" \
 echo ""
 
 # ---------------------------------------------------------------------------
+# seed_init_catalog_if_absent (auto-promo: INIT only for brand-new apps)
+# ---------------------------------------------------------------------------
+echo "--- seed_init_catalog_if_absent ---"
+
+# Brand-new app: no catalog.json on the target -> write INIT, do not invent a version.
+new_cat="$TMPDIR_ROOT/new-app/catalog.json"
+seeded_result="$(seed_init_catalog_if_absent "$new_cat")"
+assert_eq "absent catalog is seeded" "seeded" printf '%s' "$seeded_result"
+assert_json_eq "seeded catalog is INIT template" \
+  '{"latest":{"version":"INIT","tag":"INIT"},"versions":[]}' \
+  cat "$new_cat"
+
+# Version bump: catalog.json already exists -> leave it untouched (no merge, no INIT overwrite).
+existing_cat="$(mkfile '{"latest":{"version":"1.0.0","tag":"app-v1.0.0"},"versions":[{"version":"1.0.0","tag":"app-v1.0.0"}]}')"
+skipped_result="$(seed_init_catalog_if_absent "$existing_cat")"
+assert_eq "existing catalog is skipped" "skipped" printf '%s' "$skipped_result"
+assert_json_eq "existing catalog content is untouched" \
+  '{"latest":{"version":"1.0.0","tag":"app-v1.0.0"},"versions":[{"version":"1.0.0","tag":"app-v1.0.0"}]}' \
+  cat "$existing_cat"
+
+echo ""
+
+# ---------------------------------------------------------------------------
 # merge_manifest_entry
 # ---------------------------------------------------------------------------
 echo "--- merge_manifest_entry ---"
@@ -194,7 +217,7 @@ assert_json_eq "appends new app to category" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
   merge_manifest_entry "$m1" '{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}' "shipping"
 
-# Same app id, newer version -> replace the single pinned entry (no dup, zip advances).
+# Same app id, newer version -> overlay onto the single pinned entry (no dup, zip advances).
 m2="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}]}')"
 assert_json_eq "replaces pinned entry with newer version" \
   '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}' \
@@ -205,6 +228,20 @@ m2b="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sh
 assert_json_eq "idempotent upsert at equal version" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}]}' \
   merge_manifest_entry "$m2b" '{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}' "shipping"
+
+# Same app id, same version, target has extra keys the source lacks (e.g. 26.9
+# carousel fields, 26.8 entry without them) -> extras are preserved, not wiped.
+m2d="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"old","isFeatured":true,"badge":"popular"}]}')"
+assert_json_eq "equal-version overlay preserves target-only keys" \
+  '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new","isFeatured":true,"badge":"popular"}]}' \
+  merge_manifest_entry "$m2d" '{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}' "shipping"
+
+# Same app id, NEWER version, target has extra keys -> version/zip advance and
+# extras are still preserved. Also stays in its original array position.
+m2e="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","isFeatured":true},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}')"
+assert_json_eq "newer-version overlay preserves target-only keys and position" \
+  '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0","isFeatured":true},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
+  merge_manifest_entry "$m2e" '{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}' "shipping"
 
 # Same app id, OLDER version (back-port hop) -> target's newer pin is untouched.
 m2c="$(mkfile '{"shipping":[{"id":"a","zip":"a-v2.0.0.zip","version":"2.0.0"}]}')"
@@ -227,10 +264,9 @@ m4_indent="$(merge_manifest_entry "$m4" '{"id":"b","zip":"b-v1.0.0.zip","version
   | grep -m1 '"analytics"' | sed -E 's/[^ ].*//' | tr -d '\n' | wc -c | tr -d ' ')"
 assert_eq "upsert emits 4-space indentation" "4" printf '%s' "$m4_indent"
 
-# Byte-identical re-upsert must be a true no-op: it must NOT move the entry to
-# the end of its category array (which would happen if the equal-version
-# "replace" branch fired), or every other entry's promotion would be reordered
-# for zero effect on a fully-idempotent re-promotion.
+# Byte-identical re-upsert must be a true no-op: it must NOT rewrite or move
+# the entry (which would reorder every other entry for zero effect on a
+# fully-idempotent re-promotion).
 m5="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}')"
 assert_json_eq "byte-identical re-upsert does not reorder" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
@@ -299,7 +335,7 @@ echo ""
 # ---------------------------------------------------------------------------
 echo "--- merge_manifest_file ---"
 
-# Source has a newer entry for an app the target already pins -> replaces it,
+# Source has a newer entry for an app the target already pins -> overlays it,
 # same monotonic guard as merge_manifest_entry, applied across every category.
 mf1_target="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}]}')"
 mf1_source="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}')"
@@ -327,6 +363,14 @@ mf4_source="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1
 assert_json_eq "idempotent re-merge (no dup)" \
   '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}' \
   merge_manifest_file "$mf4_target" "$mf4_source"
+
+# Whole-file promote of an equal-version source that lacks target-only keys
+# must not wipe them (the #113 26.8→26.9 carousel-field regression).
+mf4b_target="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0","isFeatured":true,"badge":"popular","featuredLearnMoreUrl":"https://example.com"}]}')"
+mf4b_source="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0"}]}')"
+assert_json_eq "whole-file equal-version merge preserves target-only keys" \
+  '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0","isFeatured":true,"badge":"popular","featuredLearnMoreUrl":"https://example.com"}]}' \
+  merge_manifest_file "$mf4b_target" "$mf4b_source"
 
 # A scalar top-level field (e.g. defaultLocale) has no per-entry version to
 # compare, so it must still carry forward verbatim rather than being silently
