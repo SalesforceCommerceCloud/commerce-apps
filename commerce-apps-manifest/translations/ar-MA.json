@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "أظهر للمتسوقين مدى قرب سلة التسوق الخاصة بهم من فتح العروض الترويجية للطلب والشحن."
+    },
+    "zenkraft-shipping": {
+        "name": "شحن Zenkraft",
+        "description": "حساب أسعار الشحن وتواريخ التسليم المقدرة، مدعومة بـ Zenkraft."
     }
 }

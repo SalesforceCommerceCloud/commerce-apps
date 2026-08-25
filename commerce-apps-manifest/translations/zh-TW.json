@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "向購物者顯示他們的購物籃距離解鎖訂單和配送促銷還有多近。"
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft 配送",
+        "description": "由 Zenkraft 提供支援的運費計算及預計交貨日期。"
     }
 }

@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "Mostre aos compradores o quão perto o cesto deles está de desbloquear promoções de pedido e envio."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft Envio",
+        "description": "Cálculo de tarifas de envio e datas de entrega estimadas com tecnologia Zenkraft."
     }
 }

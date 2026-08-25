@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "注文および配送のプロモーションのロック解除まで、バスケットがどれだけ近づいているかを買い物客に表示します。"
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft 配送",
+        "description": "Zenkraftによる配送料計算と推定配達日。"
     }
 }

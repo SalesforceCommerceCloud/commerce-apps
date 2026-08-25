@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "Pokaż kupującym, jak blisko ich koszyk jest odblokowania promocji na zamówienie i wysyłkę."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft Wysyłka",
+        "description": "Obliczanie stawek wysyłki i szacowane daty dostawy obsługiwane przez Zenkraft."
     }
 }

@@ -34,5 +34,9 @@
     "approaching-discounts": {
         "name": "Approaching Discounts",
         "description": "Laat shoppers zien hoe dicht hun winkelmandje bij het ontgrendelen van bestel- en verzendpromoties is."
+    },
+    "zenkraft-shipping": {
+        "name": "Zenkraft Verzending",
+        "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
     }
 }
