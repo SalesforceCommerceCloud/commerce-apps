@@ -56,6 +56,20 @@
       "domain": "shipping",
       "type": "custom",
       "provider": "custom"
+    },
+    {
+      "id": "cds-shipping",
+      "name": "Commerce Delivery Service",
+      "description": "Show shoppers estimated delivery dates for products and during checkout",
+      "iconName": "salesforce.svg",
+      "domain": "shipping",
+      "type": "app",
+      "provider": "salesforce",
+      "companyName": "Salesforce",
+      "requiredFeatureToggle": "Order360IntegrationEnabled",
+      "version": "1.0.0",
+      "zip": "cds-shipping-v1.0.0.zip",
+      "sha256": "5af6ea74abf41ffdad63797fd4d8d13310d277ef571147daac0a208186c156ab"
     }
   ],
   "payment": [
