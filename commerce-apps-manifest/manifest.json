@@ -23,18 +23,19 @@
     {
       "id": "avalara-tax",
       "name": "Avalara Tax",
-      "description": "Automated tax compliance solution by Avalara",
+      "description": "Automate tax compliance directly within Storefront Next, powered by Avalara.",
       "iconName": "avalara.png",
       "domain": "tax",
       "type": "app",
       "provider": "thirdParty",
       "companyName": "Avalara",
-      "version": "1.0.1",
-      "zip": "avalara-tax-v1.0.1.zip",
-      "sha256": "ff76d5c64f2c3779d1b3cc9af1500ce514d4c8c308b090bbe09fd942d84a615d",
+      "version": "1.0.2",
+      "zip": "avalara-tax-v1.0.2.zip",
+      "sha256": "6364276001cba49aae71b2030f67777f4ed2579c0506d58810c6364fa2a0c040",
       "badge": "popular",
       "isFeatured": true,
-      "featuredLearnMoreUrl": "https://www.avalara.com/us/en/products/calculations.html"
+      "featuredTagline": "Avalara automatically calculates accurate, real-time sales tax at checkout — keeping you compliant in every jurisdiction you sell in.",
+      "featuredLearnMoreUrl": "https://knowledge.avalara.com/bundle/rlo1665048243109_rlo1665048243109/page/mmr8655465456366.html"
     }
   ],
   "shipping": [
