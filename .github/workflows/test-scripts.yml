@@ -5,10 +5,12 @@ on:
     types: [opened, reopened, synchronize]
     paths:
       - '.github/scripts/**'
+      - '.github/config/**'
 
 jobs:
   test-scripts:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +39,11 @@ jobs:
             printf '  %s\n' "${missing[@]}"
             exit 1
           fi
+
+      - name: Install XML tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libxml2-utils
 
       - name: Run script tests
         run: ./.github/scripts/run-all-tests.sh

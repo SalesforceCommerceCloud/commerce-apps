@@ -18,8 +18,8 @@ Complete reference for all supported SFCC site preference attribute types with e
 ## String
 
 ```xml
-<attribute-definition attribute-id="appApiKey">
-    <display-name xml:lang="x-default">API Key</display-name>
+<attribute-definition attribute-id="appPublicIdentifier">
+    <display-name xml:lang="x-default">Public Identifier</display-name>
     <type>string</type>
     <mandatory-flag>false</mandatory-flag>
     <externally-managed-flag>false</externally-managed-flag>
@@ -127,9 +127,14 @@ Complete reference for all supported SFCC site preference attribute types with e
 
 ## Password (encrypted)
 
+This type is documented for legacy schema compatibility, but masking does not make Site
+preferences an approved secret store. Do not use it for keys, tokens, passwords, credentials,
+or other secret values. Authentication secrets belong in ecom service credentials and
+must be read through `LocalServiceRegistry`.
+
 ```xml
-<attribute-definition attribute-id="appApiSecret">
-    <display-name xml:lang="x-default">API Secret</display-name>
+<attribute-definition attribute-id="appRestrictedNote">
+    <display-name xml:lang="x-default">Restricted Note</display-name>
     <type>password</type>
     <mandatory-flag>false</mandatory-flag>
     <externally-managed-flag>false</externally-managed-flag>

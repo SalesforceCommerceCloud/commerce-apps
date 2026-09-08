@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VALIDATE="$SCRIPT_DIR/validate-translations.sh"
+REQUIRED_LOCALES="$SCRIPT_DIR/../config/required-bm-locales.txt"
 
 PASS=0
 FAIL=0
@@ -19,13 +20,28 @@ LAST_RC=0
 #   tasksList:<json>              (writes app-configuration/tasksList.json)
 #   adminComponents:<json>        (writes app-configuration/adminComponents.json)
 #   no-translations               (skips creating translations dir)
+#   no-seed-required              (leaves required locale files unseeded)
+#   seed-required-without-en-US   (creates every required locale except en-US)
 make_cap() {
   local cap; cap="$(mktemp -d "$TMPDIR_ROOT/cap.XXXXXX")"
   local has_translations=true
+  local seed_required=true
   for spec in "$@"; do
     case "$spec" in
       no-translations)
         has_translations=false
+        ;;
+      no-seed-required)
+        seed_required=false
+        ;;
+      seed-required-without-en-US)
+        seed_required=false
+        mkdir -p "$cap/app-configuration/translations"
+        while IFS= read -r locale || [[ -n "$locale" ]]; do
+          locale="${locale%$'\r'}"
+          [[ -z "$locale" || "$locale" == "en-US" ]] && continue
+          printf '%s' "$DE_BASIC" > "$cap/app-configuration/translations/$locale.json"
+        done < "$REQUIRED_LOCALES"
         ;;
       tasks:*)
         local rest="${spec#tasks:}"
@@ -50,6 +66,16 @@ make_cap() {
   done
   if [[ "$has_translations" == "true" && ! -d "$cap/app-configuration/translations" ]]; then
     mkdir -p "$cap/app-configuration/translations"
+  fi
+  if [[ "$seed_required" == "true" && -f "$cap/app-configuration/translations/en-US.json" ]]; then
+    while IFS= read -r locale || [[ -n "$locale" ]]; do
+      locale="${locale%$'\r'}"
+      [[ -z "$locale" ]] && continue
+      if [[ ! -f "$cap/app-configuration/translations/$locale.json" ]]; then
+        cp "$cap/app-configuration/translations/en-US.json" \
+          "$cap/app-configuration/translations/$locale.json"
+      fi
+    done < "$REQUIRED_LOCALES"
   fi
   echo "$cap"
 }
@@ -107,7 +133,7 @@ TASKS_LIST_OK='[{"taskKey":"setup_account","name":"Setup","description":"d","tas
 
 assert_passes "missing translations dir is OK (optional)" no-translations
 
-assert_passes "en-US only" "tasks:en-US.json:$EN_BASIC"
+assert_passes "all required locales seeded from en-US" "tasks:en-US.json:$EN_BASIC"
 
 assert_passes "en-US + matching de" \
   "tasks:en-US.json:$EN_BASIC" \
@@ -122,11 +148,20 @@ assert_passes "adminComponents pair coverage and parity" \
   "tasks:de.json:{\"tasks\":{\"setup_account\":{\"name\":\"S\",\"description\":\"d\"}},\"adminComponents\":{\"component_visibility\":{\"attributes\":{\"sfcc.checkout.shippingAddress.after\":{\"label\":\"Beim Checkout\"}}}}}" \
   "adminComponents:{\"configuration\":[{\"componentKey\":\"component_visibility\",\"type\":\"storefrontComponentVisibility\",\"attributes\":[{\"id\":\"sfcc.checkout.shippingAddress.after\",\"label\":\"Show on Checkout\",\"defaultValue\":true}]}]}"
 
+assert_passes "additional valid BCP-47 locale is accepted" \
+  "tasks:en-US.json:$EN_BASIC" \
+  "tasks:fr-CA.json:$EN_BASIC"
+
 # --- Rejecting shapes ------------------------------------------------------
 
 assert_rejects "translations dir without en-US.json is rejected" \
-  "en-US.json is missing" \
-  "tasks:de.json:$DE_BASIC"
+  "missing required locale file(s): en-US.json" \
+  seed-required-without-en-US
+
+assert_rejects "translations dir missing required defaults is rejected" \
+  "missing required locale file(s)" \
+  no-seed-required \
+  "tasks:en-US.json:$EN_BASIC"
 
 assert_rejects "invalid JSON locale is rejected" \
   "not valid JSON" \
@@ -140,10 +175,10 @@ assert_rejects "empty name in en-US is rejected" \
   "missing/invalid name or description" \
   'tasks:en-US.json:{"tasks":{"setup_account":{"name":"","description":"d"}}}'
 
-assert_rejects "unsupported locale filename is rejected" \
-  "Unsupported locale file" \
+assert_rejects "misformatted locale filename is rejected" \
+  "misformatted locale file" \
   "tasks:en-US.json:$EN_BASIC" \
-  "tasks:xx-YY.json:$EN_BASIC"
+  "tasks:zh_CN.json:$EN_BASIC"
 
 assert_rejects "tasksList taskKey missing from en-US is rejected" \
   "not present in translations/en-US.json" \

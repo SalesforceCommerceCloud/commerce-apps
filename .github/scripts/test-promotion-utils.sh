@@ -126,7 +126,7 @@ echo "--- next_release_branch ---"
 
 assert_eq "26.8 -> 26.9"                 "release/26.9" next_release_branch "release/26.8" "$BRANCHES"
 assert_eq "26.9 -> 27.0"                 "release/27.0" next_release_branch "release/26.9" "$BRANCHES"
-assert_eq "highest release -> main"      "main"         next_release_branch "release/27.0" "$BRANCHES"
+assert_eq "highest release terminates"   ""             next_release_branch "release/27.0" "$BRANCHES"
 assert_eq "refs/heads/ prefix accepted"  "release/26.9" next_release_branch "refs/heads/release/26.8" "$BRANCHES"
 assert_eq "major rollover picks minimal" "release/27.0" next_release_branch "release/26.9" \
   "$(printf '%s\n' refs/heads/release/27.5 refs/heads/release/27.0 refs/heads/release/28.0)"
@@ -184,6 +184,96 @@ assert_json_eq "empty catalog seeds first entry" \
 echo ""
 
 # ---------------------------------------------------------------------------
+# seed_init_catalog_if_absent (auto-promo: INIT only for brand-new apps)
+# ---------------------------------------------------------------------------
+echo "--- seed_init_catalog_if_absent ---"
+
+# Brand-new app: no catalog.json on the target -> write INIT, do not invent a version.
+new_cat="$TMPDIR_ROOT/new-app/catalog.json"
+seeded_result="$(seed_init_catalog_if_absent "$new_cat")"
+assert_eq "absent catalog is seeded" "seeded" printf '%s' "$seeded_result"
+assert_json_eq "seeded catalog is INIT template" \
+  '{"latest":{"version":"INIT","tag":"INIT"},"versions":[]}' \
+  cat "$new_cat"
+
+# Version bump: catalog.json already exists -> leave it untouched (no merge, no INIT overwrite).
+existing_cat="$(mkfile '{"latest":{"version":"1.0.0","tag":"app-v1.0.0"},"versions":[{"version":"1.0.0","tag":"app-v1.0.0"}]}')"
+skipped_result="$(seed_init_catalog_if_absent "$existing_cat")"
+assert_eq "existing catalog is skipped" "skipped" printf '%s' "$skipped_result"
+assert_json_eq "existing catalog content is untouched" \
+  '{"latest":{"version":"1.0.0","tag":"app-v1.0.0"},"versions":[{"version":"1.0.0","tag":"app-v1.0.0"}]}' \
+  cat "$existing_cat"
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# collect_promotable_zips + apply_promoted_zip_onto_target
+# (workflow wiring: only changed ZIPs are copied; unlisted apps stay put)
+# ---------------------------------------------------------------------------
+echo "--- collect_promotable_zips / apply_promoted_zip_onto_target ---"
+
+src="$TMPDIR_ROOT/src-26.8"
+tgt="$TMPDIR_ROOT/tgt-26.9"
+mkdir -p \
+  "$src/tax/avalara-tax" \
+  "$src/merchandising/approaching-discounts" \
+  "$tgt/tax/avalara-tax" \
+  "$tgt/commerce-apps-manifest"
+printf 'AVALARA-100' > "$src/tax/avalara-tax/avalara-tax-v1.0.0.zip"
+printf 'AVALARA-OLD' > "$src/tax/avalara-tax/avalara-tax-v0.9.0.zip"
+printf 'AD-100' > "$src/merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip"
+printf 'AVALARA-101' > "$tgt/tax/avalara-tax/avalara-tax-v1.0.1.zip"
+printf '%s\n' '{"latest":{"version":"1.0.1","tag":"avalara-tax-v1.0.1"},"versions":[{"version":"1.0.1","tag":"avalara-tax-v1.0.1"}]}' \
+  > "$tgt/tax/avalara-tax/catalog.json"
+printf '%s\n' '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.1.zip","version":"1.0.1","isFeatured":true,"badge":"popular"}],"merchandising":[]}' \
+  > "$tgt/commerce-apps-manifest/manifest.json"
+src_manifest="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0"}],"merchandising":[{"id":"approaching-discounts","zip":"approaching-discounts-v1.0.0.zip","version":"1.0.0"}]}')"
+
+# Push analog: only the new Approaching Discounts ZIP changed.
+only_ad="$(mkfile "merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip")"
+assert_eq "only changed new-app ZIP is selected" \
+  "$(printf '%s\t%s\t%s\n' merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip 1.0.0 merchandising)" \
+  collect_promotable_zips "$src" "$src_manifest" "$only_ad"
+
+# A ZIP that exists on source but is not the pinned manifest entry (back-port)
+# plus a deletion (missing file) must not appear in the TSV.
+mixed="$(mkfile "$(printf '%s\n' \
+  merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip \
+  tax/avalara-tax/avalara-tax-v0.9.0.zip \
+  tax/avalara-tax/does-not-exist.zip)")"
+assert_eq "unpinned and missing ZIPs are not selected" \
+  "$(printf '%s\t%s\t%s\n' merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip 1.0.0 merchandising)" \
+  collect_promotable_zips "$src" "$src_manifest" "$mixed"
+
+# Apply the selected ZIP onto 26.9, then whole-file merge (manifest_changed).
+tsv="$(collect_promotable_zips "$src" "$src_manifest" "$only_ad")"
+while IFS=$'\t' read -r zip_path version category; do
+  [[ -z "$zip_path" ]] && continue
+  apply_promoted_zip_onto_target "$tgt" "$src/$zip_path" "$zip_path" "$src_manifest" "$category" >/dev/null
+done <<< "$tsv"
+tmp="$(mktemp)"
+merge_manifest_file "$tgt/commerce-apps-manifest/manifest.json" "$src_manifest" > "$tmp"
+mv "$tmp" "$tgt/commerce-apps-manifest/manifest.json"
+
+assert_eq "new-app ZIP is copied onto the target" "AD-100" \
+  cat "$tgt/merchandising/approaching-discounts/approaching-discounts-v1.0.0.zip"
+assert_json_eq "new-app catalog is INIT" \
+  '{"latest":{"version":"INIT","tag":"INIT"},"versions":[]}' \
+  cat "$tgt/merchandising/approaching-discounts/catalog.json"
+assert_eq "avalara 1.0.1 ZIP bytes are unchanged" "AVALARA-101" \
+  cat "$tgt/tax/avalara-tax/avalara-tax-v1.0.1.zip"
+assert_eq "avalara 1.0.0 ZIP is not copied" "absent" \
+  bash -c "if [[ -f '$tgt/tax/avalara-tax/avalara-tax-v1.0.0.zip' ]]; then echo present; else echo absent; fi"
+assert_json_eq "avalara catalog.json is untouched" \
+  '{"latest":{"version":"1.0.1","tag":"avalara-tax-v1.0.1"},"versions":[{"version":"1.0.1","tag":"avalara-tax-v1.0.1"}]}' \
+  cat "$tgt/tax/avalara-tax/catalog.json"
+assert_json_eq "avalara pin stays 1.0.1 with extras; new app is appended" \
+  '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.1.zip","version":"1.0.1","isFeatured":true,"badge":"popular"}],"merchandising":[{"id":"approaching-discounts","zip":"approaching-discounts-v1.0.0.zip","version":"1.0.0"}]}' \
+  cat "$tgt/commerce-apps-manifest/manifest.json"
+
+echo ""
+
+# ---------------------------------------------------------------------------
 # merge_manifest_entry
 # ---------------------------------------------------------------------------
 echo "--- merge_manifest_entry ---"
@@ -194,7 +284,7 @@ assert_json_eq "appends new app to category" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
   merge_manifest_entry "$m1" '{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}' "shipping"
 
-# Same app id, newer version -> replace the single pinned entry (no dup, zip advances).
+# Same app id, newer version -> overlay onto the single pinned entry (no dup, zip advances).
 m2="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}]}')"
 assert_json_eq "replaces pinned entry with newer version" \
   '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}' \
@@ -205,6 +295,20 @@ m2b="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sh
 assert_json_eq "idempotent upsert at equal version" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}]}' \
   merge_manifest_entry "$m2b" '{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}' "shipping"
+
+# Same app id, same version, target has extra keys the source lacks (e.g. 26.9
+# carousel fields, 26.8 entry without them) -> extras are preserved, not wiped.
+m2d="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"old","isFeatured":true,"badge":"popular"}]}')"
+assert_json_eq "equal-version overlay preserves target-only keys" \
+  '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new","isFeatured":true,"badge":"popular"}]}' \
+  merge_manifest_entry "$m2d" '{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","sha256":"new"}' "shipping"
+
+# Same app id, NEWER version, target has extra keys -> version/zip advance and
+# extras are still preserved. Also stays in its original array position.
+m2e="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0","isFeatured":true},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}')"
+assert_json_eq "newer-version overlay preserves target-only keys and position" \
+  '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0","isFeatured":true},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
+  merge_manifest_entry "$m2e" '{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}' "shipping"
 
 # Same app id, OLDER version (back-port hop) -> target's newer pin is untouched.
 m2c="$(mkfile '{"shipping":[{"id":"a","zip":"a-v2.0.0.zip","version":"2.0.0"}]}')"
@@ -227,10 +331,9 @@ m4_indent="$(merge_manifest_entry "$m4" '{"id":"b","zip":"b-v1.0.0.zip","version
   | grep -m1 '"analytics"' | sed -E 's/[^ ].*//' | tr -d '\n' | wc -c | tr -d ' ')"
 assert_eq "upsert emits 4-space indentation" "4" printf '%s' "$m4_indent"
 
-# Byte-identical re-upsert must be a true no-op: it must NOT move the entry to
-# the end of its category array (which would happen if the equal-version
-# "replace" branch fired), or every other entry's promotion would be reordered
-# for zero effect on a fully-idempotent re-promotion.
+# Byte-identical re-upsert must be a true no-op: it must NOT rewrite or move
+# the entry (which would reorder every other entry for zero effect on a
+# fully-idempotent re-promotion).
 m5="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}')"
 assert_json_eq "byte-identical re-upsert does not reorder" \
   '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"},{"id":"b","zip":"b-v1.0.0.zip","version":"1.0.0"}]}' \
@@ -299,7 +402,7 @@ echo ""
 # ---------------------------------------------------------------------------
 echo "--- merge_manifest_file ---"
 
-# Source has a newer entry for an app the target already pins -> replaces it,
+# Source has a newer entry for an app the target already pins -> overlays it,
 # same monotonic guard as merge_manifest_entry, applied across every category.
 mf1_target="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}]}')"
 mf1_source="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}')"
@@ -314,6 +417,15 @@ assert_json_eq "older source entry does not regress target's pin" \
   '{"shipping":[{"id":"a","zip":"a-v2.0.0.zip","version":"2.0.0"}]}' \
   merge_manifest_file "$mf2_target" "$mf2_source"
 
+# Realistic 26.8 → 26.9 hop: source adds a brand-new app (approaching-discounts)
+# AND still pins avalara at an OLDER version than the target. Whole-file merge
+# must append the new app and must NOT roll avalara back (or drop 26.9 extras).
+mf2b_target="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.1.zip","version":"1.0.1","isFeatured":true,"badge":"popular"}],"merchandising":[]}')"
+mf2b_source="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0"}],"merchandising":[{"id":"approaching-discounts","zip":"approaching-discounts-v1.0.0.zip","version":"1.0.0"}]}')"
+assert_json_eq "new-app promote does not regress a newer target pin" \
+  '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.1.zip","version":"1.0.1","isFeatured":true,"badge":"popular"}],"merchandising":[{"id":"approaching-discounts","zip":"approaching-discounts-v1.0.0.zip","version":"1.0.0"}]}' \
+  merge_manifest_file "$mf2b_target" "$mf2b_source"
+
 # Source introduces a brand-new app in an existing category -> appended.
 mf3_target="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}]}')"
 mf3_source="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.0.0.zip","version":"1.0.0"}],"tax":[{"id":"t","zip":"t-v1.0.0.zip","version":"1.0.0"}]}')"
@@ -327,6 +439,14 @@ mf4_source="$(mkfile '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1
 assert_json_eq "idempotent re-merge (no dup)" \
   '{"shipping":[{"id":"a","zip":"a-v1.1.0.zip","version":"1.1.0"}]}' \
   merge_manifest_file "$mf4_target" "$mf4_source"
+
+# Whole-file promote of an equal-version source that lacks target-only keys
+# must not wipe them (the #113 26.8→26.9 carousel-field regression).
+mf4b_target="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0","isFeatured":true,"badge":"popular","featuredLearnMoreUrl":"https://example.com"}]}')"
+mf4b_source="$(mkfile '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0"}]}')"
+assert_json_eq "whole-file equal-version merge preserves target-only keys" \
+  '{"tax":[{"id":"avalara-tax","zip":"avalara-tax-v1.0.0.zip","version":"1.0.0","isFeatured":true,"badge":"popular","featuredLearnMoreUrl":"https://example.com"}]}' \
+  merge_manifest_file "$mf4b_target" "$mf4b_source"
 
 # A scalar top-level field (e.g. defaultLocale) has no per-entry version to
 # compare, so it must still carry forward verbatim rather than being silently

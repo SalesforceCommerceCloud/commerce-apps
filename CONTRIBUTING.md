@@ -149,6 +149,7 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 - `name` - Display name
 - `description` - App description
 - `iconName` - Icon filename (e.g., `avalara.png`)
+- `companyName` - (String) Name of the company/ISV that publishes the app (e.g., `"Avalara"`). Required for all third-party apps; shown alongside the app in the commerce apps workspace.
 - `domain` - One of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
 - `type` - Always `"app"` for commerce apps
 - `provider` - Always `"thirdParty"` for ISV apps
@@ -172,6 +173,16 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 An app may declare `sfnext` alone, or `sfnext` and `sfra` together. An app may **not** declare `sfra` alone — SFRA support is always additive to SFNext. If `storefrontSupport` is absent (e.g., a backend-only app), no version gating is applied. Omit `maxVersion` unless you have confirmed an incompatibility — the installer treats absence as "no upper bound."
 
 When present, the `storefrontSupport` field in the root manifest must match the `storefrontSupport` field in the app's `commerce-app.json` inside the ZIP.
+
+#### Featured App Fields (Optional)
+
+The commerce apps workspace can highlight select apps as **featured**, giving them richer promotional placement (a tagline, a promotional image, and a "learn more" link). Featured status is curated by Salesforce — you cannot self-promote — but you can prepare your app so it is eligible.
+
+- `featuredTagline` - (String) Short marketing tagline shown on the featured placement (e.g., `"Automated tax compliance trusted by 30,000+ businesses worldwide."`). Also add it to `commerce-apps-manifest/translations/en-US.json` under your app's key so it can be localized.
+- `featuredLearnMoreUrl` - (String) Absolute URL to a page where merchants can learn more about the app (e.g., a product landing page).
+- `featuredImageName` - (String) Filename of a promotional image committed to `commerce-apps-manifest/featured-images/` (e.g., `"acme-featured.png"`).
+
+> **`isFeatured` and `badge` are reserved for Salesforce.** Do **not** set `isFeatured` or `badge` (`"new"`, `"popular"`) in your submission — both are controlled by Salesforce curation, and PRs that set them will be asked to remove them. To be **considered** for featured placement, include `companyName` (required) plus the featured fields above (`featuredTagline`, `featuredLearnMoreUrl`, `featuredImageName`) so your app is ready to promote if selected.
 
 #### Computing `sha256`
 
@@ -429,7 +440,7 @@ commerce-{appName}-app-v{version}/
     ├── tasksList.json
     ├── adminComponents.json     (optional)
     └── translations/
-        ├── en-US.json           # required if translations/ exists
+        ├── en-US.json           # canonical locale; all defaults are required
         ├── de.json
         ├── ja.json
         └── ...
@@ -460,8 +471,9 @@ Rules:
 - The top-level `tasks` and `adminComponents` keys are reserved by the registry. Do not introduce sibling keys without coordinating with the registry team — future namespaces will follow the same reserved pattern.
 - Translatable fields per task: `name`, `description` (both required, non-empty, in every locale file that lists the task).
 - Translatable fields per admin component: `attributes.<id>.label` (required, non-empty, for every (componentKey, attribute id) pair listed in the locale file).
-- Locale filenames must use the BCP-47 tag of a [supported BM locale](#supported-locales) (`en-US.json`, `de.json`, `fr.json`, …).
-- `en-US.json` is **required** when `translations/` exists. It defines the canonical key set every other locale file must match exactly — no extra keys, no missing keys, in either namespace.
+- Every [required default BM locale](#supported-locales) must be present when `translations/` exists.
+- Additional locales are accepted when their filenames use the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$` (`en-US.json`, `de.json`, `fr-CA.json`, …).
+- `en-US.json` defines the canonical key set every other locale file must match exactly — no extra keys, no missing keys, in either namespace.
 - The English text in `en-US.json` and the literal English in `tasksList.json` / `adminComponents.json` must stay in sync. If a string changes, update both.
 
 ### Fallback chain
@@ -474,35 +486,23 @@ At render time the BM client requests a locale; the registry resolves each trans
    - tasks → `name` / `description` on the task itself in `tasksList.json`
    - admin component attribute labels → `label` on the attribute in `adminComponents.json`
 
-Result: an app that omits `translations/` entirely keeps rendering literal English in every locale (existing behavior). An app that ships only `en-US.json` renders the same strings in every locale, but is wired up to add more locales later without further code changes.
+Result: an app that omits `translations/` entirely keeps rendering literal English in every locale (existing behavior). Once an app adds `translations/`, it must provide every required default BM locale.
 
 ### Locale rollout
 
-`en-US` is required at submission when `translations/` is present. Additional locales are optional and can be added incrementally as your localization team produces them — there is no requirement to ship all supported locales at once.
+All required default BM locales are required at submission when `translations/` is present. Additional correctly named locales can be added as your localization team produces them.
 
-> **Heads up:** translation files are bundled inside the CAP zip and merged into the persisted task list at install time. Adding or updating translations after the fact requires shipping a new app version and having merchants upgrade — there is no out-of-band path for the registry to push translation updates to an already-installed app. Plan to include `en-US.json` (at minimum) in any version that introduces translatable strings, even if other locales come later.
+> **Heads up:** translation files are bundled inside the CAP zip and merged into the persisted task list at install time. Adding or updating translations after the fact requires shipping a new app version and having merchants upgrade — there is no out-of-band path for the registry to push translation updates to an already-installed app. Plan to include the complete required default locale set in any version that introduces translatable strings.
 
 ### Supported locales
 
-Locale filenames are validated against the set of locales supported by Business Manager. The currently supported set is:
+The authoritative required default locale set is
+[`required-bm-locales.txt`](.github/config/required-bm-locales.txt). It applies
+to both `commerce-apps-manifest/translations/` and any packaged
+`app-configuration/translations/` directory.
 
-| Locale | Filename |
-|:--|:--|
-| Arabic (Morocco) | `ar-MA.json` |
-| German | `de.json` |
-| English (United States) | `en-US.json` |
-| Spanish | `es.json` |
-| French | `fr.json` |
-| Italian | `it.json` |
-| Japanese | `ja.json` |
-| Korean | `ko.json` |
-| Dutch | `nl.json` |
-| Polish | `pl.json` |
-| Portuguese | `pt.json` |
-| Chinese (Simplified) | `zh-CN.json` |
-| Chinese (Traditional) | `zh-TW.json` |
-
-CI will reject locale files whose filenames are outside this set.
+Both directories may include additional locale files only when each filename
+matches the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$`.
 
 ---
 
@@ -621,8 +621,10 @@ Before submitting your PR, please verify:
 ### Required Files
 - [ ] ZIP file name follows the required format: `[appName]-v[version].zip`
 - [ ] ZIP contains single root folder: `commerce-[appName]-app-v[version]/`
-- [ ] `manifest.json` includes all required fields (name, displayName, domain, description, version, zip, sha256)
+- [ ] `manifest.json` includes all required fields (name, displayName, domain, description, companyName, version, zip, sha256)
 - [ ] `catalog.json` is included for new apps only (with INIT values)
+- [ ] `isFeatured` and `badge` are **not** set in the submission (reserved for Salesforce curation)
+- [ ] If featured fields are provided, `featuredImageName` refers to an image committed under `commerce-apps-manifest/featured-images/`
 
 ### Version and Hash Validation
 - [ ] `version` in `manifest.json` matches `version` in `commerce-app.json`
@@ -642,9 +644,10 @@ Before submitting your PR, please verify:
 ### Localization
 - [ ] Every entry in `tasksList.json` declares a unique non-empty `taskKey` matching `^[a-z][a-z0-9_]*$`
 - [ ] If `adminComponents.json` is shipped, every entry declares a unique non-empty `componentKey` matching `^[a-z][a-z0-9_]*$`
-- [ ] If `app-configuration/translations/` exists, `en-US.json` is present and lists every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
+- [ ] `commerce-apps-manifest/translations/` and, when present, `app-configuration/translations/` contain every required default BM locale
+- [ ] If `app-configuration/translations/` exists, `en-US.json` lists every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
 - [ ] Every non-default locale file lists exactly the same keys as `en-US.json` (no extras, no missing) in both `tasks` and `adminComponents` namespaces
-- [ ] All locale filenames are in the [supported locale set](#supported-locales) and use BCP-47 tags
+- [ ] Additional locale filenames match the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$`
 - [ ] English text in `en-US.json` matches the literal English in `tasksList.json` and `adminComponents.json`
 
 ### Domain and Naming

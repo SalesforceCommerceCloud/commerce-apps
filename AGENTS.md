@@ -142,7 +142,7 @@ Your response:
 ### 4. Security
 - NO hardcoded production credentials in impex
 - Use placeholders for API keys/secrets
-- Use `<password>` type for sensitive site preferences
+- Do not store secret values in Site preferences; store authentication secrets in ecom service credentials and access them through `LocalServiceRegistry`
 - Mark sensitive data clearly in documentation
 - NO secret files (`.env`, `.key`, `.pem`, `.p12`, `.pfx`, `.jks`) in packages
 - NO direct `HTTPClient` usage — must use service framework
@@ -194,6 +194,14 @@ Your response:
 - If absent, no version gating is applied at install time
 - Values must match exactly between root manifest and `commerce-app.json`
 - Only `sfnext` and `sfra` keys are allowed inside `storefrontSupport`; only `minVersion` and `maxVersion` are allowed inside each storefront object, and `sfra` requires `sfnext` to also be present.
+
+### 8a. Company Name and Featured App Fields
+- `companyName` (**required** for third-party apps) - name of the publishing company/ISV (e.g., `"Avalara"`); shown alongside the app in the commerce apps workspace
+- The commerce apps workspace can highlight curated apps as **featured**. The following fields are optional and prepare an app to be *considered* for featured placement:
+  - `featuredTagline` - short marketing tagline; also add it to `commerce-apps-manifest/translations/en-US.json` under the app's key for localization
+  - `featuredLearnMoreUrl` - absolute URL to a "learn more" page
+  - `featuredImageName` - filename of a promotional image committed to `commerce-apps-manifest/featured-images/`
+- **`isFeatured` and `badge` are reserved for Salesforce and must NOT be set by app developers.** Both are controlled by Salesforce curation (`badge` supports `"new"`, `"popular"`). If a submission sets `isFeatured` or `badge`, flag it and remove it. To pursue featured status, ensure `companyName` is present and include the featured fields above so the app is ready to promote if selected.
 
 **Icon validation examples:**
 ```
@@ -497,8 +505,8 @@ Before suggesting `/submit-app-pr`, verify:
 
 **Security:**
 - [ ] No sensitive data in XML
-- [ ] Passwords use `<password>` type
-- [ ] API keys are placeholders
+- [ ] No secret values are stored in Site preferences; authentication secrets use ecom service credentials/`LocalServiceRegistry`
+- [ ] API keys in service impex are placeholders
 - [ ] No direct HTTPClient usage (use service framework)
 - [ ] No secret files in package (.env, .key, .pem, .p12, .pfx, .jks)
 - [ ] No eval/innerHTML/outerHTML/insertAdjacentHTML/document write

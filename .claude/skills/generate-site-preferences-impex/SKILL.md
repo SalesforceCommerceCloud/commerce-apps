@@ -19,7 +19,7 @@ Use proactively whenever:
 - Creating a new commerce app (always needs preferences)
 - User mentions "configuration", "settings", or "preferences"
 - App needs merchant-configurable options
-- Adding API credentials, feature toggles, or environment selection
+- Adding feature toggles, environment selection, or other non-secret merchant settings
 - Any scenario where merchants need to configure app behavior
 
 ## Step 1: Collect preference information
@@ -39,14 +39,14 @@ Use proactively whenever:
 
 Read `references/attribute-types.md` for complete type reference with examples:
 - **boolean** - Enable/disable flags
-- **string** - API keys, URLs, short text
+- **string** - URLs, public identifiers, short text
 - **text** - Long descriptions, JSON configs
 - **integer** - Counts, limits
 - **decimal** - Percentages, ratings
 - **enum-of-string** - Dropdown selections
 - **set-of-string** - Multiple selections
 - **email** - Email addresses
-- **password** - Encrypted secrets
+- **password** - Legacy masked values only; do not use Site preferences for secret values
 
 ## Step 3: Use app-specific patterns
 
@@ -78,24 +78,6 @@ Create the attribute definitions file:
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <default-value>false</default-value>
-            </attribute-definition>
-
-            <!-- API Credentials -->
-            <attribute-definition attribute-id="{appName}ApiKey">
-                <display-name xml:lang="x-default">{displayName} API Key</display-name>
-                <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-                <min-length>0</min-length>
-                <default-value></default-value>
-            </attribute-definition>
-
-            <attribute-definition attribute-id="{appName}ApiSecret">
-                <display-name xml:lang="x-default">{displayName} API Secret</display-name>
-                <type>password</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-                <min-length>0</min-length>
             </attribute-definition>
 
             <!-- Environment Selection -->
@@ -133,8 +115,6 @@ Create the attribute definitions file:
             <attribute-group group-id="{appName}">
                 <display-name xml:lang="x-default">{displayName}</display-name>
                 <attribute attribute-id="{appName}Enabled"/>
-                <attribute attribute-id="{appName}ApiKey"/>
-                <attribute attribute-id="{appName}ApiSecret"/>
                 <attribute attribute-id="{appName}Environment"/>
                 <attribute attribute-id="{appName}DebugMode"/>
             </attribute-group>
@@ -157,7 +137,6 @@ Create default preference values:
     <preference preference-id="{appName}Environment">sandbox</preference>
     <preference preference-id="{appName}DebugMode">false</preference>
 
-    <!-- Leave sensitive values (API keys, secrets) empty -->
 </preferences>
 ```
 
@@ -177,10 +156,11 @@ For international merchants, add translations. See `references/attribute-types.m
 ### Defaults
 - Safe defaults: Start with features disabled
 - Sensible values: Choose defaults that work for most cases
-- Empty credentials: Don't include placeholder API keys
+- Secret values: Do not configure them as Site preferences
 
 ### Security
-- Use `password` type for API secrets
+- Never generate Site preferences for keys, tokens, passwords, credentials, or other secret values
+- Use ecom service credentials and `LocalServiceRegistry` for authentication secrets
 - Don't expose secrets in XML
 - Document sensitive fields clearly
 
@@ -197,7 +177,7 @@ For international merchants, add translations. See `references/attribute-types.m
 - [ ] Descriptions provide helpful guidance
 - [ ] Appropriate data types
 - [ ] Safe default values
-- [ ] Password type for secrets
+- [ ] No secret values stored in Site preferences
 - [ ] All attributes in group definition
 - [ ] XML well-formed
 - [ ] SITEID placeholder used
@@ -225,7 +205,7 @@ xmllint --noout impex/install/sites/SITEID/preferences.xml
 | No default values | Set sensible defaults |
 | Everything mandatory | Only require essentials |
 | Generic descriptions | Provide clear guidance |
-| Hardcoded credentials | Leave empty for merchants |
+| Secret values in Site preferences | Remove them; use ecom service credentials for authentication secrets |
 | Not in group | Add all attributes to group |
 
 ## Quick reference
