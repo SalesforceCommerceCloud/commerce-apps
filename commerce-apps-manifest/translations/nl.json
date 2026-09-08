@@ -15,10 +15,10 @@
     "name": "Aangepaste verzending",
     "description": "Configureer een aangepaste verzendberekening met uw eigen API's."
   },
-    "zenkraft-shipping": {
-        "name": "Zenkraft Verzending",
-        "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
-    },
+  "zenkraft-shipping": {
+    "name": "Zenkraft Verzending",
+    "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
+  },
   "custom-payment": {
     "name": "Aangepaste betaling",
     "description": "Configureer een aangepaste betalingsintegratie met uw eigen API's."

@@ -15,10 +15,10 @@
     "name": "Wysyłka niestandardowa",
     "description": "Skonfiguruj niestandardowe obliczanie kosztów wysyłki, podając własne interfejsy API."
   },
-    "zenkraft-shipping": {
-        "name": "Zenkraft Wysyłka",
-        "description": "Obliczanie stawek wysyłki i szacowane daty dostawy obsługiwane przez Zenkraft."
-    },
+  "zenkraft-shipping": {
+    "name": "Zenkraft Wysyłka",
+    "description": "Obliczanie stawek wysyłki i szacowane daty dostawy obsługiwane przez Zenkraft."
+  },
   "custom-payment": {
     "name": "Płatność niestandardowa",
     "description": "Skonfiguruj niestandardową integrację płatności, podając własne interfejsy API."
