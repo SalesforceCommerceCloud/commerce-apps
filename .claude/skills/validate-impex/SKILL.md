@@ -88,9 +88,11 @@ xmllint --schema "$(b2c docs schema preferences --path)" impex/install/preferenc
 ### Uninstallation file (`impex/uninstall/services.xml`)
 
 **Check:**
-- [ ] All services use `mode="delete"`
-- [ ] Deletion order: service → profile → credential
+- [ ] All credentials, profiles, and services use `mode="delete"`
+- [ ] Element order matches `services.xsd` (and install): credential → profile → service
 - [ ] All IDs match install file
+
+**BM UI vs Site Impex:** Business Manager UI still requires deleting the service first (`RemoveServiceProfile` / `RemoveServiceCredential` refuse delete while a service references them). That UI rule does **not** apply to CAP uninstall IMPEX.
 
 **Verify pairs match:**
 ```bash
@@ -154,7 +156,8 @@ diff /tmp/install-ids.txt /tmp/uninstall-ids.txt
 | `Service with ID already exists` | Use unique IDs |
 | `Attribute not defined in group` | Add to group-definitions |
 | `Invalid value for type` | Match default value to type |
-| `Cannot delete service, profile in use` | Delete in order: service → profile → credential |
+| `Cannot delete service, profile in use` | Business Manager UI: delete the service first, then the profile, then the credential. This UI rule does **not** apply to CAP uninstall IMPEX. |
+| Uninstall `services.xml` fails XSD / services not deleted | Site Impex processes elements in document order. Use credential → profile → service (`mode="delete"`), the same sequence as install. |
 | `SITEID not found` | Use SITEID placeholder |
 
 ## Step 8: Pre-import checklist
