@@ -15,6 +15,10 @@
     "name": "カスタム配送",
     "description": "独自のAPIを使用してカスタム配送計算を設定します。"
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft 配送",
+    "description": "Zenkraftによる配送料計算と推定配達日。"
+  },
   "custom-payment": {
     "name": "カスタム決済",
     "description": "独自のAPIを使用してカスタム決済統合を設定します。"

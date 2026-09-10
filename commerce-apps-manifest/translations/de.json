@@ -15,6 +15,10 @@
     "name": "Benutzerdefinierter Versand",
     "description": "Konfigurieren Sie eine benutzerdefinierte Versandberechnung mit Ihren eigenen APIs."
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft Versand",
+    "description": "Versandkostenberechnung und geschätzte Liefertermine powered by Zenkraft."
+  },
   "custom-payment": {
     "name": "Benutzerdefinierte Zahlung",
     "description": "Konfigurieren Sie eine benutzerdefinierte Zahlungsintegration mit Ihren eigenen APIs."

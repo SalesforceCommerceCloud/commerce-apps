@@ -15,6 +15,10 @@
     "name": "Envio personalizado",
     "description": "Configure um cálculo de envio personalizado fornecendo suas próprias APIs."
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft Envio",
+    "description": "Cálculo de tarifas de envio e datas de entrega estimadas com tecnologia Zenkraft."
+  },
   "custom-payment": {
     "name": "Pagamento personalizado",
     "description": "Configure uma integração de pagamento personalizada fornecendo suas próprias APIs."

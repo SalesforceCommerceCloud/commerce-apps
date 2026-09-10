@@ -15,6 +15,10 @@
     "name": "맞춤 배송",
     "description": "자체 API를 제공하여 맞춤 배송 계산을 구성합니다."
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft 배송",
+    "description": "Zenkraft가 제공하는 배송 요금 계산 및 예상 배송 날짜."
+  },
   "custom-payment": {
     "name": "맞춤 결제",
     "description": "자체 API를 제공하여 맞춤 결제 통합을 구성합니다."

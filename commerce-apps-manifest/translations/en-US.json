@@ -15,6 +15,10 @@
     "name": "Custom Shipping",
     "description": "Configure a custom shipping calculation by providing your own APIs."
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft Shipping",
+    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+  },
   "custom-payment": {
     "name": "Custom Payment",
     "description": "Configure a custom payment integration by providing your own APIs."

@@ -15,6 +15,10 @@
     "name": "自訂配送",
     "description": "透過提供您自己的 API 來設定自訂配送計算。"
   },
+  "zenkraft-shipping": {
+    "name": "Zenkraft 配送",
+    "description": "由 Zenkraft 提供支援的運費計算及預計交貨日期。"
+  },
   "custom-payment": {
     "name": "自訂付款",
     "description": "透過提供您自己的 API 來設定自訂付款整合。"
