@@ -67,6 +67,7 @@
 ### Impex Files (if applicable)
 - [ ] Service install file has matching uninstall file
 - [ ] Uninstall files use `mode="delete"`
+- [ ] Uninstall `services.xml` element order is credential → profile → service (same as install)
 - [ ] All attribute IDs prefixed with app name
 - [ ] No hardcoded production credentials in services.xml
 - [ ] SITEID placeholder used (not actual site ID)
