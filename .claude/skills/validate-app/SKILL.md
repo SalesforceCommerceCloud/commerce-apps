@@ -193,6 +193,7 @@ find "$CAP_ROOT/impex/" -name "*.xml" -exec xmllint --noout {} \;
 See `references/impex-validation.md` for detailed rules:
 - Services use dotted notation
 - Install/uninstall pairs match
+- Uninstall `services.xml` uses credential → profile → service order with `mode="delete"` (same XSD sequence as install; BM UI service-first delete does not apply to IMPEX)
 - Attribute IDs use camelCase with app prefix
 - SITEID placeholder (not actual site ID)
 - No hardcoded credentials

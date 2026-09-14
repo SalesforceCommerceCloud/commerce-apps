@@ -208,7 +208,7 @@ Beyond `b2c cap validate`, validate the XML directly:
 - Well-formed XML for every file under `impex/`
 - Correct SFCC namespaces (`http://www.demandware.com/xml/impex/services/2015-07-01`, etc.)
 - `mode="delete"` on every entry in `impex/uninstall/`
-- Service IDs in install match uninstall, deletion order is service → profile → credential
+- Service IDs in install match uninstall; uninstall element order is credential → profile → service (same `services.xsd` sequence as install)
 - Attribute IDs are camelCase and prefixed with the app name
 - `SITEID` placeholder used in `preferences.xml` (not a real site ID)
 - No hardcoded production credentials
