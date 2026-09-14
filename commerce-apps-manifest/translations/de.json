@@ -35,5 +35,9 @@
   "approaching-discounts": {
     "name": "Approaching Discounts",
     "description": "Zeigen Sie Kunden, wie nah ihr Warenkorb daran ist, Bestell- und Versandaktionen freizuschalten."
+  },
+  "cds-shipping": {
+    "name": "Commerce Delivery Service",
+    "description": "Zeigen Sie Kunden geschätzte Liefertermine für Produkte und während des Checkouts."
   }
 }

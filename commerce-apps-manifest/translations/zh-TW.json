@@ -35,5 +35,9 @@
   "approaching-discounts": {
     "name": "Approaching Discounts",
     "description": "向購物者顯示他們的購物籃距離解鎖訂單和配送促銷還有多近。"
+  },
+  "cds-shipping": {
+    "name": "Commerce Delivery Service",
+    "description": "向購物者顯示商品以及結帳期間的預計送達日期。"
   }
 }

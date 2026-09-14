@@ -35,5 +35,9 @@
   "approaching-discounts": {
     "name": "Approaching Discounts",
     "description": "Pokaż kupującym, jak blisko ich koszyk jest odblokowania promocji na zamówienie i wysyłkę."
+  },
+  "cds-shipping": {
+    "name": "Commerce Delivery Service",
+    "description": "Pokaż kupującym szacowane daty dostawy produktów oraz podczas realizacji zamówienia."
   }
 }
