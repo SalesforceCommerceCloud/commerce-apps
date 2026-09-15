@@ -59,16 +59,18 @@
       "provider": "custom"
     },
     {
-      "id": "zenkraft-shipping",
-      "name": "Zenkraft Shipping",
-      "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft.",
-      "iconName": "zenkraft.png",
+      "id": "cds-shipping",
+      "name": "Commerce Delivery Service",
+      "description": "Show shoppers estimated delivery dates for products and during checkout",
+      "iconName": "salesforce.svg",
       "domain": "shipping",
       "type": "app",
-      "provider": "thirdParty",
+      "provider": "salesforce",
+      "companyName": "Salesforce",
+      "requiredFeatureToggle": "Order360IntegrationEnabled",
       "version": "1.0.0",
-      "zip": "zenkraft-shipping-v1.0.0.zip",
-      "sha256": "fbdf241dfca9c412c634c107a8d5d02a5f0e55fd9b26d36f92c5b340a250bf55"
+      "zip": "cds-shipping-v1.0.0.zip",
+      "sha256": "5af6ea74abf41ffdad63797fd4d8d13310d277ef571147daac0a208186c156ab"
     }
   ],
   "payment": [

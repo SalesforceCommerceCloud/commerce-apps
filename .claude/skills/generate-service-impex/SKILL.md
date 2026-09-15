@@ -123,14 +123,16 @@ Read `references/service-patterns.md` for pre-built patterns:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns="http://www.demandware.com/xml/impex/services/2015-07-01">
-    <!-- Delete in reverse order: service → profile → credential -->
-    <service service-id="{serviceId}" mode="delete"/>
-    <service-profile profile-id="{profileId}" mode="delete"/>
+    <!-- Same XSD order as install: credential → profile → service -->
     <service-credential credential-id="{credentialId}" mode="delete"/>
+    <service-profile profile-id="{profileId}" mode="delete"/>
+    <service service-id="{serviceId}" mode="delete"/>
 </services>
 ```
 
-**CRITICAL:** Always use `mode="delete"` and reverse order.
+**CRITICAL:** Always use `mode="delete"`. Site Impex `services.xsd` requires this sequence: `service-credential`, then `service-profile`, then `service`. Use the **same element order for install and uninstall**. The platform processes elements in document order; putting `<service>` first makes the uninstall file invalid against the XSD, so services are not deleted. Impex is safe deleting credentials and profiles first because ORM nulls `SERVICE.CREDENTIALID` / `PROFILEID` when those objects are removed.
+
+**BM UI vs Site Impex:** Business Manager UI still requires deleting the service first (`RemoveServiceProfile` / `RemoveServiceCredential` refuse delete while a service references them). That UI rule does **not** apply to CAP uninstall IMPEX.
 
 ## Step 6: Configuration best practices
 
@@ -222,8 +224,8 @@ Share profile across multiple endpoints:
 - [ ] Timeout appropriate for service type
 - [ ] Rate limiting configured
 - [ ] Circuit breaker enabled for external APIs
-- [ ] Uninstall file includes all services in reverse order
-- [ ] All services use `mode="delete"` in uninstall
+- [ ] Uninstall file includes all credentials, profiles, and services in XSD order (credential → profile → service)
+- [ ] All uninstall entries use `mode="delete"`
 - [ ] XML well-formed
 - [ ] Log prefix descriptive
 
@@ -249,7 +251,7 @@ var result = service.call(params);
 |---------|-----|
 | Hardcoded production credentials | Use placeholders |
 | Missing uninstall script | Create matching uninstall |
-| Wrong deletion order | Delete: service → profile → credential |
+| Wrong deletion order | For CAP uninstall IMPEX, use credential → profile → service (`mode="delete"`), the same XSD order as install. BM UI still requires service-first; that rule does not apply to IMPEX. |
 | No rate limiting | Add rate limit config |
 | Timeout too short | Increase based on API response time |
 | No circuit breaker | Enable for external APIs |

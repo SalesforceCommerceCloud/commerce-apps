@@ -34,9 +34,11 @@ find commerce-<appName>-app-v<version>/impex/ -name "*.xml" -exec xmllint --noou
 ### Uninstall file (`impex/uninstall/services.xml`)
 
 **Required checks:**
-- [ ] All services use `mode="delete"`
-- [ ] Deletion order: service → profile → credential
+- [ ] All credentials, profiles, and services use `mode="delete"`
+- [ ] Element order matches `services.xsd` (and install): credential → profile → service
 - [ ] All service/profile/credential IDs match install file exactly
+
+**BM UI vs Site Impex:** Business Manager UI refuses to delete a profile or credential while a service still references it (delete the service first). That UI rule does **not** apply to CAP uninstall IMPEX. Site Impex processes elements in document order and `services.xsd` requires credential → profile → service.
 
 ## Site Preferences Validation
 
@@ -101,6 +103,7 @@ Check for these frequent issues:
 **Structure:**
 - [ ] All XML files are well-formed (no unclosed tags)
 - [ ] All XML files use correct namespace declarations
+- [ ] Uninstall `services.xml` uses credential → profile → service (XSD order). BM UI service-first delete does not apply to IMPEX.
 
 **If any validation fails:**
 - Report specific file path
