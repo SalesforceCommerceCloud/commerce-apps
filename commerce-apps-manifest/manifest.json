@@ -71,6 +71,18 @@
       "version": "1.0.0",
       "zip": "cds-shipping-v1.0.0.zip",
       "sha256": "5af6ea74abf41ffdad63797fd4d8d13310d277ef571147daac0a208186c156ab"
+    },
+    {
+      "id": "zenkraft-shipping",
+      "name": "Zenkraft Shipping",
+      "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft.",
+      "iconName": "zenkraft.png",
+      "domain": "shipping",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.0",
+      "zip": "zenkraft-shipping-v1.0.0.zip",
+      "sha256": "fbdf241dfca9c412c634c107a8d5d02a5f0e55fd9b26d36f92c5b340a250bf55"
     }
   ],
   "payment": [
