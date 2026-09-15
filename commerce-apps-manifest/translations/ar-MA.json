@@ -15,6 +15,10 @@
     "name": "شحن مخصص",
     "description": "تكوين حساب شحن مخصص من خلال توفير واجهات API الخاصة بك."
   },
+  "zenkraft-shipping": {
+    "name": "شحن Zenkraft",
+    "description": "حساب أسعار الشحن وتواريخ التسليم المقدرة، مدعومة بـ Zenkraft."
+  },
   "custom-payment": {
     "name": "دفع مخصص",
     "description": "تكوين تكامل دفع مخصص من خلال توفير واجهات API الخاصة بك."
