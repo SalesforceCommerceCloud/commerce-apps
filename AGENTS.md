@@ -150,6 +150,7 @@ Your response:
 - NO `setTimeout`/`setInterval` in hook scripts
 - NO unbounded loops (`while(true)` / `for(;;)`) without break/return
 - NO ISML `<isprint>` with `encoding="off"`
+- NO `@salesforce/storefront-ui` imports in Storefront Next extensions — use `@/components/ui/...` (mirrored merchant builds remove that package; Vite/Rollup fails otherwise). Runtime APIs stay on `@salesforce/storefront-next-runtime/...`.
 - ALL apps with services MUST have rate limiting AND circuit breaker enabled on service profiles
 
 ### 5. Impex Rules
@@ -528,6 +529,7 @@ Before suggesting `/submit-app-pr`, verify:
 - [ ] No eval/innerHTML/outerHTML/insertAdjacentHTML/document write
 - [ ] Hook scripts have try/catch, export expected functions, no setTimeout/setInterval
 - [ ] No unbounded loops without exit conditions
+- [ ] No `@salesforce/storefront-ui` imports in storefront-next (use `@/components/ui/...`)
 - [ ] All service profiles have rate-limit-enabled=true AND circuit-breaker-enabled=true (or cb-enabled=true)
 
 ## Helping Developers Effectively
