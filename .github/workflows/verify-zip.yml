@@ -204,6 +204,18 @@ jobs:
             fi
             echo "  ✓ $project_output"
 
+            # Storefront Next extensions must not import @salesforce/storefront-ui
+            # (mirrored merchant builds remove that package). See
+            # .github/scripts/validate-storefront-imports.sh. Skips gracefully
+            # if the CAP has no storefront-next/ directory (Backend-only apps).
+            if ! sf_imports_output="$(bash ".github/scripts/validate-storefront-imports.sh" "$root" 2>&1)"; then
+              echo "::error file=$zip_path::storefront import validation failed:"
+              printf '%s\n' "$sf_imports_output"
+              rm -rf "$tmpdir"
+              exit 1
+            fi
+            echo "  ✓ $sf_imports_output"
+
             rm -rf "$tmpdir"
           done < changed_zips.txt
 
