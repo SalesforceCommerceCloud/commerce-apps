@@ -23,6 +23,10 @@
         "name": "Salesforce Payments",
         "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods."
     },
+    "esw-sfnext": {
+        "name": "ESW",
+        "description": "ESW cross-border pricing, checkout, and fulfillment integration for Storefront Next."
+    },
     "noibu": {
         "name": "Noibu",
         "description": "Loads Noibu session monitoring script on every storefront page"

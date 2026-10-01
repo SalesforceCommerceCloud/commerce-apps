@@ -50,6 +50,33 @@ strip_comments() {
   grep -vE '^[0-9]+:\s*//' | grep -vE '^[0-9]+:\s*\*' | grep -vE '^[0-9]+:\s*/\*'
 }
 
+# jQuery 3.6.3 is a licensed BM vendor asset; these two lexical rules match its internal implementation.
+# Keep the exception pinned to the one package path and exact upstream bytes. Any update must be reviewed.
+APPROVED_JQUERY_PATH='cartridges/bm_cartridges/bm_eshopworld_core/cartridge/static/default/js/jquery-3.6.3.min.js'
+APPROVED_JQUERY_SHA256='87bdc5a6c1d6100b5994d0a0e449a3353eda704a1b87ef695bc203c08aa71b48'
+
+file_sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d ' ' -f 1
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | cut -d ' ' -f 1
+  else
+    return 1
+  fi
+}
+
+is_approved_jquery_asset() {
+  local file="$1"
+  case "$file" in
+    */"$APPROVED_JQUERY_PATH") ;;
+    *) return 1 ;;
+  esac
+
+  local digest
+  digest="$(file_sha256 "$file")" || return 1
+  [[ "$digest" == "$APPROVED_JQUERY_SHA256" ]]
+}
+
 # Collect JS/DS files (cartridge server-side scripts + storefront-next TS)
 # Using while-read for macOS bash 3 compatibility (no mapfile)
 JS_FILES=()
@@ -124,6 +151,7 @@ done
 # S3: innerHTML assignment (BLOCK)
 for f in ${ALL_CODE_FILES[@]+"${ALL_CODE_FILES[@]}"}; do
   [[ -z "$f" ]] && continue
+  if is_approved_jquery_asset "$f"; then continue; fi
   while IFS= read -r line; do
     block "$f" "innerHTML assignment detected — XSS risk: $line"
   done < <(grep -nE '\.innerHTML\s*=' "$f" 2>/dev/null | strip_comments | head -5)
@@ -451,6 +479,7 @@ done
 # Q7: console.log in production cartridge code (BLOCK)
 for f in ${JS_FILES[@]+"${JS_FILES[@]}"}; do
   [[ -z "$f" ]] && continue
+  if is_approved_jquery_asset "$f"; then continue; fi
   while IFS= read -r line; do
     block "$f" "console.log/debug statement in cartridge code — use dw.system.Logger: $line"
   done < <(grep -nE 'console\.(log|debug|info|warn|error)\s*\(' "$f" 2>/dev/null | strip_comments | head -5)

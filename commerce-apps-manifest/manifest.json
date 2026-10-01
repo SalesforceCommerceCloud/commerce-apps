@@ -85,6 +85,18 @@
             "connectionDetailsComponents": [
                 "ccbm_payments/merchantAccountDetails"
             ]
+        },
+        {
+            "id": "esw-sfnext",
+            "name": "ESW",
+            "description": "ESW cross-border pricing, checkout, and fulfillment integration for Storefront Next.",
+            "iconName": "eshopworld.png",
+            "domain": "payment",
+            "type": "app",
+            "provider": "thirdParty",
+            "version": "5.1.2",
+            "zip": "esw-sfnext-v5.1.2.zip",
+            "sha256": "2d9161541d1f74defdb7433f507606094b6f21ac19787f23a500cc9f143341f8"
         }
     ],
     "fraud": [],
