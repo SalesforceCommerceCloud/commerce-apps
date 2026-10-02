@@ -169,6 +169,19 @@ assert_blocks "innerHTML assignment" "$cap"
 cap="$(mkcap)"; printf 'var x = el.innerHTML;\n' > "$cap/app.js"
 assert_passes "innerHTML read is safe" "$cap"
 
+cap="$(mkcap)"
+jquery_file="$cap/cartridges/bm_cartridges/bm_eshopworld_core/cartridge/static/default/js/jquery-3.6.3.min.js"
+mkdir -p "$(dirname "$jquery_file")"
+printf 'el.innerHTML = untrusted; console.log("modified vendor asset");\n' > "$jquery_file"
+run_scan "$cap"
+if [[ "$LAST_RC" -eq 1 ]] && echo "$LAST_OUTPUT" | grep -qF "innerHTML assignment detected" && echo "$LAST_OUTPUT" | grep -qF "console.log/debug statement"; then
+  echo "  PASS: changed jQuery bytes at the allowlisted path still trigger both blockers"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: changed jQuery bytes at the allowlisted path must still trigger both blockers"
+  FAIL=$((FAIL + 1))
+fi
+
 echo ""
 
 # ---------------------------------------------------------------------------
