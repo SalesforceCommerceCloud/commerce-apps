@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "Show shoppers estimated delivery dates for products and during checkout"
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Custom Ratings and Reviews",
+    "description": "Configure a custom ratings and reviews integration by providing your own APIs."
+  },
+  "custom-address-verification": {
+    "name": "Custom Address Verification",
+    "description": "Configure a custom address verification integration by providing your own APIs."
+  },
+  "custom-search": {
+    "name": "Custom Search",
+    "description": "Configure a custom search integration by providing your own APIs."
+  },
+  "custom-content-management": {
+    "name": "Custom Content Management",
+    "description": "Configure a custom content management integration by providing your own APIs."
   }
 }

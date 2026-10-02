@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "向購物者顯示商品以及結帳期間的預計送達日期。"
+  },
+  "custom-ratings-and-reviews": {
+    "name": "自訂評分與評論",
+    "description": "透過提供您自己的 API 來設定自訂評分與評論整合。"
+  },
+  "custom-address-verification": {
+    "name": "自訂地址驗證",
+    "description": "透過提供您自己的 API 來設定自訂地址驗證整合。"
+  },
+  "custom-search": {
+    "name": "自訂搜尋",
+    "description": "透過提供您自己的 API 來設定自訂搜尋整合。"
+  },
+  "custom-content-management": {
+    "name": "自訂內容管理系統",
+    "description": "透過提供您自己的 API 來設定自訂內容管理系統整合。"
   }
 }

@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "쇼핑객에게 상품 및 결제 중 예상 배송일을 보여줍니다."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "맞춤 평점 및 리뷰",
+    "description": "자체 API를 제공하여 맞춤 평점 및 리뷰 통합을 구성합니다."
+  },
+  "custom-address-verification": {
+    "name": "맞춤 주소 확인",
+    "description": "자체 API를 제공하여 맞춤 주소 확인 통합을 구성합니다."
+  },
+  "custom-search": {
+    "name": "맞춤 검색",
+    "description": "자체 API를 제공하여 맞춤 검색 통합을 구성합니다."
+  },
+  "custom-content-management": {
+    "name": "맞춤 콘텐츠 관리 시스템",
+    "description": "자체 API를 제공하여 맞춤 콘텐츠 관리 시스템 통합을 구성합니다."
   }
 }
