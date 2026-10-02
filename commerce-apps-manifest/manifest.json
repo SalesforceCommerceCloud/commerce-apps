@@ -96,7 +96,7 @@
             "provider": "thirdParty",
             "version": "5.1.2",
             "zip": "esw-sfnext-v5.1.2.zip",
-            "sha256": "2d9161541d1f74defdb7433f507606094b6f21ac19787f23a500cc9f143341f8"
+            "sha256": "b42a0bcc967fb27cbbe4f4df7c295447414da4afc2b3fdedd5285e8a9039574f"
         }
     ],
     "fraud": [],
