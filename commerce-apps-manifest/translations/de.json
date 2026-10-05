@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "Zeigen Sie Kunden geschätzte Liefertermine für Produkte und während des Checkouts."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Benutzerdefinierte Bewertungen und Rezensionen",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Bewertungs- und Rezensionsintegration mit Ihren eigenen APIs."
+  },
+  "custom-address-verification": {
+    "name": "Benutzerdefinierte Adressprüfung",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Adressprüfungsintegration mit Ihren eigenen APIs."
+  },
+  "custom-search": {
+    "name": "Benutzerdefinierte Suche",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Suchintegration mit Ihren eigenen APIs."
+  },
+  "custom-content-management": {
+    "name": "Benutzerdefiniertes Content-Management-System",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Content-Management-System-Integration mit Ihren eigenen APIs."
   }
 }

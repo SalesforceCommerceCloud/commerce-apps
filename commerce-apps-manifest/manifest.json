@@ -169,5 +169,49 @@
         }
       }
     }
+  ],
+  "ratings-and-reviews": [
+    {
+      "id": "custom-ratings-and-reviews",
+      "name": "Custom Ratings and Reviews",
+      "description": "Configure a custom ratings and reviews integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "ratings-and-reviews",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "address-verification": [
+    {
+      "id": "custom-address-verification",
+      "name": "Custom Address Verification",
+      "description": "Configure a custom address verification integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "address-verification",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "search": [
+    {
+      "id": "custom-search",
+      "name": "Custom Search",
+      "description": "Configure a custom search integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "search",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "content-management": [
+    {
+      "id": "custom-content-management",
+      "name": "Custom Content Management",
+      "description": "Configure a custom content management integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "content-management",
+      "type": "custom",
+      "provider": "custom"
+    }
   ]
 }
