@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "Pokaż kupującym szacowane daty dostawy produktów oraz podczas realizacji zamówienia."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Oceny i recenzje niestandardowe",
+    "description": "Skonfiguruj niestandardową integrację ocen i recenzji, podając własne interfejsy API."
+  },
+  "custom-address-verification": {
+    "name": "Weryfikacja adresu niestandardowa",
+    "description": "Skonfiguruj niestandardową integrację weryfikacji adresu, podając własne interfejsy API."
+  },
+  "custom-search": {
+    "name": "Wyszukiwanie niestandardowe",
+    "description": "Skonfiguruj niestandardową integrację wyszukiwania, podając własne interfejsy API."
+  },
+  "custom-content-management": {
+    "name": "Niestandardowy system zarządzania treścią",
+    "description": "Skonfiguruj niestandardową integrację systemu zarządzania treścią, podając własne interfejsy API."
   }
 }

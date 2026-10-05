@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "向购物者显示商品以及结账期间的预计送达日期。"
+  },
+  "custom-ratings-and-reviews": {
+    "name": "自定义评分和评论",
+    "description": "通过提供您自己的 API 来配置自定义评分和评论集成。"
+  },
+  "custom-address-verification": {
+    "name": "自定义地址验证",
+    "description": "通过提供您自己的 API 来配置自定义地址验证集成。"
+  },
+  "custom-search": {
+    "name": "自定义搜索",
+    "description": "通过提供您自己的 API 来配置自定义搜索集成。"
+  },
+  "custom-content-management": {
+    "name": "自定义内容管理系统",
+    "description": "通过提供您自己的 API 来配置自定义内容管理系统集成。"
   }
 }

@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "أظهر للمتسوقين تواريخ التسليم المقدرة للمنتجات وأثناء إتمام الشراء."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "التقييمات والمراجعات المخصصة",
+    "description": "تكوين تكامل تقييمات ومراجعات مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "custom-address-verification": {
+    "name": "التحقق المخصص من العنوان",
+    "description": "تكوين تكامل تحقق من العنوان مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "custom-search": {
+    "name": "بحث مخصص",
+    "description": "تكوين تكامل بحث مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "custom-content-management": {
+    "name": "نظام إدارة محتوى مخصص",
+    "description": "تكوين تكامل نظام إدارة محتوى مخصص من خلال توفير واجهات API الخاصة بك."
   }
 }

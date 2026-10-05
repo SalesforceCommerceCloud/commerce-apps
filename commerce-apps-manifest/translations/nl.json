@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "Laat shoppers geschatte leverdata zien voor producten en tijdens het afrekenen."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Aangepaste beoordelingen en recensies",
+    "description": "Configureer een aangepaste beoordelings- en recensie-integratie met uw eigen API's."
+  },
+  "custom-address-verification": {
+    "name": "Aangepaste adresverificatie",
+    "description": "Configureer een aangepaste adresverificatie-integratie met uw eigen API's."
+  },
+  "custom-search": {
+    "name": "Aangepaste zoekfunctie",
+    "description": "Configureer een aangepaste zoekintegratie met uw eigen API's."
+  },
+  "custom-content-management": {
+    "name": "Aangepast contentbeheersysteem",
+    "description": "Configureer een aangepaste contentbeheersysteemintegratie met uw eigen API's."
   }
 }

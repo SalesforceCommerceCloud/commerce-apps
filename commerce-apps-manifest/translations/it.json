@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "Mostra ai clienti le date di consegna stimate per i prodotti e durante il checkout."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Valutazioni e recensioni personalizzate",
+    "description": "Configura un'integrazione di valutazioni e recensioni personalizzata fornendo le tue API."
+  },
+  "custom-address-verification": {
+    "name": "Verifica dell'indirizzo personalizzata",
+    "description": "Configura un'integrazione di verifica dell'indirizzo personalizzata fornendo le tue API."
+  },
+  "custom-search": {
+    "name": "Ricerca personalizzata",
+    "description": "Configura un'integrazione di ricerca personalizzata fornendo le tue API."
+  },
+  "custom-content-management": {
+    "name": "Sistema di gestione dei contenuti personalizzato",
+    "description": "Configura un'integrazione di sistema di gestione dei contenuti personalizzata fornendo le tue API."
   }
 }
