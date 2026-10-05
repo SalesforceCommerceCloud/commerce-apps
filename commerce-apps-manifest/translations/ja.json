@@ -43,5 +43,21 @@
   "cds-shipping": {
     "name": "Commerce Delivery Service",
     "description": "商品およびチェックアウト時の推定配送日を買い物客に表示します。"
+  },
+  "custom-ratings-and-reviews": {
+    "name": "カスタム評価とレビュー",
+    "description": "独自のAPIを使用してカスタム評価とレビューの統合を設定します。"
+  },
+  "custom-address-verification": {
+    "name": "カスタム住所確認",
+    "description": "独自のAPIを使用してカスタム住所確認の統合を設定します。"
+  },
+  "custom-search": {
+    "name": "カスタム検索",
+    "description": "独自のAPIを使用してカスタム検索の統合を設定します。"
+  },
+  "custom-content-management": {
+    "name": "カスタムコンテンツ管理システム",
+    "description": "独自のAPIを使用してカスタムコンテンツ管理システムの統合を設定します。"
   }
 }
