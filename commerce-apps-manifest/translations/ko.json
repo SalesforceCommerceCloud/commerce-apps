@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "맞춤 콘텐츠 관리 시스템",
     "description": "자체 API를 제공하여 맞춤 콘텐츠 관리 시스템 통합을 구성합니다."
+  },
+  "custom-fraud": {
+    "name": "맞춤 사기 탐지",
+    "description": "자체 API를 제공하여 맞춤 사기 탐지 통합을 구성합니다."
+  },
+  "custom-giftcard": {
+    "name": "맞춤 기프트 카드",
+    "description": "자체 API를 제공하여 맞춤 기프트 카드 통합을 구성합니다."
   }
 }

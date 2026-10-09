@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "自定义内容管理系统",
     "description": "通过提供您自己的 API 来配置自定义内容管理系统集成。"
+  },
+  "custom-fraud": {
+    "name": "自定义欺诈检测",
+    "description": "通过提供您自己的 API 来配置自定义欺诈集成。"
+  },
+  "custom-giftcard": {
+    "name": "自定义礼品卡",
+    "description": "通过提供您自己的 API 来配置自定义礼品卡集成。"
   }
 }

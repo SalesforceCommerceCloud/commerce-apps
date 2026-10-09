@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "カスタムコンテンツ管理システム",
     "description": "独自のAPIを使用してカスタムコンテンツ管理システムの統合を設定します。"
+  },
+  "custom-fraud": {
+    "name": "カスタム不正検知",
+    "description": "独自のAPIを使用してカスタム不正検知の統合を設定します。"
+  },
+  "custom-giftcard": {
+    "name": "カスタムギフトカード",
+    "description": "独自のAPIを使用してカスタムギフトカードの統合を設定します。"
   }
 }

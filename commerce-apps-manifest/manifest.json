@@ -123,7 +123,28 @@
       ]
     }
   ],
-  "fraud": [],
+  "fraud": [
+    {
+      "id": "custom-fraud",
+      "name": "Custom Fraud",
+      "description": "Configure a custom fraud integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "fraud",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "giftcard": [
+    {
+      "id": "custom-giftcard",
+      "name": "Custom Gift Card",
+      "description": "Configure a custom gift card integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "giftcard",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
   "analytics": [
     {
       "id": "custom-analytics",

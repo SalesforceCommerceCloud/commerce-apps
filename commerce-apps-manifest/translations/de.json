@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "Benutzerdefiniertes Content-Management-System",
     "description": "Konfigurieren Sie eine benutzerdefinierte Content-Management-System-Integration mit Ihren eigenen APIs."
+  },
+  "custom-fraud": {
+    "name": "Benutzerdefinierte Betrugserkennung",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Betrugsintegration mit Ihren eigenen APIs."
+  },
+  "custom-giftcard": {
+    "name": "Benutzerdefinierte Geschenkkarte",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Geschenkkartenintegration mit Ihren eigenen APIs."
   }
 }
