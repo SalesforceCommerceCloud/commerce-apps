@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "Système de gestion de contenu personnalisé",
     "description": "Configurez une intégration de système de gestion de contenu personnalisée en fournissant vos propres API."
+  },
+  "custom-fraud": {
+    "name": "Fraude personnalisé",
+    "description": "Configurez une intégration de fraude personnalisée en fournissant vos propres API."
+  },
+  "custom-giftcard": {
+    "name": "Carte cadeau personnalisée",
+    "description": "Configurez une intégration de carte cadeau personnalisée en fournissant vos propres API."
   }
 }

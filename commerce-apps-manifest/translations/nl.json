@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "Aangepast contentbeheersysteem",
     "description": "Configureer een aangepaste contentbeheersysteemintegratie met uw eigen API's."
+  },
+  "custom-fraud": {
+    "name": "Aangepaste fraudedetectie",
+    "description": "Configureer een aangepaste fraude-integratie met uw eigen API's."
+  },
+  "custom-giftcard": {
+    "name": "Aangepaste cadeaubon",
+    "description": "Configureer een aangepaste cadeaubonintegratie met uw eigen API's."
   }
 }

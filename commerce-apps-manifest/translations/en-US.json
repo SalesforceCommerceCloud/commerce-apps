@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "Custom Content Management",
     "description": "Configure a custom content management integration by providing your own APIs."
+  },
+  "custom-fraud": {
+    "name": "Custom Fraud",
+    "description": "Configure a custom fraud integration by providing your own APIs."
+  },
+  "custom-giftcard": {
+    "name": "Custom Gift Card",
+    "description": "Configure a custom gift card integration by providing your own APIs."
   }
 }

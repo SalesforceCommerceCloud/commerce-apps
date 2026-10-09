@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "自訂內容管理系統",
     "description": "透過提供您自己的 API 來設定自訂內容管理系統整合。"
+  },
+  "custom-fraud": {
+    "name": "自訂詐欺偵測",
+    "description": "透過提供您自己的 API 來設定自訂詐欺整合。"
+  },
+  "custom-giftcard": {
+    "name": "自訂禮品卡",
+    "description": "透過提供您自己的 API 來設定自訂禮品卡整合。"
   }
 }

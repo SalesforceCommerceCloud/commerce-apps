@@ -59,5 +59,13 @@
   "custom-content-management": {
     "name": "Niestandardowy system zarządzania treścią",
     "description": "Skonfiguruj niestandardową integrację systemu zarządzania treścią, podając własne interfejsy API."
+  },
+  "custom-fraud": {
+    "name": "Niestandardowe wykrywanie oszustw",
+    "description": "Skonfiguruj niestandardową integrację wykrywania oszustw, podając własne interfejsy API."
+  },
+  "custom-giftcard": {
+    "name": "Niestandardowa karta podarunkowa",
+    "description": "Skonfiguruj niestandardową integrację kart podarunkowych, podając własne interfejsy API."
   }
 }
