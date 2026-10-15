@@ -28,6 +28,10 @@
     "description": "Procese pagos de forma nativa en Storefront Next. Salesforce Payments admite múltiples pasarelas y métodos de pago.",
     "featuredTagline": "Cobre pagos rápidamente con una solución integral y perfecta para Adyen, Stripe y PayPal."
   },
+  "esw-sfnext": {
+    "name": "ESW",
+    "description": "Integración de ESW para precios transfronterizos, pago y gestión de pedidos en Storefront Next."
+  },
   "custom-analytics": {
     "name": "Analítica personalizada",
     "description": "Configure una integración de analítica personalizada proporcionando sus propias API."
