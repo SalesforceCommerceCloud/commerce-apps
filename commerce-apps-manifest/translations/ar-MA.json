@@ -28,6 +28,10 @@
     "description": "معالجة المدفوعات بشكل أصلي في Storefront Next. يدعم Salesforce Payments بوابات وطرق دفع متعددة.",
     "featuredTagline": "اجمع المدفوعات بسرعة من خلال حل شامل وسلس لـ Adyen و Stripe و PayPal."
   },
+  "esw-sfnext": {
+    "name": "ESW",
+    "description": "تكامل ESW للتسعير عبر الحدود وإتمام الشراء وتنفيذ الطلبات في Storefront Next."
+  },
   "noibu": {
     "name": "Noibu",
     "description": "يحمّل نص Noibu لمراقبة الجلسة على كل صفحة من صفحات الواجهة"
