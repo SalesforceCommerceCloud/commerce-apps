@@ -68,9 +68,9 @@
       "provider": "salesforce",
       "companyName": "Salesforce",
       "requiredFeatureToggle": "Order360IntegrationEnabled",
-      "version": "1.0.0",
-      "zip": "cds-shipping-v1.0.0.zip",
-      "sha256": "5af6ea74abf41ffdad63797fd4d8d13310d277ef571147daac0a208186c156ab"
+      "version": "1.0.1",
+      "zip": "cds-shipping-v1.0.1.zip",
+      "sha256": "7ef87b25de1636db90c6d4372dda9be27f205c786b8d3036a029a6f25ac4935e"
     },
     {
       "id": "zenkraft-shipping",
