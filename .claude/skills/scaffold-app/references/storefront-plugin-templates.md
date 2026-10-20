@@ -695,6 +695,22 @@ import { useNavigate } from '@/hooks/use-navigate';
 import { Link } from 'react-router';
 ```
 
+**UI primitive imports (REQUIRED for mirrored merchant Storefront Next builds):**
+```typescript
+// ✅ Correct - host aliases (mirrored Storefront Next inlines UI into @/components/ui/)
+import { Button } from '@/components/ui/button';
+import { Accordion, AccordionItem } from '@/components/ui/accordion';
+import { Form, FormField } from '@/components/ui/form';
+
+// ❌ Wrong - @salesforce/storefront-ui is removed in mirrored merchant builds;
+// Vite/Rollup fails with "failed to resolve import"
+import { Button } from '@salesforce/storefront-ui/components/ui/button';
+```
+
+**Allowed `@salesforce/*` packages in extensions:**
+- ✅ `@salesforce/storefront-next-runtime/...` (config, APIs, runtime helpers)
+- ❌ `@salesforce/storefront-ui` / `@salesforce/storefront-ui/...` (never — use `@/components/ui/...`)
+
 ### TypeScript Rules
 
 - **No non-null assertions:** Avoid using `!` operator (e.g., `value!.prop`)
@@ -1147,6 +1163,7 @@ storefront-next/src/extensions/product-reviews/
 - [ ] **Use `import type` for ALL types/interfaces** (React types, custom types from .ts files)
 - [ ] **Regular `import` only for runtime values** (functions, components, hooks)
 - [ ] No direct react-router imports (use @/components/link and @/hooks/use-navigate)
+- [ ] **No `@salesforce/storefront-ui` imports** — UI primitives use `@/components/ui/...` only
 
 ### Internationalization
 - [ ] **All three locales created:** en-US, en-GB, it-IT

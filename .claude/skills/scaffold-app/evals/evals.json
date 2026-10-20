@@ -763,6 +763,10 @@
           "description": "Imports from same module are combined into single statement (ESLint: no-duplicate-imports)"
         },
         {
+          "name": "no @salesforce/storefront-ui imports",
+          "description": "UI primitives import from @/components/ui/... only; never @salesforce/storefront-ui (mirrored merchant builds remove that package)"
+        },
+        {
           "name": "no array index used as React key",
           "description": "Components don't use array index as key prop in map() (ESLint: react/no-array-index-key)"
         },

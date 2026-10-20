@@ -150,12 +150,13 @@ Your response:
 - NO `setTimeout`/`setInterval` in hook scripts
 - NO unbounded loops (`while(true)` / `for(;;)`) without break/return
 - NO ISML `<isprint>` with `encoding="off"`
+- NO `@salesforce/storefront-ui` imports in Storefront Next extensions — use `@/components/ui/...` (mirrored merchant builds remove that package; Vite/Rollup fails otherwise). Runtime APIs stay on `@salesforce/storefront-next-runtime/...`.
 - ALL apps with services MUST have rate limiting AND circuit breaker enabled on service profiles
 
 ### 5. Impex Rules
 - Service install files MUST have matching uninstall files
 - Uninstall MUST use `mode="delete"`
-- Deletion order: service → profile → credential
+- Uninstall element order: credential → profile → service (Site Impex `services.xsd`; same order as install). BM UI still requires service-first; that rule does not apply to CAP uninstall IMPEX.
 - Use `SITEID` placeholder, not actual site IDs
 - All attribute IDs MUST be prefixed with app name
 
@@ -346,6 +347,21 @@ tax/avalara-tax/catalog.json
 <service service-id="myapp.api" mode="delete"/>
 ```
 
+### ❌ Wrong Uninstall Element Order
+```xml
+<!-- WRONG for Site Impex — violates services.xsd and services are not deleted -->
+<service service-id="myapp.api" mode="delete"/>
+<service-profile profile-id="myapp.profile" mode="delete"/>
+<service-credential credential-id="myapp.credential" mode="delete"/>
+
+<!-- RIGHT — same XSD order as install: credential → profile → service -->
+<service-credential credential-id="myapp.credential" mode="delete"/>
+<service-profile profile-id="myapp.profile" mode="delete"/>
+<service service-id="myapp.api" mode="delete"/>
+```
+
+Business Manager UI still requires deleting the service first. That UI rule does not apply to CAP uninstall IMPEX.
+
 ### ❌ Version Mismatch
 ```json
 // manifest.json
@@ -499,6 +515,7 @@ Before suggesting `/submit-app-pr`, verify:
 **Impex Validation:**
 - [ ] XML syntax valid (no parsing errors)
 - [ ] Service install has matching uninstall
+- [ ] Uninstall `services.xml` uses credential → profile → service order with `mode="delete"`
 - [ ] Attribute IDs prefixed with app name
 - [ ] No hardcoded production credentials
 - [ ] SITEID placeholder used (not actual site ID)
@@ -512,6 +529,7 @@ Before suggesting `/submit-app-pr`, verify:
 - [ ] No eval/innerHTML/outerHTML/insertAdjacentHTML/document write
 - [ ] Hook scripts have try/catch, export expected functions, no setTimeout/setInterval
 - [ ] No unbounded loops without exit conditions
+- [ ] No `@salesforce/storefront-ui` imports in storefront-next (use `@/components/ui/...`)
 - [ ] All service profiles have rate-limit-enabled=true AND circuit-breaker-enabled=true (or cb-enabled=true)
 
 ## Helping Developers Effectively

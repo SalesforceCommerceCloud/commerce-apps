@@ -59,6 +59,20 @@
       "provider": "custom"
     },
     {
+      "id": "cds-shipping",
+      "name": "Commerce Delivery Service",
+      "description": "Show shoppers estimated delivery dates for products and during checkout",
+      "iconName": "salesforce.svg",
+      "domain": "shipping",
+      "type": "app",
+      "provider": "salesforce",
+      "companyName": "Salesforce",
+      "requiredFeatureToggle": "Order360IntegrationEnabled",
+      "version": "1.0.1",
+      "zip": "cds-shipping-v1.0.1.zip",
+      "sha256": "7ef87b25de1636db90c6d4372dda9be27f205c786b8d3036a029a6f25ac4935e"
+    },
+    {
       "id": "zenkraft-shipping",
       "name": "Zenkraft Shipping",
       "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft.",
@@ -109,7 +123,28 @@
       ]
     }
   ],
-  "fraud": [],
+  "fraud": [
+    {
+      "id": "custom-fraud",
+      "name": "Custom Fraud",
+      "description": "Configure a custom fraud integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "fraud",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "giftcard": [
+    {
+      "id": "custom-giftcard",
+      "name": "Custom Gift Card",
+      "description": "Configure a custom gift card integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "giftcard",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
   "analytics": [
     {
       "id": "custom-analytics",
@@ -154,6 +189,50 @@
           "minVersion": "1.2.0"
         }
       }
+    }
+  ],
+  "ratings-and-reviews": [
+    {
+      "id": "custom-ratings-and-reviews",
+      "name": "Custom Ratings and Reviews",
+      "description": "Configure a custom ratings and reviews integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "ratings-and-reviews",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "address-verification": [
+    {
+      "id": "custom-address-verification",
+      "name": "Custom Address Verification",
+      "description": "Configure a custom address verification integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "address-verification",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "search": [
+    {
+      "id": "custom-search",
+      "name": "Custom Search",
+      "description": "Configure a custom search integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "search",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "content-management": [
+    {
+      "id": "custom-content-management",
+      "name": "Custom Content Management",
+      "description": "Configure a custom content management integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "content-management",
+      "type": "custom",
+      "provider": "custom"
     }
   ]
 }

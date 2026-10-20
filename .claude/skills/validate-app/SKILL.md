@@ -182,6 +182,18 @@ jq -r '[.components[]?.path, .actionHooks[]?.handler, .routes[]?.handler] | .[] 
 
 If the extension ships translations, they live under `storefront-next/src/extensions/<appName>/locales/<locale>/translations.json`. Locale set is app-specific — not a fixed allowlist.
 
+### Step 8b: Forbid `@salesforce/storefront-ui` imports (UI-only/Fullstack)
+
+**Skip if Backend-only** (`HAS_UI=0`).
+
+Mirrored merchant Storefront Next builds inline UI primitives into `@/components/ui/...` and remove the `@salesforce/storefront-ui` package. CAP code that still imports that package builds in the monorepo but fails Vite/Rollup in merchant installs (`Rollup failed to resolve import "@salesforce/storefront-ui/..."`).
+
+**FAIL** if any storefront source file imports or requires `@salesforce/storefront-ui` (package root or any subpath). Allowed alternatives: `@/components/ui/...` for UI primitives; `@salesforce/storefront-next-runtime/...` for runtime APIs.
+
+```bash
+bash .github/scripts/validate-storefront-imports.sh "$CAP_ROOT"
+```
+
 ## Step 9: Validate impex (Backend-only/Fullstack)
 
 **Skip if UI-only.**
@@ -193,6 +205,7 @@ find "$CAP_ROOT/impex/" -name "*.xml" -exec xmllint --noout {} \;
 See `references/impex-validation.md` for detailed rules:
 - Services use dotted notation
 - Install/uninstall pairs match
+- Uninstall `services.xml` uses credential → profile → service order with `mode="delete"` (same XSD sequence as install; BM UI service-first delete does not apply to IMPEX)
 - Attribute IDs use camelCase with app prefix
 - SITEID placeholder (not actual site ID)
 - No hardcoded credentials

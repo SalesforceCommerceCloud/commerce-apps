@@ -39,5 +39,33 @@
   "approaching-discounts": {
     "name": "Approaching Discounts",
     "description": "向購物者顯示他們的購物籃距離解鎖訂單和配送促銷還有多近。"
+  },
+  "cds-shipping": {
+    "name": "Commerce Delivery Service",
+    "description": "向購物者顯示商品以及結帳期間的預計送達日期。"
+  },
+  "custom-ratings-and-reviews": {
+    "name": "自訂評分與評論",
+    "description": "透過提供您自己的 API 來設定自訂評分與評論整合。"
+  },
+  "custom-address-verification": {
+    "name": "自訂地址驗證",
+    "description": "透過提供您自己的 API 來設定自訂地址驗證整合。"
+  },
+  "custom-search": {
+    "name": "自訂搜尋",
+    "description": "透過提供您自己的 API 來設定自訂搜尋整合。"
+  },
+  "custom-content-management": {
+    "name": "自訂內容管理系統",
+    "description": "透過提供您自己的 API 來設定自訂內容管理系統整合。"
+  },
+  "custom-fraud": {
+    "name": "自訂詐欺偵測",
+    "description": "透過提供您自己的 API 來設定自訂詐欺整合。"
+  },
+  "custom-giftcard": {
+    "name": "自訂禮品卡",
+    "description": "透過提供您自己的 API 來設定自訂禮品卡整合。"
   }
 }

@@ -39,5 +39,33 @@
   "approaching-discounts": {
     "name": "Approaching Discounts",
     "description": "Muestre a los compradores lo cerca que está su cesta de desbloquear promociones de pedido y envío."
+  },
+  "cds-shipping": {
+    "name": "Commerce Delivery Service",
+    "description": "Muestre a los compradores las fechas de entrega estimadas de los productos y durante el pago."
+  },
+  "custom-ratings-and-reviews": {
+    "name": "Valoraciones y reseñas personalizadas",
+    "description": "Configure una integración de valoraciones y reseñas personalizada proporcionando sus propias API."
+  },
+  "custom-address-verification": {
+    "name": "Verificación de dirección personalizada",
+    "description": "Configure una integración de verificación de dirección personalizada proporcionando sus propias API."
+  },
+  "custom-search": {
+    "name": "Búsqueda personalizada",
+    "description": "Configure una integración de búsqueda personalizada proporcionando sus propias API."
+  },
+  "custom-content-management": {
+    "name": "Sistema de gestión de contenido personalizado",
+    "description": "Configure una integración de sistema de gestión de contenido personalizada proporcionando sus propias API."
+  },
+  "custom-fraud": {
+    "name": "Detección de fraude personalizada",
+    "description": "Configure una integración de fraude personalizada proporcionando sus propias API."
+  },
+  "custom-giftcard": {
+    "name": "Tarjeta de regalo personalizada",
+    "description": "Configure una integración de tarjeta de regalo personalizada proporcionando sus propias API."
   }
 }

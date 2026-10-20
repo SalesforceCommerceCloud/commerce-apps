@@ -180,6 +180,7 @@ For site preferences, invoke `/generate-site-preferences-impex` skill.
 - Always use `useTranslation()` - never hardcode English strings; namespace uses ext + PascalCase (e.g., `useTranslation('extProductReviews')`), JSON root key uses camelCase (e.g., `"productReviews"`)
 - **Generate all three locales:** en-US, en-GB, it-IT with identical key structures
 - **Configuration:** Use `useConfig<AppConfig>()` with direct property access (`appConfig.extension?.appName?.key || defaultValue`), NEVER use `.get()` method. PUBLIC__ env vars with double underscores (e.g., `PUBLIC__app__extension__appName__apiKey`)
+- **UI primitives must use host aliases:** import from `@/components/ui/...` (e.g., `@/components/ui/button`), never from `@salesforce/storefront-ui/...`. Mirrored merchant Storefront Next builds inline those components into `@/components/ui/` and remove the `@salesforce/storefront-ui` package — Vite/Rollup fails if CAP code still imports it. Runtime APIs stay on `@salesforce/storefront-next-runtime/...`.
 - **Follow Storefront Next ESLint and Prettier rules:** semicolons, single quotes, 4-space indentation, trailing commas (ES5), parentheses around arrow params, bracket spacing, JSX bracket same line, no hardcoded Tailwind colors, no duplicate imports, no array index as React key, consistent type imports, no console statements, printWidth 120, useCallback formatting (see references/storefront-plugin-templates.md for complete config)
 - **Use 4-space indentation** for all TypeScript, JSX, and JSON files (1 level = 4 spaces)
 - Verify target IDs exist before using (grep for UITarget in codebase or check the complete target ID reference)
@@ -189,6 +190,7 @@ For site preferences, invoke `/generate-site-preferences-impex` skill.
 - ❌ No hardcoded Salesforce version numbers in dependencies
 - ❌ No direct color/spacing values in components (use theme variables)
 - ❌ No `importPackage()` in hook implementations (use `require()`)
+- ❌ No `@salesforce/storefront-ui` imports (use `@/components/ui/...` instead)
 
 See `references/storefront-plugin-templates.md` for complete extension templates.
 
@@ -242,6 +244,7 @@ Check:
 - [ ] UI apps: Verify target IDs exist in codebase (check Complete Target ID Reference)
 - [ ] UI apps: ESLint and Prettier compliance (semicolons, single quotes, 4-space indent, trailing commas ES5, parentheses around arrow params, bracket spacing, JSX bracket same line, no duplicate imports, no array index keys, import type, no hardcoded colors, no console)
 - [ ] UI apps: **No Tailwind config files, no hardcoded theme values**
+- [ ] UI apps: **No `@salesforce/storefront-ui` imports** — UI primitives use `@/components/ui/...` only
 - [ ] .gitignore updated to exclude `**/commerce-*-app-*/`
 
 Provide next steps:
@@ -278,7 +281,7 @@ Get started: cd <domain>/<appName>/commerce-<appName>-app-v<version>
 - Use templates from `assets/templates/` - they include proper structure and error handling
 - **Multi-target approach:** Commerce apps typically span multiple UI targets, not single components. Ask about all needed targets (e.g., checkout flow + order summary + header) and generate all component shells together.
 - **Task list and icons:** Always generate `app-configuration/tasksList.json` with merchant-facing post-installation tasks (credential setup, testing, verification). Remind vendors to customize the task list for their app and **add app icon to icons/ directory before submission** (PNG, 512x512px recommended).
-- **UI-only apps:** Use TypeScript (.tsx) for all components with proper type annotations. Focus on component reusability with clear prop interfaces. Must include tests (.test.tsx) for coverage enforcement. Always use `useTranslation()` for i18n - never hardcode strings. **Generate all three locales** (en-US, en-GB, it-IT) with identical key structures. Configuration uses `useConfig<AppConfig>()` with **direct property access** (`appConfig.extension?.appName?.key || defaultValue`), never `.get()` method. PUBLIC__ env vars follow double underscore convention. **Follow Prettier and ESLint rules:** 4-space indentation, trailing commas, parentheses around arrow params, single quotes, consistent type imports, no duplicate imports, no array index keys, no hardcoded Tailwind colors, no console statements, useCallback proper indentation. **Never generate Tailwind config files** - use `@theme inline`.
+- **UI-only apps:** Use TypeScript (.tsx) for all components with proper type annotations. Focus on component reusability with clear prop interfaces. Must include tests (.test.tsx) for coverage enforcement. Always use `useTranslation()` for i18n - never hardcode strings. **Generate all three locales** (en-US, en-GB, it-IT) with identical key structures. Configuration uses `useConfig<AppConfig>()` with **direct property access** (`appConfig.extension?.appName?.key || defaultValue`), never `.get()` method. PUBLIC__ env vars follow double underscore convention. **Follow Prettier and ESLint rules:** 4-space indentation, trailing commas, parentheses around arrow params, single quotes, consistent type imports, no duplicate imports, no array index keys, no hardcoded Tailwind colors, no console statements, useCallback proper indentation. **Never generate Tailwind config files** - use `@theme inline`. **Never import `@salesforce/storefront-ui`** — use `@/components/ui/...` for Button, Accordion, Form, and other UI primitives (mirrored merchant Storefront Next builds remove that package).
 - **Storefront extension system:** Register components via target-config.json using `targetId`, `path`, `order` fields. Context providers go in `contextProviders` array, not inline wrapping. Locales use `locales/{locale}/translations.json` structure. **Always verify targetId exists** using the Complete Target ID Reference in storefront-plugin-templates.md - non-existent targets cause components to never render.
 - **Backend apps:** Need comprehensive error handling and logging for production debugging. **Hook implementations must use `require()` not `importPackage()`**, always return `dw.system.Status` (never undefined). **package.json must include `"hooks": "cartridge/scripts/hooks.json"` field.** Generate **both install/ and uninstall/ impex directories** for safe merchant lifecycle management.
 - **Fullstack apps:** Maintain separation - UI in storefront-next/, business logic in cartridges/

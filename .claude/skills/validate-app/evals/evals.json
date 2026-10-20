@@ -35,7 +35,7 @@
       "id": 6,
       "prompt": "Is my UI-only ratings widget ready? It's at ratings-and-reviews/yotpo-ratings/yotpo-ratings-v1.0.0.zip",
       "context": "UI-only architecture validation",
-      "expected_behavior": "Detects UI-only architecture (has storefront-next/, NO cartridges/ or impex/). Validates UI-specific requirements: target-config.json exists with valid components array, index.ts barrel file exists, all three required locales present (en-US/, en-GB/, it-IT/) with translations.json, checks TypeScript files use proper structure. Skips backend/impex validation. Reports PASS if UI requirements met."
+      "expected_behavior": "Detects UI-only architecture (has storefront-next/, NO cartridges/ or impex/). Validates UI-specific requirements: target-config.json exists with valid components array, index.ts barrel file exists, all three required locales present (en-US/, en-GB/, it-IT/) with translations.json, checks TypeScript files use proper structure, runs validate-storefront-imports.sh and FAILs if any file imports @salesforce/storefront-ui (must use @/components/ui/... instead). Skips backend/impex validation. Reports PASS if UI requirements met."
     },
     {
       "id": 7,
@@ -53,7 +53,7 @@
       "id": 9,
       "prompt": "Validate everything for analytics/google-analytics-v3.0.0.zip. I want a complete check before submitting.",
       "context": "Comprehensive validation request",
-      "expected_behavior": "Runs ALL 14 validation steps: (1) identifies app, (2) verifies ZIP exists, (3) validates SHA256, (4) validates manifest entry, (5) validates ZIP contents, (6) detects architecture, (7) validates commerce-app.json, (8) validates storefront files if UI/Fullstack, (9) validates impex if Backend/Fullstack, (10) verifies catalog.json, (11) validates translations, (12) validates icon matching, (13) runs security scan, (14) cleans up. Reports comprehensive PASS/FAIL with all findings."
+      "expected_behavior": "Runs ALL validation steps including Step 8b storefront import check: (1) identifies app, (2) verifies ZIP exists, (3) validates SHA256, (4) validates manifest entry, (5) validates ZIP contents, (6) detects architecture, (7) validates commerce-app.json, (8) validates storefront files if UI/Fullstack and fails on @salesforce/storefront-ui imports, (9) validates impex if Backend/Fullstack, (10) verifies catalog.json, (11) validates translations, (12) validates icon matching, (13) runs security scan, (14) cleans up. Reports comprehensive PASS/FAIL with all findings."
     },
     {
       "id": 10,
