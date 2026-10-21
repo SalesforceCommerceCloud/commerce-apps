@@ -372,7 +372,7 @@ Two app-configuration files contribute strings to Business Manager:
 - `app-configuration/tasksList.json` — the "Complete your setup" checklist shown after install.
 - `app-configuration/adminComponents.json` (optional) — admin-rendered components such as `storefrontComponentVisibility` toggle rows.
 
-By default the strings ship in English. Apps may also ship locale files under `app-configuration/translations/` so BM renders them in the user's language. Translatable fields are marked below per artifact.
+Every config task in `tasksList.json` must have translations under `app-configuration/translations/`. The literal English `name` and `description` stay on the task and remain the last-resort fallback at render time. Translatable fields are marked below per artifact.
 
 ### `taskKey` is required on every task
 
@@ -432,7 +432,7 @@ The literal English `label` on each attribute stays in `adminComponents.json` an
 
 ### `app-configuration/translations/<locale>.json`
 
-If your app ships any translated strings, add a `translations/` directory:
+A CAP that ships `tasksList.json` must include a `translations/` directory:
 
 ```
 commerce-{appName}-app-v{version}/
@@ -486,7 +486,7 @@ At render time the BM client requests a locale; the registry resolves each trans
    - tasks → `name` / `description` on the task itself in `tasksList.json`
    - admin component attribute labels → `label` on the attribute in `adminComponents.json`
 
-Result: an app that omits `translations/` entirely keeps rendering literal English in every locale (existing behavior). Once an app adds `translations/`, it must provide every required default BM locale.
+A submission that includes `tasksList.json` must include `translations/` with every required default BM locale, and `en-US.json` must list every `taskKey`. At runtime, a missing requested locale still falls through to `en-US.json` and then to the literal English on the task.
 
 ### Locale rollout
 
@@ -644,8 +644,8 @@ Before submitting your PR, please verify:
 ### Localization
 - [ ] Every entry in `tasksList.json` declares a unique non-empty `taskKey` matching `^[a-z][a-z0-9_]*$`
 - [ ] If `adminComponents.json` is shipped, every entry declares a unique non-empty `componentKey` matching `^[a-z][a-z0-9_]*$`
-- [ ] `commerce-apps-manifest/translations/` and, when present, `app-configuration/translations/` contain every required default BM locale
-- [ ] If `app-configuration/translations/` exists, `en-US.json` lists every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
+- [ ] `app-configuration/translations/` is present whenever `tasksList.json` is, and both it and `commerce-apps-manifest/translations/` contain every required default BM locale
+- [ ] `en-US.json` lists every `taskKey` from `tasksList.json` and, when `adminComponents.json` is shipped, every (componentKey, attribute id) pair
 - [ ] Every non-default locale file lists exactly the same keys as `en-US.json` (no extras, no missing) in both `tasks` and `adminComponents` namespaces
 - [ ] Additional locale filenames match the BM-supported BCP-47 format `^[a-z]{2}(-[A-Z]{2})?\.json$`
 - [ ] English text in `en-US.json` matches the literal English in `tasksList.json` and `adminComponents.json`

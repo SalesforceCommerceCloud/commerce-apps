@@ -4,11 +4,13 @@
 # Usage: validate-translations.sh <cap-root>
 #
 # Exit codes:
-#   0 - translations are valid (or directory is absent — it's optional)
+#   0 - translations are valid, or both translations/ and tasksList.json are absent
 #   1 - translations are invalid (errors printed to stderr)
 #   2 - usage error (bad args or unreadable input)
 #
 # Schema:
+#   - When tasksList.json is present, translations/ is required. Config task
+#     translations are not optional.
 #   - Every required default BM locale file must be present when the directory
 #     exists, and additional locale filenames must use the BM-supported BCP-47 format.
 #   - Each locale file must be a JSON object with a "tasks" object whose
@@ -38,9 +40,14 @@ if [[ ! -d "$cap_root" ]]; then
 fi
 
 translations_dir="$cap_root/app-configuration/translations"
+tasks_list="$cap_root/app-configuration/tasksList.json"
 
 if [[ ! -d "$translations_dir" ]]; then
-  echo "No app-configuration/translations/ - OK (optional)"
+  if [[ -f "$tasks_list" ]]; then
+    echo "app-configuration/translations/ is required when tasksList.json is present" >&2
+    exit 1
+  fi
+  echo "No app-configuration/translations/ and no tasksList.json - OK"
   exit 0
 fi
 
@@ -115,7 +122,6 @@ if [[ -n "$shape_errors" ]]; then
 fi
 
 # tasksList.json taskKey coverage in en-US.json.
-tasks_list="$cap_root/app-configuration/tasksList.json"
 if [[ -f "$tasks_list" ]]; then
   missing_in_en="$(jq -r --argjson en "$(jq '.tasks | keys' "$default_locale")" \
     '[.[] | .taskKey] - $en | join(", ")' "$tasks_list" 2>/dev/null)"
