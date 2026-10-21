@@ -75,14 +75,16 @@
     {
       "id": "zenkraft-shipping",
       "name": "Zenkraft Shipping",
-      "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft.",
+      "description": "Shipping rate calculation, estimated delivery dates, order tracking, and returns powered by Zenkraft.",
       "iconName": "zenkraft.png",
       "domain": "shipping",
       "type": "app",
       "provider": "thirdParty",
-      "version": "1.0.0",
-      "zip": "zenkraft-shipping-v1.0.0.zip",
-      "sha256": "fbdf241dfca9c412c634c107a8d5d02a5f0e55fd9b26d36f92c5b340a250bf55"
+      "companyName": "Zenkraft",
+      "version": "1.1.0",
+      "zip": "zenkraft-shipping-v1.1.0.zip",
+      "sha256": "374c63e6244ccb2f03e4ad1a5b388794ecaebda97aea672cf4cb55628328aefd",
+      "featuredLearnMoreUrl": "https://learn.zenkraft.com/salesforce-native-shipping-for-agentic-commerce-storefronts?utm_source=salesforce&utm_medium=referral&utm_campaign=storefront-next"
     }
   ],
   "payment": [
