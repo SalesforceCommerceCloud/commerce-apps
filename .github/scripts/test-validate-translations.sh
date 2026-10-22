@@ -131,7 +131,7 @@ TASKS_LIST_OK='[{"taskKey":"setup_account","name":"Setup","description":"d","tas
 
 # --- Passing shapes --------------------------------------------------------
 
-assert_passes "missing translations dir is OK (optional)" no-translations
+assert_passes "missing translations dir is OK when there is no tasksList.json" no-translations
 
 assert_passes "all required locales seeded from en-US" "tasks:en-US.json:$EN_BASIC"
 
@@ -179,6 +179,11 @@ assert_rejects "misformatted locale filename is rejected" \
   "misformatted locale file" \
   "tasks:en-US.json:$EN_BASIC" \
   "tasks:zh_CN.json:$EN_BASIC"
+
+assert_rejects "tasksList without translations dir is rejected" \
+  "translations/ is required when tasksList.json is present" \
+  no-translations \
+  "tasksList:$TASKS_LIST_OK"
 
 assert_rejects "tasksList taskKey missing from en-US is rejected" \
   "not present in translations/en-US.json" \

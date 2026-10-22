@@ -233,7 +233,7 @@ bash .github/scripts/validate-tasks-list.sh "$CAP_ROOT/app-configuration/tasksLi
 [[ -f "$CAP_ROOT/app-configuration/adminComponents.json" ]] && \
   bash .github/scripts/validate-admin-components.sh "$CAP_ROOT/app-configuration/adminComponents.json"
 
-# app-shipped translations (optional directory; cross-references the two files above)
+# app-shipped translations (required when tasksList.json is present)
 bash .github/scripts/validate-translations.sh "$CAP_ROOT"
 ```
 
