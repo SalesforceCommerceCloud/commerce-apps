@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 배송",
-    "description": "Zenkraft가 제공하는 배송 요금 계산 및 예상 배송 날짜."
+    "description": "Zenkraft가 제공하는 배송 요금 계산, 예상 배송 날짜, 주문 추적 및 반품."
   },
   "custom-payment": {
     "name": "맞춤 결제",

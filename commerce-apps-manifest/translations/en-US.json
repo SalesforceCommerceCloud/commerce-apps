@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Shipping",
-    "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft."
+    "description": "Shipping rate calculation, estimated delivery dates, order tracking, and returns powered by Zenkraft."
   },
   "custom-payment": {
     "name": "Custom Payment",
