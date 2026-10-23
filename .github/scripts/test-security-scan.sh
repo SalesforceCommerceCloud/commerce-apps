@@ -1001,6 +1001,12 @@ assert_blocks "hardcoded site-id blocks" "$cap"
 cap="$(mkcap)"; printf '<site site-id="SITEID"><prefs/></site>\n' > "$cap/prefs.xml"
 assert_no_warning "SITEID placeholder — no site-id warning" "Hardcoded site-id" "$cap"
 
+cap="$(mkcap)"; printf '<context site-id="Sites"/>\n' > "$cap/jobs.xml"
+assert_passes "BM organization site-id Sites is allowed" "$cap"
+
+cap="$(mkcap)"; printf '<context site-id="Sites-Site"/>\n' > "$cap/jobs.xml"
+assert_blocks "domain-style site-id Sites-Site still blocks" "$cap"
+
 echo ""
 
 # ---------------------------------------------------------------------------
