@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "カスタムギフトカード",
     "description": "独自のAPIを使用してカスタムギフトカードの統合を設定します。"
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Checkout.com Flow で、Storefront Next でカード、ウォレット、ローカル決済手段を受け付けます。3D セキュア、リスク評価、Business Manager からのキャプチャ・取消・返金、署名付き Webhook に対応しています。"
   }
 }

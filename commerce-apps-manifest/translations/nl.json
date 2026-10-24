@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Aangepaste cadeaubon",
     "description": "Configureer een aangepaste cadeaubonintegratie met uw eigen API's."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Accepteer kaarten, wallets en lokale betaalmethoden in Storefront Next met Checkout.com Flow. Inclusief 3D Secure, risicobeoordeling, capture, annulering en terugbetaling vanuit Business Manager, en ondertekende webhooks."
   }
 }

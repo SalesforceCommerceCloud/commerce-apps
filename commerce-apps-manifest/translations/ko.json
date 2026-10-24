@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "맞춤 기프트 카드",
     "description": "자체 API를 제공하여 맞춤 기프트 카드 통합을 구성합니다."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Checkout.com Flow로 Storefront Next에서 카드, 지갑, 현지 결제 수단을 받으세요. 3D Secure, 위험 평가, Business Manager에서의 매입·취소·환불, 서명된 웹훅을 지원합니다."
   }
 }

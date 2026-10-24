@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "بطاقة هدية مخصصة",
     "description": "تكوين تكامل بطاقة هدية مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "اقبل البطاقات والمحافظ الرقمية وطرق الدفع المحلية في Storefront Next مع Checkout.com Flow. يشمل 3D Secure وتقييم المخاطر والتحصيل والإلغاء والاسترداد من Business Manager، إضافة إلى webhooks موقّعة."
   }
 }
