@@ -124,7 +124,7 @@
     },
     {
       "id": "checkoutcom",
-      "name": "Checkout.com",
+      "name": "Checkout.com Flow",
       "description": "Accept cards, wallets and local payment methods in Storefront Next with Checkout.com Flow. Includes 3D Secure, risk assessment, capture, void and refund from Business Manager, and signed webhooks.",
       "iconName": "checkoutcom.svg",
       "domain": "payment",
@@ -132,7 +132,7 @@
       "provider": "thirdParty",
       "version": "1.0.0",
       "zip": "checkoutcom-v1.0.0.zip",
-      "sha256": "f76ea86624b1f4e61a79d1a7bb6fe27eebf7ec08cddf18a8e92068463f605f63"
+      "sha256": "e1a893b0e8d6e8f867c91d59ac6b059ef358359cb07b5d4dbb11a08a1b42e742"
     }
   ],
   "fraud": [

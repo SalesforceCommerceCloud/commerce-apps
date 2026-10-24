@@ -69,7 +69,7 @@
     "description": "Configure a custom gift card integration by providing your own APIs."
   },
   "checkoutcom": {
-    "name": "Checkout.com",
+    "name": "Checkout.com Flow",
     "description": "Accept cards, wallets and local payment methods in Storefront Next with Checkout.com Flow. Includes 3D Secure, risk assessment, capture, void and refund from Business Manager, and signed webhooks."
   }
 }
