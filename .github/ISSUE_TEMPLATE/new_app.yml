@@ -37,14 +37,12 @@ body:
         - tax
         - payment
         - shipping
-        - gift-cards
         - ratings-and-reviews
-        - loyalty
         - search
         - address-verification
+        - content-management
+        - merchandising
         - analytics
-        - approaching-discounts
-        - fraud
     validations:
       required: true
 
