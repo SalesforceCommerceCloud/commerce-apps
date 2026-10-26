@@ -131,9 +131,9 @@
       "domain": "payment",
       "type": "app",
       "provider": "thirdParty",
-      "version": "1.0.0",
-      "zip": "checkoutcom-v1.0.0.zip",
-      "sha256": "3fa97a0df6611ef804df079cb9b15f134baca086c606ed1e9b96ff79185aa018"
+      "version": "1.0.1",
+      "zip": "checkoutcom-v1.0.1.zip",
+      "sha256": "da8ac52babbe5cbfdfd54985b85e90223ef5d161e6bf803ffd4d837c88de30d3"
     }
   ],
   "fraud": [
