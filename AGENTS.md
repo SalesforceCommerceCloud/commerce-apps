@@ -10,7 +10,7 @@ This is a **Commerce App Registry** for Salesforce Commerce Cloud B2C Commerce. 
 
 **Key Concepts:**
 - **Commerce App Package (CAP):** A ZIP file containing cartridges, UI extensions, impex configs, and documentation
-- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`)
+- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`)
 - **ISV:** Independent Software Vendor (the company publishing the app)
 - **Impex:** XML configuration files for SFCC (services, site preferences, custom objects)
 
@@ -420,14 +420,12 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 #### Feature Domains (show under "Additional Setup" in Checkout Hub)
 | Domain | Description | Example Apps |
 |--------|-------------|--------------|
-| `gift-cards` | Gift card purchasing, redemption, and balance | Salesforce Gift Cards, Adyen Gift Cards |
 | `ratings-and-reviews` | Product ratings and reviews | Bazaarvoice, Yotpo, PowerReviews |
-| `loyalty` | Loyalty programs and rewards | LoyaltyLion, Smile.io |
-| `search` | Search and merchandising | Algolia, Elasticsearch |
+| `search` | Product search and discovery | Algolia, Elasticsearch |
 | `address-verification` | Address validation and standardization | Smarty, Google Address Validation |
+| `content-management` | Content management and delivery | Salesforce CMS, Contentful |
+| `merchandising` | Merchandising and promotion experiences | Salesforce Approaching Discounts |
 | `analytics` | Analytics and reporting | Google Analytics, Segment |
-| `approaching-discounts` | Approaching discount notifications | Salesforce Approaching Discounts |
-| `fraud` | Fraud detection and prevention | Signifyd, Forter, Riskified |
 
 ### Common App Patterns
 | Type | What It Does | Typical Components |
@@ -437,7 +435,6 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 | Shipping | Calculate shipping rates | Carrier API integration, rate calculation hooks |
 | Reviews (`ratings-and-reviews`) | Product ratings/reviews | Reviews API, React components for display |
 | Loyalty | Points and rewards | Customer data sync, points calculation |
-| Gift Cards (`gift-cards`) | Gift card management | Payment method integration, balance API |
 
 ### Impex File Types
 
@@ -587,7 +584,7 @@ A: Depends on what you're doing:
 - Anything else: NO - CI manages it
 
 **Q: "Where does my app go in the registry?"**
-A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, or `fraud`. The domain uses hyphen-case and is specified directly in the manifest.
+A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, or `content-management`. The domain uses hyphen-case and is specified directly in the manifest.
 
 ## Key Files to Reference
 

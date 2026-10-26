@@ -2,7 +2,7 @@
 
 **App Name:**
 **Display Name:**
-**Domain:** <!-- tax, payment, shipping, gift-cards, ratings-and-reviews, loyalty, search, address-verification, analytics, approaching-discounts, fraud -->
+**Domain:** <!-- tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management -->
 **ISV/Vendor Name:**
 **Version:**
 

@@ -292,15 +292,12 @@ Every app's `domain` field must be one of these. Domains use hyphen-case. Provid
 | `tax` | Providers | Tax calculation and compliance | Avalara, Vertex |
 | `payment` | Providers | Payment processing | Stripe, Adyen, PayPal |
 | `shipping` | Providers | Shipping and fulfillment | ShipStation, EasyPost |
-| `gift-cards` | Additional Setup | Gift card purchasing, redemption, and balance | Salesforce Gift Cards, Adyen Gift Cards |
 | `ratings-and-reviews` | Additional Setup | Product ratings and reviews | Bazaarvoice, Yotpo, PowerReviews |
-| `loyalty` | Additional Setup | Loyalty programs and rewards | LoyaltyLion, Smile.io |
-| `search` | Additional Setup | Search and merchandising | Algolia, Elasticsearch |
+| `search` | Additional Setup | Product search and discovery | Algolia, Elasticsearch |
 | `address-verification` | Additional Setup | Address validation and standardization | Smarty, Google Address Validation |
 | `analytics` | Additional Setup | Analytics and reporting | Google Analytics, Segment |
-| `approaching-discounts` | Additional Setup | Approaching discount notifications | Salesforce Approaching Discounts |
-| `fraud` | Additional Setup | Fraud detection and prevention | Signifyd, Forter, Riskified |
 | `content-management` | Additional Setup | Content management and delivery | Salesforce CMS, Contentful |
+| `merchandising` | Additional Setup | Merchandising and promotion experiences | Salesforce Approaching Discounts |
 
 ## Tech Stack
 
