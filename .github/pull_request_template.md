@@ -2,7 +2,7 @@
 
 **App Name:**
 **Display Name:**
-**Domain:** <!-- tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management -->
+**Domain:** <!-- tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard -->
 **ISV/Vendor Name:**
 **Version:**
 
@@ -81,6 +81,7 @@
 - [ ] Verified service configurations work
 - [ ] Tested site preferences are configurable
 - [ ] Verified hooks execute correctly
+- [ ] Registers all required hooks for the domain (see README "Backend Extension Points by Domain")
 - [ ] Tested UI components render properly (if applicable)
 - [ ] Ran unit tests (if applicable)
 

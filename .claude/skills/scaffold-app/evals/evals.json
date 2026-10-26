@@ -367,7 +367,7 @@
         },
         {
           "name": "hooks.json for payment domain",
-          "description": "app.payment.processor.<appName> hook configured"
+          "description": "sfcc.app.payment.getClaimedPaymentMethods, onAttemptOrderTransition and reversePayment hooks configured"
         }
       ]
     },

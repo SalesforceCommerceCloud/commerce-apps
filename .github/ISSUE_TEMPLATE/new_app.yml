@@ -43,6 +43,8 @@ body:
         - content-management
         - merchandising
         - analytics
+        - fraud
+        - giftcard
     validations:
       required: true
 

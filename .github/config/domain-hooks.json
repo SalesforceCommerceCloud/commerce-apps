@@ -1,0 +1,64 @@
+{
+  "_comment": "Backend extension points per commerce-app domain. Source: digital repo hook interfaces (bc_api/dw/apps/checkout/hooks, TaxHooks, ShippingHooks, GiftCardHooks). 'enforce' is 'error' (blocks the PR) or 'warn' (annotation only).",
+  "universalOptional": [
+    "checkConnectionHealth"
+  ],
+  "domains": {
+    "tax": {
+      "enforce": "error",
+      "strictAllowList": true,
+      "required": [
+        "calculate",
+        "commit",
+        "cancel"
+      ],
+      "optional": []
+    },
+    "shipping": {
+      "enforce": "error",
+      "required": [
+        "calculate",
+        "quote"
+      ],
+      "optional": [
+        "estimate"
+      ]
+    },
+    "payment": {
+      "enforce": "error",
+      "required": [
+        "getClaimedPaymentMethods",
+        "onAttemptOrderTransition",
+        "reversePayment"
+      ],
+      "optional": [
+        "afterCreateBasketPaymentInstrument",
+        "afterUpdateBasketPaymentInstrument",
+        "afterCreateOrderPaymentInstrument",
+        "afterUpdateOrderPaymentInstrument",
+        "authorizePayment",
+        "cancelAuthorization",
+        "capturePayment",
+        "refundCapture"
+      ]
+    },
+    "giftcard": {
+      "enforce": "error",
+      "required": [
+        "getBalance",
+        "capture",
+        "refund"
+      ],
+      "optional": []
+    },
+    "fraud": {
+      "enforce": "error",
+      "requiredAnyOf": [
+        "beforePayment",
+        "afterPayment"
+      ],
+      "required": [],
+      "optional": []
+    }
+  }
+}
