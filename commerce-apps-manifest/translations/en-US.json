@@ -28,6 +28,10 @@
     "description": "Process payments natively in Storefront Next. Salesforce Payments supports multiple payment gateways and methods.",
     "featuredTagline": "Collect payments fast with a seamless end-to-end solution for Adyen, Stripe, and PayPal."
   },
+  "esw-sfnext": {
+    "name": "ESW",
+    "description": "ESW cross-border pricing, checkout, and fulfillment integration for Storefront Next."
+  },
   "custom-analytics": {
     "name": "Custom Analytics",
     "description": "Configure a custom analytics integration by providing your own APIs."
