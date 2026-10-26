@@ -10,7 +10,7 @@ This is a **Commerce App Registry** for Salesforce Commerce Cloud B2C Commerce. 
 
 **Key Concepts:**
 - **Commerce App Package (CAP):** A ZIP file containing cartridges, UI extensions, impex configs, and documentation
-- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`)
+- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`)
 - **ISV:** Independent Software Vendor (the company publishing the app)
 - **Impex:** XML configuration files for SFCC (services, site preferences, custom objects)
 
@@ -426,13 +426,19 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 | `content-management` | Content management and delivery | Salesforce CMS, Contentful |
 | `merchandising` | Merchandising and promotion experiences | Salesforce Approaching Discounts |
 | `analytics` | Analytics and reporting | Google Analytics, Segment |
+| `fraud` | Fraud detection and prevention | Custom fraud integrations |
+| `giftcard` | Gift card balance and redemption | Custom gift card integrations |
 
 ### Common App Patterns
 | Type | What It Does | Typical Components |
 |------|-------------|-------------------|
 | Tax | Calculate sales tax | Service integration, hooks (calculate, commit, cancel) |
-| Payment | Process payments | Payment processor integration, authorization hooks |
-| Shipping | Calculate shipping rates | Carrier API integration, rate calculation hooks |
+| Payment | Process payments | Payment processor integration, hooks (getClaimedPaymentMethods, onAttemptOrderTransition, reversePayment) |
+| Shipping | Calculate shipping rates | Carrier API integration, hooks (calculate, quote, optional estimate) |
+| Gift card | Balance, capture, refund | Gift card API integration, hooks (getBalance, capture, refund) |
+| Fraud | Pre/post-authorization fraud decisions | Fraud API integration, hooks (beforePayment and/or afterPayment) |
+
+Required hooks per domain are defined in `.github/config/domain-hooks.json` and listed in the README ("Backend Extension Points by Domain").
 | Reviews (`ratings-and-reviews`) | Product ratings/reviews | Reviews API, React components for display |
 | Loyalty | Points and rewards | Customer data sync, points calculation |
 
@@ -584,7 +590,7 @@ A: Depends on what you're doing:
 - Anything else: NO - CI manages it
 
 **Q: "Where does my app go in the registry?"**
-A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, or `content-management`. The domain uses hyphen-case and is specified directly in the manifest.
+A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, or `giftcard`. The domain uses hyphen-case and is specified directly in the manifest.
 
 ## Key Files to Reference
 

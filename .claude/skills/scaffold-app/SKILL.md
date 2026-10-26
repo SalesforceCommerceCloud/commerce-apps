@@ -48,7 +48,7 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 ### 2. Collect Information
 
 **All apps need:**
-- Domain (tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management)
+- Domain (tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard)
 - App name (kebab-case, unique identifier) - **CRITICAL:** This will be used as the folder name and must match the "id" field in manifest.json
 - Display name (human-readable with vendor)
 - Version (typically 1.0.0)
@@ -196,13 +196,21 @@ See `references/storefront-plugin-templates.md` for complete extension templates
 
 ### 5. Domain-Specific Hooks
 
-Configure hooks.json based on domain:
-- **Tax:** `sfcc.app.tax.calculate`, `sfcc.app.tax.commit`, `sfcc.app.tax.cancel`
-- **Payment:** `sfcc.app.payment.processor.<appName>`
-- **Shipping:** `sfcc.app.shipping.calculate`
-- **Loyalty:** `sfcc.app.loyalty.calculate`, `sfcc.app.loyalty.points`
-- **Gift Cards:** `sfcc.app.payment.processor.<appName>`, `sfcc.app.giftcard.balance`
-- **Ratings/Reviews:** `sfcc.app.data.enrich`
+Configure hooks.json based on domain. The source of truth is `.github/config/domain-hooks.json` (enforced in CI by `.github/scripts/validate-hooks.sh`); each hook's exported function name must equal the last segment of the hook name.
+
+| Domain | Required hooks (`sfcc.app.<domain>.<name>`) | Optional |
+|--------|---------------------------------------------|----------|
+| `tax` | `calculate`, `commit`, `cancel` | |
+| `shipping` | `calculate`, `quote` (register both so checkout and basket prices agree) | `estimate` |
+| `payment` | `getClaimedPaymentMethods`, `onAttemptOrderTransition`, `reversePayment` | `afterCreate/UpdateBasketPaymentInstrument`, `afterCreate/UpdateOrderPaymentInstrument`, `authorizePayment`, `cancelAuthorization`, `capturePayment`, `refundCapture` |
+| `giftcard` | `getBalance`, `capture`, `refund` (`capture` and `refund` must be idempotent) | |
+| `fraud` | at least one of `beforePayment`, `afterPayment` | |
+
+Notes:
+- `payment`: never claim `COMMERCE_APP_GIFT_CARD` (reserved). `authorizePayment`/`cancelAuthorization`/`capturePayment`/`refundCapture` are never called by the platform; they are app-internal helpers.
+- `fraud`: `beforePayment`/`afterPayment` have a ~1s platform timeout; an exception or timeout is treated as a decline. `afterPayment` must not call `OrderMgr`.
+- Payment, fraud and gift card hooks only run when the `PaymentFraudOrchestrationEnabled` platform toggle is on (default off).
+- Other domains (analytics, merchandising, search, ...) have no required backend hooks.
 
 **Connection health check (optional, any app with an external dependency):**
 
