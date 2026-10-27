@@ -78,7 +78,7 @@ xmllint --schema "$(b2c docs schema preferences --path)" impex/install/preferenc
 ### Installation file (`impex/install/services.xml`)
 
 **Check:**
-- [ ] XML namespace: `http://www.demandware.com/xml/impex/services/2015-07-01`
+- [ ] XML namespace: `http://www.demandware.com/xml/impex/services/2014-09-26`
 - [ ] Service IDs use dotted notation (e.g., `vendor.service.api`)
 - [ ] All services reference valid credentials and profiles
 - [ ] No hardcoded production credentials

@@ -24,7 +24,7 @@ find commerce-<appName>-app-v<version>/impex/ -name "*.xml" -exec xmllint --noou
 ### Install file (`impex/install/services.xml`)
 
 **Required checks:**
-- [ ] XML namespace is `http://www.demandware.com/xml/impex/services/2015-07-01`
+- [ ] XML namespace is `http://www.demandware.com/xml/impex/services/2014-09-26`
 - [ ] All service IDs use dotted notation (e.g., `vendor.service.api`)
 - [ ] All services reference valid credentials and profiles
 - [ ] No hardcoded production credentials or secrets

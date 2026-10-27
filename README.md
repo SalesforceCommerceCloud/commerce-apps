@@ -116,6 +116,24 @@ Example:
 
 CI validates this file's shape on PR. If the file is omitted, the merchant doesn't see a visibility section in BM and every registered target stays enabled.
 
+### Backend Extension Points by Domain
+
+Backend apps register hooks as `sfcc.app.<domain>.<name>` in `hooks.json`. The exported function name must equal the last segment of the hook name. CI (`.github/scripts/validate-hooks.sh`, configured by `.github/config/domain-hooks.json`) checks these on every ZIP:
+
+| Domain | Required hooks | Optional hooks |
+|--------|----------------|----------------|
+| `tax` | `calculate`, `commit`, `cancel` | |
+| `shipping` | `calculate`, `quote` | `estimate` |
+| `payment` | `getClaimedPaymentMethods`, `onAttemptOrderTransition`, `reversePayment` | `afterCreateBasketPaymentInstrument`, `afterUpdateBasketPaymentInstrument`, `afterCreateOrderPaymentInstrument`, `afterUpdateOrderPaymentInstrument`, `authorizePayment`, `cancelAuthorization`, `capturePayment`, `refundCapture` |
+| `giftcard` | `getBalance`, `capture`, `refund` | |
+| `fraud` | at least one of `beforePayment`, `afterPayment` | |
+
+`checkConnectionHealth` is optional for every domain. Other domains have no required backend hooks.
+
+Why these are required: a gift card app without `capture` places orders without charging the card; without `refund` a failed payment leaves the card unrefunded. A payment app without `reversePayment` throws when the platform needs to reverse a payment. Shipping `quote` and `calculate` must agree so the price shown at shipping-method selection matches the basket total. Gift card `capture`/`refund` must be idempotent. `afterPayment` (fraud) must not call `OrderMgr`. `payment` apps must not claim the reserved `COMMERCE_APP_GIFT_CARD` payment method.
+
+Enforcement: violations for `tax`, `shipping`, `payment`, `giftcard` and `fraud` fail the build (the `enforce` value per domain in `domain-hooks.json`). Hooks are located the way the platform does it: a site cartridge `package.json` must have a `"hooks"` entry pointing to your `hooks.json`. Salesforce-native apps that ship no site cartridges (for example `sf-payments`) are exempt.
+
 ### Connection Health Check Hook (optional)
 
 Any Commerce App can implement a **connection health check hook** so Business Manager displays connectivity status on the app's tile in the Checkout Hub. The hook is called when a merchant loads the app details page or manually refreshes the connection status — it shows a health badge (Healthy, Degraded, Unhealthy, or Unknown) alongside an optional message and remediation hint. How you define "connection" is up to you — it could be an API endpoint, a credential validation, a third-party service ping, or any check that confirms your app's external dependency is reachable.
@@ -292,15 +310,14 @@ Every app's `domain` field must be one of these. Domains use hyphen-case. Provid
 | `tax` | Providers | Tax calculation and compliance | Avalara, Vertex |
 | `payment` | Providers | Payment processing | Stripe, Adyen, PayPal |
 | `shipping` | Providers | Shipping and fulfillment | ShipStation, EasyPost |
-| `gift-cards` | Additional Setup | Gift card purchasing, redemption, and balance | Salesforce Gift Cards, Adyen Gift Cards |
 | `ratings-and-reviews` | Additional Setup | Product ratings and reviews | Bazaarvoice, Yotpo, PowerReviews |
-| `loyalty` | Additional Setup | Loyalty programs and rewards | LoyaltyLion, Smile.io |
-| `search` | Additional Setup | Search and merchandising | Algolia, Elasticsearch |
+| `search` | Additional Setup | Product search and discovery | Algolia, Elasticsearch |
 | `address-verification` | Additional Setup | Address validation and standardization | Smarty, Google Address Validation |
 | `analytics` | Additional Setup | Analytics and reporting | Google Analytics, Segment |
-| `approaching-discounts` | Additional Setup | Approaching discount notifications | Salesforce Approaching Discounts |
-| `fraud` | Additional Setup | Fraud detection and prevention | Signifyd, Forter, Riskified |
+| `fraud` | Additional Setup | Fraud detection and prevention | Custom fraud integrations |
+| `giftcard` | Additional Setup | Gift card balance and redemption | Custom gift card integrations |
 | `content-management` | Additional Setup | Content management and delivery | Salesforce CMS, Contentful |
+| `merchandising` | Additional Setup | Merchandising and promotion experiences | Salesforce Approaching Discounts |
 
 ## Tech Stack
 

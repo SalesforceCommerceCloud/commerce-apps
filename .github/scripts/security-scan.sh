@@ -289,7 +289,7 @@ S15_IDEAL_DEFAULT="    <timeout-millis>10000</timeout-millis>\n    <rate-limit-e
 s15_get_ideal() {
   case "$APP_DOMAIN" in
     tax) printf '%b' "$S15_IDEAL_TAX" ;;
-    payment) printf '%b' "$S15_IDEAL_PAYMENT" ;;
+    payment|giftcard) printf '%b' "$S15_IDEAL_PAYMENT" ;;
     fraud) printf '%b' "$S15_IDEAL_FRAUD" ;;
     shipping) printf '%b' "$S15_IDEAL_SHIPPING" ;;
     *) printf '%b' "$S15_IDEAL_DEFAULT" ;;
