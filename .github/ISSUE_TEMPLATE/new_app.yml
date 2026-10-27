@@ -37,14 +37,14 @@ body:
         - tax
         - payment
         - shipping
-        - gift-cards
         - ratings-and-reviews
-        - loyalty
         - search
         - address-verification
+        - content-management
+        - merchandising
         - analytics
-        - approaching-discounts
         - fraud
+        - giftcard
     validations:
       required: true
 
@@ -80,14 +80,13 @@ body:
     attributes:
       label: Localization at submission
       description: |
-        Does this submission include translated strings (for `tasksList.json` and/or `adminComponents.json`) under `app-configuration/translations/`?
+        Config task translations under `app-configuration/translations/` are required for every `taskKey` in `tasksList.json`, including every required default BM locale.
         See the [Localizing app-shipped strings](https://github.com/salesforce/commerce-apps/blob/main/CONTRIBUTING.md#localizing-app-shipped-strings) section of CONTRIBUTING.md.
 
         **Heads up:** translations are bundled into the CAP zip and merged at install time — adding or updating them later requires shipping a new app version and having merchants upgrade. There is no out-of-band path to push translation updates to already-installed apps.
       options:
-        - "No translations — English only (literal text in tasksList.json / adminComponents.json)"
-        - "en-US only — wired up for translations, additional locales coming later"
-        - "en-US plus one or more additional locales"
+        - "Required default BM locales for every config task"
+        - "Required default BM locales plus additional locales"
     validations:
       required: true
 
@@ -96,8 +95,8 @@ body:
     attributes:
       label: Locales included
       description: |
-        If you ship locale files, list the BCP-47 tags here (e.g., `en-US, de, ja`).
-        Leave blank if no translations are shipped.
+        List the BCP-47 tags shipped under `app-configuration/translations/` (e.g., `en-US, de, ja`).
+        Every required default BM locale must be included.
       placeholder: en-US, de, ja
     validations:
       required: false
@@ -137,7 +136,7 @@ body:
           required: true
         - label: If `adminComponents.json` is shipped, every entry declares a unique non-empty `componentKey` (snake_case)
           required: true
-        - label: If `app-configuration/translations/` is included, `en-US.json` is present and covers every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
+        - label: `app-configuration/translations/` is included, and `en-US.json` covers every `taskKey` from `tasksList.json` and every (componentKey, attribute id) pair from `adminComponents.json`
           required: true
         - label: All required default BM locale files are present, and any additional locale filenames use the BM-supported BCP-47 format documented in CONTRIBUTING.md
           required: true

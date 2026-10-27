@@ -469,6 +469,21 @@ else
   FAIL=$((FAIL + 1))
 fi
 
+# Test 2b: giftcard domain uses the payment profile (moves money)
+cap="$(mkcap)"; mkdir -p "$cap/impex/install"
+printf '{"domain":"giftcard"}\n' > "$cap/commerce-app.json"
+printf '<service-profile service-id="MySvc"><timeout-millis>10000</timeout-millis><rate-limit-enabled>true</rate-limit-enabled></service-profile>\n' > "$cap/impex/install/services.xml"
+mkdir -p "$cap/impex/uninstall"
+printf '<services mode="delete"><service-credential service-id="MySvc" mode="delete"/></services>\n' > "$cap/impex/uninstall/services.xml"
+run_scan "$cap"
+if [[ "$LAST_RC" -eq 1 ]] && echo "$LAST_OUTPUT" | grep -qF "giftcard" && echo "$LAST_OUTPUT" | grep -qF "<rate-limit-calls>50</rate-limit-calls>"; then
+  echo "  PASS: giftcard app missing circuit breaker — blocks with payment ideal values"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: giftcard app missing circuit breaker (expected block + payment ideal values, got exit $LAST_RC)"
+  FAIL=$((FAIL + 1))
+fi
+
 # Test 3: shipping domain missing both
 cap="$(mkcap)"; mkdir -p "$cap/impex/install"
 printf '{"domain":"shipping"}\n' > "$cap/commerce-app.json"
@@ -1000,6 +1015,12 @@ assert_blocks "hardcoded site-id blocks" "$cap"
 
 cap="$(mkcap)"; printf '<site site-id="SITEID"><prefs/></site>\n' > "$cap/prefs.xml"
 assert_no_warning "SITEID placeholder — no site-id warning" "Hardcoded site-id" "$cap"
+
+cap="$(mkcap)"; printf '<context site-id="Sites"/>\n' > "$cap/jobs.xml"
+assert_passes "BM organization site-id Sites is allowed" "$cap"
+
+cap="$(mkcap)"; printf '<context site-id="Sites-Site"/>\n' > "$cap/jobs.xml"
+assert_blocks "domain-style site-id Sites-Site still blocks" "$cap"
 
 echo ""
 

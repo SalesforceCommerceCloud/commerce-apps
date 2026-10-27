@@ -289,7 +289,7 @@ S15_IDEAL_DEFAULT="    <timeout-millis>10000</timeout-millis>\n    <rate-limit-e
 s15_get_ideal() {
   case "$APP_DOMAIN" in
     tax) printf '%b' "$S15_IDEAL_TAX" ;;
-    payment) printf '%b' "$S15_IDEAL_PAYMENT" ;;
+    payment|giftcard) printf '%b' "$S15_IDEAL_PAYMENT" ;;
     fraud) printf '%b' "$S15_IDEAL_FRAUD" ;;
     shipping) printf '%b' "$S15_IDEAL_SHIPPING" ;;
     *) printf '%b' "$S15_IDEAL_DEFAULT" ;;
@@ -525,11 +525,13 @@ if [[ -n "$install_services" && -f "$install_services" ]]; then
 fi
 
 # Q5: SITEID placeholder check in impex (BLOCK)
+# site-id="Sites" is the Business Manager organization site. Install replaces the
+# SITEID token with the storefront repository id and leaves "Sites" unchanged.
 for f in ${XML_FILES[@]+"${XML_FILES[@]}"}; do
   [[ -z "$f" ]] && continue
   while IFS= read -r line; do
     block "$f" "Hardcoded site-id — use SITEID placeholder: $line"
-  done < <(grep -nE 'site-id="[^"]*"' "$f" 2>/dev/null | grep -v 'SITEID' | grep -v 'mode="delete"' | head -3)
+  done < <(grep -nE 'site-id="[^"]*"' "$f" 2>/dev/null | grep -v 'SITEID' | grep -v 'site-id="Sites"' | grep -v 'mode="delete"' | head -3)
 done
 
 # Q6: Absolute paths in code (BLOCK)

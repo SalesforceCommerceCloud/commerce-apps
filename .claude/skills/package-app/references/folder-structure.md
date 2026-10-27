@@ -11,7 +11,7 @@ Commerce apps must follow a strict folder structure for installation to work cor
 ```
 
 Where:
-- `{domain}` = one of: tax, payment, shipping, gift-cards, ratings-and-reviews, loyalty, search, address-verification, analytics, approaching-discounts, fraud
+- `{domain}` = one of: tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard
 - `{appName}` = the app id (kebab-case, matches commerce-app.json "id" field)
 - `{version}` = semantic version (e.g., 1.0.0, 0.2.8)
 
@@ -32,12 +32,12 @@ If the folder structure doesn't match `{domain}/{appName}/`, installation will f
 ❌ **Wrong:** `tax/vendor-name/avalara-tax/`
 ✅ **Right:** `tax/avalara-tax/`
 
-❌ **Wrong:** `loyalty/apps/acme-loyalty/`
-✅ **Right:** `loyalty/acme-loyalty/`
+❌ **Wrong:** `tax/apps/acme-tax/`
+✅ **Right:** `tax/acme-tax/`
 
 ## Validation
 
 Check that:
 1. App is at `{domain}/{appName}/` where `{appName}` matches the "id" in manifest.json
 2. No extra directory nesting (no vendor folders, no "apps" subfolder)
-3. Domain is valid (one of the 11 domains listed above)
+3. Domain is valid (one of the 9 domains listed above)

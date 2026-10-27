@@ -142,6 +142,18 @@ Every immediate child directory of `cartridges/site_cartridges/` and `cartridges
 bash .github/scripts/validate-cartridge-project.sh "$CAP_ROOT"
 ```
 
+## Step 6c: Validate backend extension points (Backend-only/Fullstack)
+
+**Skip if UI-only** (`HAS_BACKEND=0`) or if `INPUT_KIND=dir` (the script reads the ZIP and derives the domain from its `{domain}/{appName}/` path; note the gap and re-run once the ZIP is built).
+
+Runs the same check as CI Step 5. Required hooks per domain come from `.github/config/domain-hooks.json` (tax, shipping, payment, giftcard, fraud). It also checks that exported function names match the hook suffix, that no hook belongs to a different domain, and that `commerce-app.json` has a non-blank `name` of at most 256 bytes and a `domain` matching the directory.
+
+```bash
+bash .github/scripts/validate-hooks.sh "{domain}/{appName}/{appName}-v{version}.zip"
+```
+
+**FAIL** on `::error` output (this includes a site cartridge `package.json` whose `"hooks"` entry does not point to the app's `hooks.json`, which means the platform registers nothing). `::warning` output (e.g. non-`sfcc.app` hooks) is reported as a warning. Salesforce-native apps with no `cartridges/site_cartridges` are skipped.
+
 ## Step 7: Validate commerce-app.json
 
 ```bash
@@ -233,7 +245,7 @@ bash .github/scripts/validate-tasks-list.sh "$CAP_ROOT/app-configuration/tasksLi
 [[ -f "$CAP_ROOT/app-configuration/adminComponents.json" ]] && \
   bash .github/scripts/validate-admin-components.sh "$CAP_ROOT/app-configuration/adminComponents.json"
 
-# app-shipped translations (optional directory; cross-references the two files above)
+# app-shipped translations (required when tasksList.json is present)
 bash .github/scripts/validate-translations.sh "$CAP_ROOT"
 ```
 

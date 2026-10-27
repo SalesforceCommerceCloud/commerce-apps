@@ -31,7 +31,7 @@ Build a registry-ready Commerce App Package (CAP) ZIP from an app directory.
 | SFRA min version | `7.0.0` | No |
 | SFRA max version | `8.0.0` | No |
 
-**Valid domains:** `tax`, `payment`, `shipping`, `gift-cards`, `ratings-and-reviews`, `loyalty`, `search`, `address-verification`, `analytics`, `approaching-discounts`, `fraud`
+**Valid domains:** `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`
 
 **Structure:** Apps must be at `{domain}/{appName}/` where `{appName}` matches the "id" field. See `references/folder-structure.md`.
 
