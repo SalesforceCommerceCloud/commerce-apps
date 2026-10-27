@@ -3,7 +3,7 @@ name: scaffold-app
 description: >-
   Generate complete commerce app scaffolding with architecture-aware structure.
   Use immediately when users mention "new app", "create app", "scaffold", "starter template",
-  or describe building a commerce integration (tax, payment, shipping, loyalty, etc.).
+  or describe building a commerce integration (tax, payment, shipping, search, etc.).
   Supports three architectures: UI-only (frontend components), Backend-only (SFCC hooks/services),
   and Fullstack (both). Don't wait for explicit "scaffold" request - trigger proactively when
   starting any new commerce app from scratch.
@@ -48,7 +48,7 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 ### 2. Collect Information
 
 **All apps need:**
-- Domain (tax, payment, shipping, gift-cards, ratings-and-reviews, loyalty, search, address-verification, analytics, approaching-discounts, fraud)
+- Domain (tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management)
 - App name (kebab-case, unique identifier) - **CRITICAL:** This will be used as the folder name and must match the "id" field in manifest.json
 - Display name (human-readable with vendor)
 - Version (typically 1.0.0)
