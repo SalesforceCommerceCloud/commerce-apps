@@ -15,7 +15,16 @@ LEVEL="error"   # severity for rule violations in the current domain
 
 report() { # $1 = severity (error|warning), $2 = file, $3 = message
   echo "::$1 file=$2::$3"
-  [[ "$1" == "error" ]] && ERRORS=$((ERRORS + 1))
+  if [[ "$1" == "error" ]]; then
+    ERRORS=$((ERRORS + 1))
+  elif [[ "$1" == "warning" && -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+    # Shown at the top of the verify-zip job. ::warning on a ZIP does not
+    # appear in the pull request diff because the ZIP has no text lines.
+    if [[ ! -s "$GITHUB_STEP_SUMMARY" ]] || ! grep -q '### Hook warnings' "$GITHUB_STEP_SUMMARY"; then
+      printf '\n### Hook warnings\n\nThe check stays green. Prefer app-specific hooks that start with `sfcc.app.*`.\n\n' >> "$GITHUB_STEP_SUMMARY"
+    fi
+    printf -- '- `%s`: %s\n' "$2" "$3" >> "$GITHUB_STEP_SUMMARY"
+  fi
   return 0
 }
 violation() { report "$LEVEL" "$ZIP" "$1"; }

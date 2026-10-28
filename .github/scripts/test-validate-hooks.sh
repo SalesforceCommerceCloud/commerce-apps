@@ -165,7 +165,11 @@ extra="$(jq -c '. + [
   {"name":"custom.integration.modifyResponse","script":"./hooks/modifyResponse.js"}
 ]' <<< "$pay")"
 z="$(make_zip payment c1 "$extra" '{"domain":"payment"}')"
+summary="$ROOT/step-summary.md"
+: > "$summary"
+export GITHUB_STEP_SUMMARY="$summary"
 run "$z"
+unset GITHUB_STEP_SUMMARY
 expect "beforePOST is a warning and does not fail" 0 'Hook "dw.ocapi.shop.basket.beforePOST" is not an app-specific hook'
 expect "calculate is a warning" 0 'Hook "dw.ocapi.shop.basket.calculate" is not an app-specific hook'
 expect "custom hook is a warning" 0 'Hook "custom.integration.modifyResponse" is not an app-specific hook'
@@ -173,6 +177,11 @@ if [[ "$OUT" == *'Hook "sfcc.app.payment.'*' is not an app-specific hook'* ]]; t
   echo "  FAIL: an sfcc.app.payment hook was warned"; echo "    $OUT"; FAIL=$((FAIL + 1))
 else
   echo "  PASS: sfcc.app.payment hooks were not warned"; PASS=$((PASS + 1))
+fi
+if grep -q '### Hook warnings' "$summary" && grep -q 'dw.ocapi.shop.basket.beforePOST' "$summary" && grep -q 'custom.integration.modifyResponse' "$summary"; then
+  echo "  PASS: warnings are written to the job summary"; PASS=$((PASS + 1))
+else
+  echo "  FAIL: job summary missing hook warnings"; echo "    $(cat "$summary")"; FAIL=$((FAIL + 1))
 fi
 
 z="$(make_zip fraud f4 "$(hooks_for fraud beforePayment afterPayment)" '{"domain":"fraud"}')"

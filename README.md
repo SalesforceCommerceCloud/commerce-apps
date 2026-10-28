@@ -134,7 +134,7 @@ Why these are required: a gift card app without `capture` places orders without 
 
 Enforcement: violations for `tax`, `shipping`, `payment`, `giftcard` and `fraud` fail the build (the `enforce` value per domain in `domain-hooks.json`). Hooks are located the way the platform does it: a site cartridge `package.json` must have a `"hooks"` entry pointing to your `hooks.json`. Salesforce-native apps that ship no site cartridges (for example `sf-payments`) are exempt.
 
-CI warns, and does not fail the build, when a registered hook does not start with `sfcc.app.*`. Use the domain extension points in the table above (`sfcc.app.<domain>.*`). On `tax`, which has a strict allow-list, a non-`sfcc.app.tax.*` hook is also an error.
+CI warns, and does not fail the build, when a registered hook does not start with `sfcc.app.*`. The same warnings are listed at the top of the verify-zip job summary. Use the domain extension points in the table above (`sfcc.app.<domain>.*`). On `tax`, which has a strict allow-list, a non-`sfcc.app.tax.*` hook is also an error.
 
 ### Connection Health Check Hook (optional)
 
