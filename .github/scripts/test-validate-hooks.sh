@@ -17,7 +17,10 @@ printf '%s' '{"payment":[{"id":"sf-native","domain":"payment","provider":"salesf
 # Hook scripts are generated per hook name (suffix function defined) unless body given.
 make_zip() {
   local domain="$1" app="$2" hooks="$3" cap="$4" body="${5:-}"
-  local work="$ROOT/work_$RANDOM" pkg
+  # mktemp, not $RANDOM: a collision reuses the previous app directory and the
+  # zip then contains both apps. find returns the first commerce-app.json.
+  local work pkg
+  work="$(mktemp -d "$ROOT/work.XXXXXX")"
   pkg="$work/commerce-$app-app-v1.0.0"
   mkdir -p "$pkg" "$ROOT/$domain/$app"
   printf '%s' "$cap" > "$pkg/commerce-app.json"
@@ -153,6 +156,50 @@ run "$z"; expect "fraud afterPayment using OrderMgr is an error" 1 "uses OrderMg
 echo "-- other domains"
 z="$(make_zip analytics a1 "-" '{"domain":"analytics"}')"
 run "$z"; expect "domains without hook rules are skipped" 0 "No hook rules"
+
+echo "-- hooks that do not start with sfcc.app.* (warning only)"
+pay="$(hooks_for payment getClaimedPaymentMethods onAttemptOrderTransition reversePayment)"
+extra="$(jq -c '. + [
+  {"name":"dw.ocapi.shop.basket.beforePOST","script":"./hooks/beforePOST.js"},
+  {"name":"dw.ocapi.shop.basket.calculate","script":"./hooks/calculate.js"},
+  {"name":"custom.integration.modifyResponse","script":"./hooks/modifyResponse.js"}
+]' <<< "$pay")"
+z="$(make_zip payment c1 "$extra" '{"domain":"payment"}')"
+summary="$ROOT/step-summary.md"
+: > "$summary"
+export GITHUB_STEP_SUMMARY="$summary"
+run "$z"
+unset GITHUB_STEP_SUMMARY
+expect "beforePOST is a warning and does not fail" 0 'Hook "dw.ocapi.shop.basket.beforePOST" is not an app-specific hook'
+expect "calculate is a warning" 0 'Hook "dw.ocapi.shop.basket.calculate" is not an app-specific hook'
+expect "custom hook is a warning" 0 'Hook "custom.integration.modifyResponse" is not an app-specific hook'
+if [[ "$OUT" == *'Hook "sfcc.app.payment.'*' is not an app-specific hook'* ]]; then
+  echo "  FAIL: an sfcc.app.payment hook was warned"; echo "    $OUT"; FAIL=$((FAIL + 1))
+else
+  echo "  PASS: sfcc.app.payment hooks were not warned"; PASS=$((PASS + 1))
+fi
+if grep -q '### Hook warnings' "$summary" && grep -q 'dw.ocapi.shop.basket.beforePOST' "$summary" && grep -q 'custom.integration.modifyResponse' "$summary"; then
+  echo "  PASS: warnings are written to the job summary"; PASS=$((PASS + 1))
+else
+  echo "  FAIL: job summary missing hook warnings"; echo "    $(cat "$summary")"; FAIL=$((FAIL + 1))
+fi
+
+z="$(make_zip fraud f4 "$(hooks_for fraud beforePayment afterPayment)" '{"domain":"fraud"}')"
+run "$z"; expect "sfcc.app beforePayment/afterPayment still pass" 0 "Hook checks passed"
+if [[ "$OUT" == *"is not an app-specific hook"* ]]; then
+  echo "  FAIL: domain hooks were warned"; echo "    $OUT"; FAIL=$((FAIL + 1))
+else
+  echo "  PASS: domain hooks were not warned"; PASS=$((PASS + 1))
+fi
+
+z="$(make_zip analytics a2 '[{"name":"dw.ocapi.shop.basket.items.beforePOST","script":"./hooks/beforePOST.js"}]' '{"domain":"analytics"}')"
+run "$z"; expect "non-sfcc.app hook warns when the domain has no hook rules" 0 'Hook "dw.ocapi.shop.basket.items.beforePOST" is not an app-specific hook'
+
+tax="$(hooks_for tax calculate commit cancel)"
+tax_extra="$(jq -c '. + [{"name":"dw.ocapi.shop.order.afterPOST","script":"./hooks/afterPOST.js"}]' <<< "$tax")"
+z="$(make_zip tax c3 "$tax_extra" '{"domain":"tax"}')"
+run "$z"; expect "strict domain still errors on a non-sfcc.app hook" 1 "Disallowed hook"
+expect "strict domain also warns" 1 'Hook "dw.ocapi.shop.order.afterPOST" is not an app-specific hook'
 
 echo ""
 echo "Passed: $PASS, Failed: $FAIL"
