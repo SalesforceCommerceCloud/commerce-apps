@@ -17,7 +17,10 @@ printf '%s' '{"payment":[{"id":"sf-native","domain":"payment","provider":"salesf
 # Hook scripts are generated per hook name (suffix function defined) unless body given.
 make_zip() {
   local domain="$1" app="$2" hooks="$3" cap="$4" body="${5:-}"
-  local work="$ROOT/work_$RANDOM" pkg
+  # mktemp, not $RANDOM: a collision reuses the previous app directory and the
+  # zip then contains both apps. find returns the first commerce-app.json.
+  local work pkg
+  work="$(mktemp -d "$ROOT/work.XXXXXX")"
   pkg="$work/commerce-$app-app-v1.0.0"
   mkdir -p "$pkg" "$ROOT/$domain/$app"
   printf '%s' "$cap" > "$pkg/commerce-app.json"
