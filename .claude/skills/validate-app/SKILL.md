@@ -152,7 +152,7 @@ Runs the same check as CI Step 5. Required hooks per domain come from `.github/c
 bash .github/scripts/validate-hooks.sh "{domain}/{appName}/{appName}-v{version}.zip"
 ```
 
-**FAIL** on `::error` output (this includes a site cartridge `package.json` whose `"hooks"` entry does not point to the app's `hooks.json`, which means the platform registers nothing). `::warning` output (e.g. non-`sfcc.app` hooks) is reported as a warning. Salesforce-native apps with no `cartridges/site_cartridges` are skipped.
+**FAIL** on `::error` output (this includes a site cartridge `package.json` whose `"hooks"` entry does not point to the app's `hooks.json`, which means the platform registers nothing). Any registered hook that does not start with `sfcc.app.*` is a `::warning` on every domain and does not by itself fail the build. `tax` still fails when a hook is outside `sfcc.app.tax.*` (strict allow-list). Salesforce-native apps with no `cartridges/site_cartridges` are skipped.
 
 ## Step 7: Validate commerce-app.json
 

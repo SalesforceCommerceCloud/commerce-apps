@@ -134,6 +134,8 @@ Why these are required: a gift card app without `capture` places orders without 
 
 Enforcement: violations for `tax`, `shipping`, `payment`, `giftcard` and `fraud` fail the build (the `enforce` value per domain in `domain-hooks.json`). Hooks are located the way the platform does it: a site cartridge `package.json` must have a `"hooks"` entry pointing to your `hooks.json`. Salesforce-native apps that ship no site cartridges (for example `sf-payments`) are exempt.
 
+CI warns, and does not fail the build, when a registered hook does not start with `sfcc.app.*`. Use the domain extension points in the table above (`sfcc.app.<domain>.*`). On `tax`, which has a strict allow-list, a non-`sfcc.app.tax.*` hook is also an error.
+
 ### Connection Health Check Hook (optional)
 
 Any Commerce App can implement a **connection health check hook** so Business Manager displays connectivity status on the app's tile in the Checkout Hub. The hook is called when a merchant loads the app details page or manually refreshes the connection status — it shows a health badge (Healthy, Degraded, Unhealthy, or Unknown) alongside an optional message and remediation hint. How you define "connection" is up to you — it could be an API endpoint, a credential validation, a third-party service ping, or any check that confirms your app's external dependency is reachable.

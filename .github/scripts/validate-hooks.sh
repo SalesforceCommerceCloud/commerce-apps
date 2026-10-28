@@ -101,6 +101,13 @@ if [[ -n "$hooks_file" ]]; then
       report error "$ZIP" "Hook \"$name\" is not in this app's domain \"$domain\" (expected sfcc.app.${domain}.*)"
     fi
   done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
+
+  # Warn on any hook that is not a commerce-app extension point. This does not
+  # fail the build. Domains with a strict allow-list still error below.
+  while IFS= read -r name; do
+    [[ "$name" == sfcc.app.* ]] && continue
+    report warning "$ZIP" "Hook \"$name\" is not an app-specific hook. If possible, use app-specific hooks which start with sfcc.app.*"
+  done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
 fi
 
 if [[ "$enforce" == "none" ]]; then
@@ -175,12 +182,8 @@ for name in ${registered[@]+"${registered[@]}"}; do
       continue
     fi
     check_script "$suffix"
-  elif [[ "$name" != sfcc.app.* ]]; then
-    if [[ "$strict" == "true" ]]; then
-      violation "Disallowed hook \"$name\". Only sfcc.app.${domain}.* hooks are allowed for $domain apps"
-    else
-      report warning "$ZIP" "Hook \"$name\" is outside the commerce-app extension points (sfcc.app.${domain}.*)"
-    fi
+  elif [[ "$name" != sfcc.app.* && "$strict" == "true" ]]; then
+    violation "Disallowed hook \"$name\". Only sfcc.app.${domain}.* hooks are allowed for $domain apps"
   fi
 done
 

@@ -154,6 +154,41 @@ echo "-- other domains"
 z="$(make_zip analytics a1 "-" '{"domain":"analytics"}')"
 run "$z"; expect "domains without hook rules are skipped" 0 "No hook rules"
 
+echo "-- hooks that do not start with sfcc.app.* (warning only)"
+pay="$(hooks_for payment getClaimedPaymentMethods onAttemptOrderTransition reversePayment)"
+extra="$(jq -c '. + [
+  {"name":"dw.ocapi.shop.basket.beforePOST","script":"./hooks/beforePOST.js"},
+  {"name":"dw.ocapi.shop.basket.calculate","script":"./hooks/calculate.js"},
+  {"name":"custom.integration.modifyResponse","script":"./hooks/modifyResponse.js"}
+]' <<< "$pay")"
+z="$(make_zip payment c1 "$extra" '{"domain":"payment"}')"
+run "$z"
+expect "beforePOST is a warning and does not fail" 0 'Hook "dw.ocapi.shop.basket.beforePOST" is not an app-specific hook'
+expect "calculate is a warning" 0 'Hook "dw.ocapi.shop.basket.calculate" is not an app-specific hook'
+expect "custom hook is a warning" 0 'Hook "custom.integration.modifyResponse" is not an app-specific hook'
+if [[ "$OUT" == *'Hook "sfcc.app.payment.'*' is not an app-specific hook'* ]]; then
+  echo "  FAIL: an sfcc.app.payment hook was warned"; echo "    $OUT"; FAIL=$((FAIL + 1))
+else
+  echo "  PASS: sfcc.app.payment hooks were not warned"; PASS=$((PASS + 1))
+fi
+
+z="$(make_zip fraud f4 "$(hooks_for fraud beforePayment afterPayment)" '{"domain":"fraud"}')"
+run "$z"; expect "sfcc.app beforePayment/afterPayment still pass" 0 "Hook checks passed"
+if [[ "$OUT" == *"is not an app-specific hook"* ]]; then
+  echo "  FAIL: domain hooks were warned"; echo "    $OUT"; FAIL=$((FAIL + 1))
+else
+  echo "  PASS: domain hooks were not warned"; PASS=$((PASS + 1))
+fi
+
+z="$(make_zip analytics a2 '[{"name":"dw.ocapi.shop.basket.items.beforePOST","script":"./hooks/beforePOST.js"}]' '{"domain":"analytics"}')"
+run "$z"; expect "non-sfcc.app hook warns when the domain has no hook rules" 0 'Hook "dw.ocapi.shop.basket.items.beforePOST" is not an app-specific hook'
+
+tax="$(hooks_for tax calculate commit cancel)"
+tax_extra="$(jq -c '. + [{"name":"dw.ocapi.shop.order.afterPOST","script":"./hooks/afterPOST.js"}]' <<< "$tax")"
+z="$(make_zip tax c3 "$tax_extra" '{"domain":"tax"}')"
+run "$z"; expect "strict domain still errors on a non-sfcc.app hook" 1 "Disallowed hook"
+expect "strict domain also warns" 1 'Hook "dw.ocapi.shop.order.afterPOST" is not an app-specific hook'
+
 echo ""
 echo "Passed: $PASS, Failed: $FAIL"
 [[ "$FAIL" -eq 0 ]]
