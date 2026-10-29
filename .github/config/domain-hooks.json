@@ -59,6 +59,19 @@
       ],
       "required": [],
       "optional": []
+    },
+    "oms": {
+      "enforce": "error",
+      "required": [
+        "order.retrieve",
+        "order.list",
+        "order.cancel",
+        "order.return"
+      ],
+      "optional": [
+        "order.accessControl",
+        "order.reasonCodes"
+      ]
     }
   }
 }

@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Cartão-presente personalizado",
     "description": "Configure uma integração de cartão-presente personalizada fornecendo suas próprias APIs."
+  },
+  "custom-oms": {
+    "name": "OMS personalizado",
+    "description": "Configure uma integração personalizada de gerenciamento de pedidos fornecendo suas próprias APIs."
   }
 }

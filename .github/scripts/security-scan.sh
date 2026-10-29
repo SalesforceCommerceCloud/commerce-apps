@@ -284,6 +284,7 @@ S15_IDEAL_TAX="    <timeout-millis>5000</timeout-millis>\n    <rate-limit-enable
 S15_IDEAL_PAYMENT="    <timeout-millis>10000</timeout-millis>\n    <rate-limit-enabled>true</rate-limit-enabled>\n    <rate-limit-calls>50</rate-limit-calls>\n    <rate-limit-millis>1000</rate-limit-millis>\n    <cb-enabled>true</cb-enabled>\n    <cb-calls>3</cb-calls>\n    <cb-millis>10000</cb-millis>"
 S15_IDEAL_FRAUD="    <timeout-millis>5000</timeout-millis>\n    <rate-limit-enabled>true</rate-limit-enabled>\n    <rate-limit-calls>100</rate-limit-calls>\n    <rate-limit-millis>1000</rate-limit-millis>\n    <cb-enabled>true</cb-enabled>\n    <cb-calls>3</cb-calls>\n    <cb-millis>10000</cb-millis>"
 S15_IDEAL_SHIPPING="    <timeout-millis>5000</timeout-millis>\n    <rate-limit-enabled>true</rate-limit-enabled>\n    <rate-limit-calls>100</rate-limit-calls>\n    <rate-limit-millis>1000</rate-limit-millis>\n    <cb-enabled>true</cb-enabled>\n    <cb-calls>5</cb-calls>\n    <cb-millis>10000</cb-millis>"
+S15_IDEAL_OMS="    <timeout-millis>10000</timeout-millis>\n    <rate-limit-enabled>true</rate-limit-enabled>\n    <rate-limit-calls>100</rate-limit-calls>\n    <rate-limit-millis>1000</rate-limit-millis>\n    <cb-enabled>true</cb-enabled>\n    <cb-calls>5</cb-calls>\n    <cb-millis>10000</cb-millis>"
 S15_IDEAL_DEFAULT="    <timeout-millis>10000</timeout-millis>\n    <rate-limit-enabled>true</rate-limit-enabled>\n    <rate-limit-calls>100</rate-limit-calls>\n    <rate-limit-millis>1000</rate-limit-millis>\n    <cb-enabled>true</cb-enabled>\n    <cb-calls>5</cb-calls>\n    <cb-millis>10000</cb-millis>"
 
 s15_get_ideal() {
@@ -292,6 +293,7 @@ s15_get_ideal() {
     payment|giftcard) printf '%b' "$S15_IDEAL_PAYMENT" ;;
     fraud) printf '%b' "$S15_IDEAL_FRAUD" ;;
     shipping) printf '%b' "$S15_IDEAL_SHIPPING" ;;
+    oms) printf '%b' "$S15_IDEAL_OMS" ;;
     *) printf '%b' "$S15_IDEAL_DEFAULT" ;;
   esac
 }

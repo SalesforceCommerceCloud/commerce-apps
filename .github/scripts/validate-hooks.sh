@@ -151,14 +151,15 @@ script_for() { jq -r --arg n "sfcc.app.${domain}.$1" '.hooks[]? | select(.name =
 
 check_script() { # $1 = suffix; verifies script exists, exports the function, and domain rules
   local suffix="$1" script target
+  local fn="${suffix##*.}"
   script="$(script_for "$suffix")"
   [[ -z "$script" ]] && return 0
   target="$hooks_dir/${script#./}"
   [[ -f "$target" || -f "$target.js" ]] || { violation "Script for \"sfcc.app.${domain}.${suffix}\" points to missing file: $script"; return 0; }
   [[ -f "$target" ]] || target="$target.js"
   # The platform calls the export named after the last hook-name segment.
-  if ! grep -qE "\b${suffix}\b" "$target"; then
-    violation "Script $script does not define/export a function named \"${suffix}\" (the platform calls the hook by that name)"
+  if ! grep -qE "\b${fn}\b" "$target"; then
+    violation "Script $script does not define/export a function named \"${fn}\" (the platform calls the hook by that name)"
   fi
   if [[ "$domain" == "payment" ]] && grep -q 'COMMERCE_APP_GIFT_CARD' "$target"; then
     violation "Script $script references COMMERCE_APP_GIFT_CARD; that payment method ID is reserved and cannot be claimed by a payment app"

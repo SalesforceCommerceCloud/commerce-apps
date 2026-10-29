@@ -145,6 +145,17 @@
       "provider": "custom"
     }
   ],
+  "oms": [
+    {
+      "id": "custom-oms",
+      "name": "Custom OMS",
+      "description": "Configure a custom order management integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "oms",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
   "analytics": [
     {
       "id": "custom-analytics",

@@ -10,7 +10,7 @@ This is a **Commerce App Registry** for Salesforce Commerce Cloud B2C Commerce. 
 
 **Key Concepts:**
 - **Commerce App Package (CAP):** A ZIP file containing cartridges, UI extensions, impex configs, and documentation
-- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`)
+- **Domain:** Functional category for the app. Can be a provider domain (`tax`, `payment`, `shipping`) or a feature domain (`analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`, `oms`)
 - **ISV:** Independent Software Vendor (the company publishing the app)
 - **Impex:** XML configuration files for SFCC (services, site preferences, custom objects)
 
@@ -129,7 +129,7 @@ Your response:
 - ZIP: `{app-name}-v{version}.zip` (e.g., `avalara-tax-v0.2.8.zip`)
 - Extracted dir: `commerce-{app-name}-app-v{version}/`
 - Service IDs: dotted notation (e.g., `avalara.tax.api`)
-- Attribute IDs: camelCase with app prefix (e.g., `avalaraTaxEnabled`)
+- Attribute IDs: camelCase or snake_case, prefixed with the app name, consistent within an app (e.g., `avalaraTaxEnabled` or `avalara_tax_enabled`). This is separate from `taskKey`/`componentKey`, which must be snake_case
 
 ### 3. Version Management
 - Semantic versioning: `major.minor.patch`
@@ -375,11 +375,12 @@ Business Manager UI still requires deleting the service first. That UI rule does
 ```xml
 <!-- WRONG -->
 <attribute-definition attribute-id="enabled">              <!-- Too generic -->
-<attribute-definition attribute-id="api_key">              <!-- snake_case -->
 <attribute-definition attribute-id="MyAppEnabled">         <!-- PascalCase -->
+<attribute-definition attribute-id="myAppEnabled">         <!-- OK alone, but wrong if the same app also uses my_app_api_key (mixed styles) -->
 
-<!-- RIGHT -->
+<!-- RIGHT (camelCase or snake_case, one style per app) -->
 <attribute-definition attribute-id="myAppEnabled">         <!-- Prefixed, camelCase -->
+<attribute-definition attribute-id="my_app_enabled">       <!-- Prefixed, snake_case -->
 ```
 
 ### ❌ Junk Files in ZIP
@@ -428,6 +429,7 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 | `analytics` | Analytics and reporting | Google Analytics, Segment |
 | `fraud` | Fraud detection and prevention | Custom fraud integrations |
 | `giftcard` | Gift card balance and redemption | Custom gift card integrations |
+| `oms` | Order management (retrieve, list, cancel, return) | Custom OMS integrations |
 
 ### Common App Patterns
 | Type | What It Does | Typical Components |
@@ -437,6 +439,7 @@ The `domain` field in manifest entries and `commerce-app.json` must be one of th
 | Shipping | Calculate shipping rates | Carrier API integration, hooks (calculate, quote, optional estimate) |
 | Gift card | Balance, capture, refund | Gift card API integration, hooks (getBalance, capture, refund) |
 | Fraud | Pre/post-authorization fraud decisions | Fraud API integration, hooks (beforePayment and/or afterPayment) |
+| OMS | Order retrieve, list, cancel, return | OMS API integration, hooks (order.retrieve, order.list, order.cancel, order.return) |
 
 Required hooks per domain are defined in `.github/config/domain-hooks.json` and listed in the README ("Backend Extension Points by Domain").
 | Reviews (`ratings-and-reviews`) | Product ratings/reviews | Reviews API, React components for display |
@@ -590,7 +593,7 @@ A: Depends on what you're doing:
 - Anything else: NO - CI manages it
 
 **Q: "Where does my app go in the registry?"**
-A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, or `giftcard`. The domain uses hyphen-case and is specified directly in the manifest.
+A: `{domain}/{app-name}/` where `{app-name}` matches the `id` field in the root manifest, and domain is one of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`, or `oms`. The domain uses hyphen-case and is specified directly in the manifest.
 
 ## Key Files to Reference
 

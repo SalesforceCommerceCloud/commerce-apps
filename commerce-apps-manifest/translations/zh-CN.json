@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "自定义礼品卡",
     "description": "通过提供您自己的 API 来配置自定义礼品卡集成。"
+  },
+  "custom-oms": {
+    "name": "自定义 OMS",
+    "description": "通过提供您自己的 API 来配置自定义订单管理集成。"
   }
 }

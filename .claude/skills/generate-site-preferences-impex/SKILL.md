@@ -27,7 +27,7 @@ Use proactively whenever:
 | Input | Example | Notes |
 |-------|---------|-------|
 | App name | `ratings-reviews` | Used for grouping and prefixing |
-| Preference ID | `ratingsReviewsEnabled` | camelCase, unique |
+| Preference ID | `ratingsReviewsEnabled` | camelCase or snake_case (`ratings_reviews_enabled`), unique |
 | Display name | `Enable Ratings & Reviews` | Human-readable |
 | Description | `Enable or disable ratings functionality` | Help text |
 | Data type | `boolean`, `string`, `enum`, etc. | See attribute-types.md |
@@ -150,7 +150,7 @@ For international merchants, add translations. See `references/attribute-types.m
 
 ### Naming
 - Prefix ALL IDs with app name: `{appName}SettingName`
-- Use camelCase: `myPreferenceName`
+- Use camelCase (`myPreferenceName`) or snake_case (`my_preference_name`), one style per app
 - Be descriptive: `autoCommitTaxOnInvoice`
 
 ### Defaults
@@ -172,7 +172,7 @@ For international merchants, add translations. See `references/attribute-types.m
 ## Step 8: Validation checklist
 
 - [ ] All attribute IDs prefixed with app name
-- [ ] camelCase naming
+- [ ] Consistent camelCase or snake_case naming
 - [ ] Display names clear and descriptive
 - [ ] Descriptions provide helpful guidance
 - [ ] Appropriate data types
@@ -201,7 +201,7 @@ xmllint --noout impex/install/sites/SITEID/preferences.xml
 | Mistake | Fix |
 |---------|-----|
 | Missing app prefix | Add app name prefix to all IDs |
-| snake_case IDs | Use camelCase |
+| Mixed camelCase and snake_case IDs | Pick one style and use it for every ID in the app |
 | No default values | Set sensible defaults |
 | Everything mandatory | Only require essentials |
 | Generic descriptions | Provide clear guidance |

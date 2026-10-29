@@ -45,6 +45,7 @@ body:
         - analytics
         - fraud
         - giftcard
+        - oms
     validations:
       required: true
 

@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "自訂禮品卡",
     "description": "透過提供您自己的 API 來設定自訂禮品卡整合。"
+  },
+  "custom-oms": {
+    "name": "自訂 OMS",
+    "description": "透過提供您自己的 API 來設定自訂訂單管理整合。"
   }
 }

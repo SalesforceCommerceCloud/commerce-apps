@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "맞춤 기프트 카드",
     "description": "자체 API를 제공하여 맞춤 기프트 카드 통합을 구성합니다."
+  },
+  "custom-oms": {
+    "name": "맞춤 OMS",
+    "description": "자체 API를 제공하여 맞춤 주문 관리 통합을 구성합니다."
   }
 }

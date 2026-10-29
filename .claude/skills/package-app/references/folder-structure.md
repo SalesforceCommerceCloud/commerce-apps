@@ -11,7 +11,7 @@ Commerce apps must follow a strict folder structure for installation to work cor
 ```
 
 Where:
-- `{domain}` = one of: tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard
+- `{domain}` = one of: tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard, oms
 - `{appName}` = the app id (kebab-case, matches commerce-app.json "id" field)
 - `{version}` = semantic version (e.g., 1.0.0, 0.2.8)
 

@@ -127,12 +127,13 @@ Backend apps register hooks as `sfcc.app.<domain>.<name>` in `hooks.json`. The e
 | `payment` | `getClaimedPaymentMethods`, `onAttemptOrderTransition`, `reversePayment` | `afterCreateBasketPaymentInstrument`, `afterUpdateBasketPaymentInstrument`, `afterCreateOrderPaymentInstrument`, `afterUpdateOrderPaymentInstrument`, `authorizePayment`, `cancelAuthorization`, `capturePayment`, `refundCapture` |
 | `giftcard` | `getBalance`, `capture`, `refund` | |
 | `fraud` | at least one of `beforePayment`, `afterPayment` | |
+| `oms` | `order.retrieve`, `order.list`, `order.cancel`, `order.return` | `order.accessControl`, `order.reasonCodes` |
 
 `checkConnectionHealth` is optional for every domain. Other domains have no required backend hooks.
 
 Why these are required: a gift card app without `capture` places orders without charging the card; without `refund` a failed payment leaves the card unrefunded. A payment app without `reversePayment` throws when the platform needs to reverse a payment. Shipping `quote` and `calculate` must agree so the price shown at shipping-method selection matches the basket total. Gift card `capture`/`refund` must be idempotent. `afterPayment` (fraud) must not call `OrderMgr`. `payment` apps must not claim the reserved `COMMERCE_APP_GIFT_CARD` payment method.
 
-Enforcement: violations for `tax`, `shipping`, `payment`, `giftcard` and `fraud` fail the build (the `enforce` value per domain in `domain-hooks.json`). Hooks are located the way the platform does it: a site cartridge `package.json` must have a `"hooks"` entry pointing to your `hooks.json`. Salesforce-native apps that ship no site cartridges (for example `sf-payments`) are exempt.
+Enforcement: violations for `tax`, `shipping`, `payment`, `giftcard`, `fraud` and `oms` fail the build (the `enforce` value per domain in `domain-hooks.json`). Hooks are located the way the platform does it: a site cartridge `package.json` must have a `"hooks"` entry pointing to your `hooks.json`. Salesforce-native apps that ship no site cartridges (for example `sf-payments`) are exempt.
 
 CI warns, and does not fail the build, when a registered hook does not start with `sfcc.app.*`. The same warnings are listed at the top of the verify-zip job summary. Use the domain extension points in the table above (`sfcc.app.<domain>.*`). On `tax`, which has a strict allow-list, a non-`sfcc.app.tax.*` hook is also an error.
 
@@ -318,6 +319,7 @@ Every app's `domain` field must be one of these. Domains use hyphen-case. Provid
 | `analytics` | Additional Setup | Analytics and reporting | Google Analytics, Segment |
 | `fraud` | Additional Setup | Fraud detection and prevention | Custom fraud integrations |
 | `giftcard` | Additional Setup | Gift card balance and redemption | Custom gift card integrations |
+| `oms` | Additional Setup | Order management | Custom OMS integrations |
 | `content-management` | Additional Setup | Content management and delivery | Salesforce CMS, Contentful |
 | `merchandising` | Additional Setup | Merchandising and promotion experiences | Salesforce Approaching Discounts |
 

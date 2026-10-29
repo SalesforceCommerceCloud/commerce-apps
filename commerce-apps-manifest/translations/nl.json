@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Aangepaste cadeaubon",
     "description": "Configureer een aangepaste cadeaubonintegratie met uw eigen API's."
+  },
+  "custom-oms": {
+    "name": "Aangepast OMS",
+    "description": "Configureer een aangepaste orderbeheerintegratie met uw eigen API's."
   }
 }
