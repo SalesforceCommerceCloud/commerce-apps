@@ -46,7 +46,7 @@ find commerce-<appName>-app-v<version>/impex/ -name "*.xml" -exec xmllint --noou
 
 **Required checks:**
 - [ ] XML namespace is `http://www.demandware.com/xml/impex/metadata/2006-10-31`
-- [ ] All attribute IDs use camelCase (not snake_case)
+- [ ] Attribute IDs are camelCase or snake_case, with one style used consistently across the app
 - [ ] All attribute IDs prefixed with app name
 - [ ] All attributes have display names and descriptions
 - [ ] Default values match data types
@@ -98,7 +98,7 @@ Check for these frequent issues:
 **ID naming:**
 - [ ] No duplicate service/credential/profile IDs
 - [ ] Service IDs don't use underscores (use dots instead)
-- [ ] Attribute IDs don't use underscores (use camelCase)
+- [ ] Attribute IDs use one naming style (camelCase or snake_case) consistently
 
 **Structure:**
 - [ ] All XML files are well-formed (no unclosed tags)

@@ -153,6 +153,30 @@ run "$z"; expect "fraud with neither hook is an error" 1 "at least one of"
 z="$(make_zip fraud f3 "$(hooks_for fraud afterPayment)" '{"domain":"fraud"}' 'var OrderMgr = require("dw/order/OrderMgr"); exports.afterPayment = function(){};')"
 run "$z"; expect "fraud afterPayment using OrderMgr is an error" 1 "uses OrderMgr"
 
+echo "-- oms"
+oms_hooks() { # <action...> -> hooks.json array (hook names are sfcc.app.oms.order.<action>)
+  local out="[" sep="" a
+  for a in "$@"; do
+    out+="$sep{\"name\":\"sfcc.app.oms.order.$a\",\"script\":\"./hooks/$a.js\"}"; sep=","
+  done
+  echo "$out]"
+}
+z="$(make_zip oms o1 "$(oms_hooks retrieve list cancel return)" '{"domain":"oms"}')"
+run "$z"; expect "oms with all four order hooks passes" 0 "Hook checks passed"
+
+for missing in retrieve list cancel return; do
+  acts=(); for a in retrieve list cancel return; do [[ "$a" == "$missing" ]] || acts+=("$a"); done
+  z="$(make_zip oms "om-$missing" "$(oms_hooks "${acts[@]}")" '{"domain":"oms"}')"
+  run "$z"; expect "oms missing order.$missing is an error" 1 "sfcc.app.oms.order.$missing"
+done
+
+z="$(make_zip oms o6 "$(oms_hooks retrieve list cancel return)" '{"domain":"oms"}' 'exports.other = function () {};')"
+run "$z"; expect "oms exported function must match last hook segment" 1 'named "retrieve"'
+
+oms_all="$(jq -c '. + [{"name":"sfcc.app.oms.checkConnectionHealth","script":"./hooks/checkConnectionHealth.js"}]' <<< "$(oms_hooks retrieve list cancel return accessControl reasonCodes)")"
+z="$(make_zip oms o7 "$oms_all" '{"domain":"oms"}')"
+run "$z"; expect "oms optional accessControl/reasonCodes/health hooks pass" 0 "Hook checks passed"
+
 echo "-- other domains"
 z="$(make_zip analytics a1 "-" '{"domain":"analytics"}')"
 run "$z"; expect "domains without hook rules are skipped" 0 "No hook rules"

@@ -48,7 +48,7 @@ If the user's description clearly indicates type, proceed directly. Otherwise as
 ### 2. Collect Information
 
 **All apps need:**
-- Domain (tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard)
+- Domain (tax, payment, shipping, analytics, merchandising, ratings-and-reviews, address-verification, search, content-management, fraud, giftcard, oms)
 - App name (kebab-case, unique identifier) - **CRITICAL:** This will be used as the folder name and must match the "id" field in manifest.json
 - Display name (human-readable with vendor)
 - Version (typically 1.0.0)
@@ -205,11 +205,13 @@ Configure hooks.json based on domain. The source of truth is `.github/config/dom
 | `payment` | `getClaimedPaymentMethods`, `onAttemptOrderTransition`, `reversePayment` | `afterCreate/UpdateBasketPaymentInstrument`, `afterCreate/UpdateOrderPaymentInstrument`, `authorizePayment`, `cancelAuthorization`, `capturePayment`, `refundCapture` |
 | `giftcard` | `getBalance`, `capture`, `refund` (`capture` and `refund` must be idempotent) | |
 | `fraud` | at least one of `beforePayment`, `afterPayment` | |
+| `oms` | `order.retrieve`, `order.list`, `order.cancel`, `order.return` | `order.accessControl`, `order.reasonCodes` |
 
 Notes:
 - `payment`: never claim `COMMERCE_APP_GIFT_CARD` (reserved). `authorizePayment`/`cancelAuthorization`/`capturePayment`/`refundCapture` are never called by the platform; they are app-internal helpers.
 - `fraud`: `beforePayment`/`afterPayment` have a ~1s platform timeout; an exception or timeout is treated as a decline. `afterPayment` must not call `OrderMgr`.
 - Payment, fraud and gift card hooks only run when the `PaymentFraudOrchestrationEnabled` platform toggle is on (default off).
+- `oms`: hooks are named `sfcc.app.oms.order.<action>` (for example `sfcc.app.oms.order.retrieve`); the exported function is named after the last segment (`retrieve`, `list`, `cancel`, `return`).
 - Other domains (analytics, merchandising, search, ...) have no required backend hooks.
 
 **Connection health check (optional, any app with an external dependency):**

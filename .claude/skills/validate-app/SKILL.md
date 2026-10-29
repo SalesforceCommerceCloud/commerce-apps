@@ -146,7 +146,7 @@ bash .github/scripts/validate-cartridge-project.sh "$CAP_ROOT"
 
 **Skip if UI-only** (`HAS_BACKEND=0`) or if `INPUT_KIND=dir` (the script reads the ZIP and derives the domain from its `{domain}/{appName}/` path; note the gap and re-run once the ZIP is built).
 
-Runs the same check as CI Step 5. Required hooks per domain come from `.github/config/domain-hooks.json` (tax, shipping, payment, giftcard, fraud). It also checks that exported function names match the hook suffix, that no hook belongs to a different domain, and that `commerce-app.json` has a non-blank `name` of at most 256 bytes and a `domain` matching the directory.
+Runs the same check as CI Step 5. Required hooks per domain come from `.github/config/domain-hooks.json` (tax, shipping, payment, giftcard, fraud, oms). It also checks that exported function names match the hook suffix, that no hook belongs to a different domain, and that `commerce-app.json` has a non-blank `name` of at most 256 bytes and a `domain` matching the directory.
 
 ```bash
 bash .github/scripts/validate-hooks.sh "{domain}/{appName}/{appName}-v{version}.zip"
@@ -218,7 +218,7 @@ See `references/impex-validation.md` for detailed rules:
 - Services use dotted notation
 - Install/uninstall pairs match
 - Uninstall `services.xml` uses credential → profile → service order with `mode="delete"` (same XSD sequence as install; BM UI service-first delete does not apply to IMPEX)
-- Attribute IDs use camelCase with app prefix
+- Attribute IDs use camelCase or snake_case with app prefix (one style per app)
 - SITEID placeholder (not actual site ID)
 - No hardcoded credentials
 

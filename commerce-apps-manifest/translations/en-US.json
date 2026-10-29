@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Custom Gift Card",
     "description": "Configure a custom gift card integration by providing your own APIs."
+  },
+  "custom-oms": {
+    "name": "Custom OMS",
+    "description": "Configure a custom order management integration by providing your own APIs."
   }
 }
