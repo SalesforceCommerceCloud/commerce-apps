@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Carta regalo personalizzata",
     "description": "Configura un'integrazione di carta regalo personalizzata fornendo le tue API."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Accetta carte, wallet e metodi di pagamento locali in Storefront Next con Checkout.com Flow. Include 3D Secure, valutazione del rischio, cattura, annullamento e rimborso da Business Manager e webhook firmati."
   }
 }

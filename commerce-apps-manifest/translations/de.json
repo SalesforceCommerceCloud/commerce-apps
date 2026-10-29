@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Benutzerdefinierte Geschenkkarte",
     "description": "Konfigurieren Sie eine benutzerdefinierte Geschenkkartenintegration mit Ihren eigenen APIs."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Akzeptieren Sie Karten, Wallets und lokale Zahlungsmethoden in Storefront Next mit Checkout.com Flow. Mit 3D Secure, Risikobewertung, Erfassung, Stornierung und Rückerstattung im Business Manager sowie signierten Webhooks."
   }
 }

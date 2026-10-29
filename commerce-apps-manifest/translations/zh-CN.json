@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "自定义礼品卡",
     "description": "通过提供您自己的 API 来配置自定义礼品卡集成。"
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "通过 Checkout.com Flow 在 Storefront Next 中接受银行卡、电子钱包和本地支付方式。包含 3D Secure、风险评估、在 Business Manager 中请款、撤销和退款，以及签名的 Webhook。"
   }
 }

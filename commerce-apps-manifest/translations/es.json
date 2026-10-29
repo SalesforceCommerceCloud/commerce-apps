@@ -67,5 +67,9 @@
   "custom-giftcard": {
     "name": "Tarjeta de regalo personalizada",
     "description": "Configure una integración de tarjeta de regalo personalizada proporcionando sus propias API."
+  },
+  "checkoutcom": {
+    "name": "Checkout.com Flow",
+    "description": "Acepte tarjetas, monederos y métodos de pago locales en Storefront Next con Checkout.com Flow. Incluye 3D Secure, evaluación de riesgos, captura, anulación y reembolso desde Business Manager, y webhooks firmados."
   }
 }
