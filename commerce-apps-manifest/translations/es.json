@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Envío",
-    "description": "Cálculo de tarifas de envío y fechas de entrega estimadas con tecnología de Zenkraft."
+    "description": "Cálculo de tarifas de envío, fechas de entrega estimadas, seguimiento de pedidos y devoluciones con tecnología de Zenkraft."
   },
   "custom-payment": {
     "name": "Pago personalizado",

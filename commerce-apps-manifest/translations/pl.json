@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Wysyłka",
-    "description": "Obliczanie stawek wysyłki i szacowane daty dostawy obsługiwane przez Zenkraft."
+    "description": "Obliczanie stawek wysyłki, szacowane daty dostawy, śledzenie zamówień i zwroty obsługiwane przez Zenkraft."
   },
   "custom-payment": {
     "name": "Płatność niestandardowa",

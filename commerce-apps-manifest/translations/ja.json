@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 配送",
-    "description": "Zenkraftによる配送料計算と推定配達日。"
+    "description": "Zenkraftによる配送料計算、推定配達日、注文追跡、返品。"
   },
   "custom-payment": {
     "name": "カスタム決済",
