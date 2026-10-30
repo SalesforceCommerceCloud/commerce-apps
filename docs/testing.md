@@ -174,7 +174,6 @@ Run validation **before** installing on a sandbox to catch structural issues ear
 - `app-configuration/tasksList.json` exists and is a JSON array with `taskNumber`, `name`, `description`, `link` per task
 - At least one of `cartridges/`, `storefront-next/`, or `impex/` is present
 - No `pipeline/` directories or `*.ds` pipeline descriptor files
-- Site cartridges (`cartridges/site_cartridges/`) contain no `controllers/`
 - `README.md` exists
 
 ```bash
@@ -713,7 +712,6 @@ Before opening the PR:
 - [ ] No junk files (`.DS_Store`, `__MACOSX`, hidden files)
 - [ ] `commerce-app.json`, `README.md`, `app-configuration/tasksList.json` present
 - [ ] No `pipeline/` directories or `*.ds` files
-- [ ] No `controllers/` under `cartridges/site_cartridges/*`
 
 **Sandbox testing:**
 - [ ] CAP installs cleanly via `b2c cap install`
