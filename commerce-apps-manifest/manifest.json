@@ -246,13 +246,13 @@
       "provider": "custom"
     }
   ],
-  "appointment": [
+  "appointment-scheduling": [
     {
       "id": "sfnext-appointment-scheduling",
       "name": "Storefront Next — Boutique Appointment Booking",
       "description": "Enables shoppers to book in-boutique appointments with a trained advisor via Salesforce Scheduler. Requires a connected Salesforce Core org provisioned from the luxury-core dataset.",
       "iconName": "salesforce.svg",
-      "domain": "appointment",
+      "domain": "appointment-scheduling",
       "type": "app",
       "provider": "salesforce",
       "version": "0.1.0",
