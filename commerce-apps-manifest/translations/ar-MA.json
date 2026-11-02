@@ -71,5 +71,9 @@
   "checkoutcom": {
     "name": "Checkout.com Flow",
     "description": "اقبل البطاقات والمحافظ الرقمية وطرق الدفع المحلية في Storefront Next مع Checkout.com Flow. يشمل 3D Secure وتقييم المخاطر والتحصيل والإلغاء والاسترداد من Business Manager، إضافة إلى webhooks موقّعة."
+  },
+  "custom-oms": {
+    "name": "نظام إدارة طلبات مخصص",
+    "description": "تكوين تكامل مخصص لإدارة الطلبات من خلال توفير واجهات API الخاصة بك."
   }
 }

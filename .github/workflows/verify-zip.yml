@@ -212,119 +212,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Required hook suffixes — every tax app must implement these
-          required_suffixes=(calculate commit cancel)
-
-          # Optional hook suffixes — allowed for any domain but not required
-          optional_suffixes=(checkConnectionHealth)
-
+          # Per-domain required/optional hooks live in .github/config/domain-hooks.json.
+          # Domains marked "enforce": "warn" there emit annotations instead of failing.
           [[ -s changed_zips.txt ]] || exit 0
 
-          is_tax_app=false
-
+          failed=0
           while IFS= read -r zip_path; do
             [[ -f "$zip_path" ]] || continue
-
-            # Only run for ZIPs under tax/ at repo root
-            case "$zip_path" in
-              tax/*) is_tax_app=true ;;
-              *) continue ;;
-            esac
-
-            # Derive domain from the directory (e.g. tax/avalara-tax/... → tax)
-            domain="$(echo "$zip_path" | cut -d'/' -f1)"
-
-            # Build required and optional hook arrays for this domain
-            required_hooks=()
-            for suffix in "${required_suffixes[@]}"; do
-              required_hooks+=("sfcc.app.${domain}.${suffix}")
-            done
-
-            optional_hooks=()
-            for suffix in "${optional_suffixes[@]}"; do
-              optional_hooks+=("sfcc.app.${domain}.${suffix}")
-            done
-
-            tmpdir="$(mktemp -d)"
-            trap 'rm -rf "$tmpdir"' RETURN
-
-            unzip -q "$zip_path" -d "$tmpdir"
-
-            # Find cartridges/site_cartridges anywhere under the unzip root
-            base="$(find "$tmpdir" -type d -path '*/cartridges/site_cartridges' -print -quit)"
-            if [[ -z "$base" || ! -d "$base" ]]; then
-              echo "::error file=$zip_path::Missing directory cartridges/site_cartridges in ZIP"
-              exit 1
-            fi
-
-            hooks_file="$(find "$base" -type f -name hooks.json -print -quit)"
-            if [[ -z "$hooks_file" ]]; then
-              echo "::error file=$zip_path::hooks.json not found under cartridges/site_cartridges"
-              exit 1
-            fi
-
-            hooks_dir="$(dirname "$hooks_file")"
-            echo "ZIP: $zip_path"
-            echo "hooks.json: $hooks_file"
-
-            # Ensure there are no hooks outside the required + optional sets
-            allowed_hooks=("${required_hooks[@]}" "${optional_hooks[@]}")
-            while IFS= read -r name; do
-              ok=false
-              for hook in "${allowed_hooks[@]}"; do
-                [[ "$name" == "$hook" ]] && ok=true && break
-              done
-              if [[ "$ok" == "false" ]]; then
-                echo "::error file=$hooks_file::Disallowed hook \"$name\". Only allowed: ${allowed_hooks[*]}"
-                exit 1
-              fi
-            done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
-
-            # Validate required hooks are present, and each has a script that exists
-            for hook in "${required_hooks[@]}"; do
-              script="$(jq -r --arg name "$hook" '.hooks[]? | select(.name == $name) | .script // empty' "$hooks_file" | head -n 1)"
-
-              if [[ -z "$script" || "$script" == "null" ]]; then
-                echo "::error file=$hooks_file::Missing hook or script for \"$hook\""
-                exit 1
-              fi
-
-              # script is relative to hooks.json location (strip leading ./)
-              rel="${script#./}"
-              target="$hooks_dir/$rel"
-
-              if [[ ! -f "$target" ]]; then
-                echo "::error file=$hooks_file::Script for \"$hook\" points to missing file: $script (resolved: $target)"
-                exit 1
-              fi
-            done
-
-            # Validate optional hooks — if present, their scripts must resolve
-            for hook in "${optional_hooks[@]}"; do
-              script="$(jq -r --arg name "$hook" '.hooks[]? | select(.name == $name) | .script // empty' "$hooks_file" | head -n 1)"
-
-              if [[ -z "$script" || "$script" == "null" ]]; then
-                continue
-              fi
-
-              rel="${script#./}"
-              target="$hooks_dir/$rel"
-
-              if [[ ! -f "$target" ]]; then
-                echo "::error file=$hooks_file::Script for optional hook \"$hook\" points to missing file: $script (resolved: $target)"
-                exit 1
-              fi
-            done
-
-            echo "SUCCESS - required ${domain} hooks and scripts verified for $zip_path"
-
-            rm -rf "$tmpdir"
-            trap - RETURN
+            bash .github/scripts/validate-hooks.sh "$zip_path" || failed=1
           done < changed_zips.txt
-
-          if [[ "$is_tax_app" == "false" ]]; then
-            echo "No changed tax apps. Skipping Step 5."
-          fi
+          exit "$failed"
 
       - name: Step 6 - Validate icon uniqueness
         shell: bash

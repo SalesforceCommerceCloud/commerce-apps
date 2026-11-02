@@ -71,5 +71,9 @@
   "checkoutcom": {
     "name": "Checkout.com Flow",
     "description": "Accetta carte, wallet e metodi di pagamento locali in Storefront Next con Checkout.com Flow. Include 3D Secure, valutazione del rischio, cattura, annullamento e rimborso da Business Manager e webhook firmati."
+  },
+  "custom-oms": {
+    "name": "OMS personalizzato",
+    "description": "Configura un'integrazione personalizzata di gestione degli ordini fornendo le tue API."
   }
 }

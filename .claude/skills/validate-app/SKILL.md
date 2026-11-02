@@ -142,6 +142,18 @@ Every immediate child directory of `cartridges/site_cartridges/` and `cartridges
 bash .github/scripts/validate-cartridge-project.sh "$CAP_ROOT"
 ```
 
+## Step 6c: Validate backend extension points (Backend-only/Fullstack)
+
+**Skip if UI-only** (`HAS_BACKEND=0`) or if `INPUT_KIND=dir` (the script reads the ZIP and derives the domain from its `{domain}/{appName}/` path; note the gap and re-run once the ZIP is built).
+
+Runs the same check as CI Step 5. Required hooks per domain come from `.github/config/domain-hooks.json` (tax, shipping, payment, giftcard, fraud, oms). It also checks that exported function names match the hook suffix, that no hook belongs to a different domain, and that `commerce-app.json` has a non-blank `name` of at most 256 bytes and a `domain` matching the directory.
+
+```bash
+bash .github/scripts/validate-hooks.sh "{domain}/{appName}/{appName}-v{version}.zip"
+```
+
+**FAIL** on `::error` output (this includes a site cartridge `package.json` whose `"hooks"` entry does not point to the app's `hooks.json`, which means the platform registers nothing). Any registered hook that does not start with `sfcc.app.*` is a `::warning` on every domain and does not by itself fail the build. In CI those warnings are also written to the job summary. `tax` still fails when a hook is outside `sfcc.app.tax.*` (strict allow-list). Salesforce-native apps with no `cartridges/site_cartridges` are skipped.
+
 ## Step 7: Validate commerce-app.json
 
 ```bash
@@ -206,7 +218,7 @@ See `references/impex-validation.md` for detailed rules:
 - Services use dotted notation
 - Install/uninstall pairs match
 - Uninstall `services.xml` uses credential → profile → service order with `mode="delete"` (same XSD sequence as install; BM UI service-first delete does not apply to IMPEX)
-- Attribute IDs use camelCase with app prefix
+- Attribute IDs use camelCase or snake_case with app prefix (one style per app)
 - SITEID placeholder (not actual site ID)
 - No hardcoded credentials
 

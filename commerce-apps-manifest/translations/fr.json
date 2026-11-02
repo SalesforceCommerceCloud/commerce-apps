@@ -61,7 +61,7 @@
     "description": "Configurez une intégration de système de gestion de contenu personnalisée en fournissant vos propres API."
   },
   "custom-fraud": {
-    "name": "Fraude personnalisé",
+    "name": "Fraude personnalisée",
     "description": "Configurez une intégration de fraude personnalisée en fournissant vos propres API."
   },
   "custom-giftcard": {
@@ -71,5 +71,9 @@
   "checkoutcom": {
     "name": "Checkout.com Flow",
     "description": "Acceptez les cartes, les portefeuilles et les moyens de paiement locaux dans Storefront Next avec Checkout.com Flow. Inclut 3D Secure, l’évaluation des risques, la capture, l’annulation et le remboursement depuis Business Manager, ainsi que des webhooks signés."
+  },
+  "custom-oms": {
+    "name": "OMS personnalisé",
+    "description": "Configurez une intégration personnalisée de gestion des commandes en fournissant vos propres API."
   }
 }

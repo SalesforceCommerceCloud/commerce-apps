@@ -71,5 +71,9 @@
   "checkoutcom": {
     "name": "Checkout.com Flow",
     "description": "Przyjmuj karty, portfele i lokalne metody płatności w Storefront Next dzięki Checkout.com Flow. Obejmuje 3D Secure, ocenę ryzyka, obciążenie, anulowanie i zwrot z Business Manager oraz podpisane webhooki."
+  },
+  "custom-oms": {
+    "name": "Niestandardowy OMS",
+    "description": "Skonfiguruj niestandardową integrację zarządzania zamówieniami, podając własne interfejsy API."
   }
 }

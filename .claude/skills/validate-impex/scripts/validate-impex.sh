@@ -37,7 +37,7 @@ if [ -f "$IMPEX_DIR/install/services.xml" ]; then
     echo "Validating services..."
 
     # Check namespace
-    if ! grep -q 'xmlns="http://www.demandware.com/xml/impex/services/2015-07-01"' "$IMPEX_DIR/install/services.xml"; then
+    if ! grep -q 'xmlns="http://www.demandware.com/xml/impex/services/2014-09-26"' "$IMPEX_DIR/install/services.xml"; then
         echo "✗ Wrong namespace in services.xml"
         ERRORS=$((ERRORS+1))
     fi

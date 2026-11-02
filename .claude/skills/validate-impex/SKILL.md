@@ -78,7 +78,7 @@ xmllint --schema "$(b2c docs schema preferences --path)" impex/install/preferenc
 ### Installation file (`impex/install/services.xml`)
 
 **Check:**
-- [ ] XML namespace: `http://www.demandware.com/xml/impex/services/2015-07-01`
+- [ ] XML namespace: `http://www.demandware.com/xml/impex/services/2014-09-26`
 - [ ] Service IDs use dotted notation (e.g., `vendor.service.api`)
 - [ ] All services reference valid credentials and profiles
 - [ ] No hardcoded production credentials
@@ -110,7 +110,7 @@ diff /tmp/install.txt /tmp/uninstall.txt
 
 **Check:**
 - [ ] XML namespace: `http://www.demandware.com/xml/impex/metadata/2006-10-31`
-- [ ] All attribute IDs use camelCase (not snake_case)
+- [ ] Attribute IDs are camelCase or snake_case, with one style used consistently across the app
 - [ ] All IDs prefixed with app name
 - [ ] Display names and descriptions present
 - [ ] Appropriate data types (boolean, string, integer, enum-of-string, etc.)
@@ -168,7 +168,7 @@ diff /tmp/install-ids.txt /tmp/uninstall-ids.txt
 - [ ] Service IDs unique and dotted notation
 - [ ] Uninstall matches install
 - [ ] No hardcoded production credentials
-- [ ] Attribute IDs use camelCase with app prefix
+- [ ] Attribute IDs use camelCase or snake_case with app prefix (one style per app)
 - [ ] All attributes in groups
 - [ ] No sensitive data in defaults
 

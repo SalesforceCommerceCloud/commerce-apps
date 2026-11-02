@@ -79,7 +79,7 @@ Read `references/service-patterns.md` for pre-built patterns:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<services xmlns="http://www.demandware.com/xml/impex/services/2015-07-01">
+<services xmlns="http://www.demandware.com/xml/impex/services/2014-09-26">
 
     <!-- Service Credential -->
     <service-credential credential-id="{credentialId}">
@@ -122,7 +122,7 @@ Read `references/service-patterns.md` for pre-built patterns:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<services xmlns="http://www.demandware.com/xml/impex/services/2015-07-01">
+<services xmlns="http://www.demandware.com/xml/impex/services/2014-09-26">
     <!-- Same XSD order as install: credential → profile → service -->
     <service-credential credential-id="{credentialId}" mode="delete"/>
     <service-profile profile-id="{profileId}" mode="delete"/>
