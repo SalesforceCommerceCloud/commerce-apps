@@ -257,7 +257,7 @@
       "provider": "salesforce",
       "version": "0.1.0",
       "zip": "sfnext-appointment-scheduling-v0.1.0.zip",
-      "sha256": "6e9c53b3e53f24df3b40604dc29a81f781fbcfdb2ee4b57a5950d3cb3d771cf0"
+      "sha256": "0785db20b05fc007ed096bfdf77485a5b38fac387288c089c4735f6e25d3e2d9"
     }
   ]
 }
