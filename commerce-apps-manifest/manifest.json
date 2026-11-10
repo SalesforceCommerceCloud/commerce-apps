@@ -83,6 +83,24 @@
       "version": "1.0.0",
       "zip": "zenkraft-shipping-v1.0.0.zip",
       "sha256": "fbdf241dfca9c412c634c107a8d5d02a5f0e55fd9b26d36f92c5b340a250bf55"
+    },
+    {
+      "id": "hemant-shipping",
+      "name": "Hemant Shipping",
+      "description": "Shipping rate calculation and quotes for checkout and basket.",
+      "iconName": "hemant-shipping.png",
+      "companyName": "Hemant",
+      "domain": "shipping",
+      "type": "app",
+      "provider": "thirdParty",
+      "version": "1.0.0",
+      "zip": "hemant-shipping-v1.0.0.zip",
+      "sha256": "f97d82f59b495221aaf79e29f1d93fc0d7ec030cc4499c0cd17b446da45cfaba",
+      "storefrontSupport": {
+        "sfnext": {
+          "minVersion": "1.0.1"
+        }
+      }
     }
   ],
   "payment": [

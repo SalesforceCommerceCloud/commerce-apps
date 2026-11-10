@@ -71,5 +71,9 @@
   "custom-oms": {
     "name": "Custom OMS",
     "description": "Configure a custom order management integration by providing your own APIs."
+  },
+  "hemant-shipping": {
+    "name": "Hemant Shipping",
+    "description": "Shipping rate calculation and quotes for checkout and basket."
   }
 }
