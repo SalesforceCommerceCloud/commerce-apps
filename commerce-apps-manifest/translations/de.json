@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Versand",
-    "description": "Versandkostenberechnung und geschätzte Liefertermine powered by Zenkraft."
+    "description": "Versandkostenberechnung, geschätzte Liefertermine, Sendungsverfolgung und Retouren powered by Zenkraft."
   },
   "custom-payment": {
     "name": "Benutzerdefinierte Zahlung",

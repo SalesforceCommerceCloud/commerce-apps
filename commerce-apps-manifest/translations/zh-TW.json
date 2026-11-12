@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 配送",
-    "description": "由 Zenkraft 提供支援的運費計算及預計交貨日期。"
+    "description": "由 Zenkraft 提供支援的運費計算、預計交貨日期、訂單追蹤及退貨。"
   },
   "custom-payment": {
     "name": "自訂付款",

@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "شحن Zenkraft",
-    "description": "حساب أسعار الشحن وتواريخ التسليم المقدرة، مدعومة بـ Zenkraft."
+    "description": "حساب أسعار الشحن وتواريخ التسليم المقدرة وتتبع الطلبات والمرتجعات، مدعومة بـ Zenkraft."
   },
   "custom-payment": {
     "name": "دفع مخصص",

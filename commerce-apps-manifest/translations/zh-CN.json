@@ -21,7 +21,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 配送",
-    "description": "由 Zenkraft 提供支持的运费计算和预计交货日期。"
+    "description": "由 Zenkraft 提供支持的运费计算、预计交货日期、订单跟踪和退货。"
   },
   "sf-payments": {
     "name": "Salesforce Payments",

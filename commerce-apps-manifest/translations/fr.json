@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Livraison",
-    "description": "Calcul des tarifs d'expédition et des dates de livraison estimées, propulsé par Zenkraft."
+    "description": "Calcul des tarifs d'expédition, dates de livraison estimées, suivi des commandes et retours, propulsé par Zenkraft."
   },
   "custom-payment": {
     "name": "Paiement personnalisé",

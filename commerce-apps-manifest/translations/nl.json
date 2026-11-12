@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Verzending",
-    "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
+    "description": "Berekening van verzendkosten, geschatte leveringsdatums, ordertracking en retouren aangedreven door Zenkraft."
   },
   "custom-payment": {
     "name": "Aangepaste betaling",
