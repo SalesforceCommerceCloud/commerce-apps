@@ -1,0 +1,18 @@
+{
+  "id": "sfnext-appointment-scheduling",
+  "name": "SFNext Appointment Scheduling (Salesforce Scheduler)",
+  "description": "Fullstack appointment booking for Storefront Next — ships both the B2C cartridge Custom SCAPI provider and the canonical storefront UX extension (AppointmentWizard, resource routes, locales). Backed by Salesforce Scheduler on a Core org via the B2C Service Framework.",
+  "domain": "appointment-scheduling",
+  "version": "0.1.0",
+  "publisher": {
+    "name": "CC Sharks",
+    "url": "https://www.salesforce.com",
+    "support": "https://www.salesforce.com"
+  },
+  "dependencies": {},
+  "storefront": {
+    "type": "sfnext",
+    "extensionId": "SFDC_EXT_APPOINTMENT_SCHEDULING",
+    "extensionPath": "storefront-next/src/extensions/appointment-scheduling"
+  }
+}
