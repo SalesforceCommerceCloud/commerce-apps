@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "Aangepast contentbeheersysteem",
     "description": "Configureer een aangepaste contentbeheersysteemintegratie met uw eigen API's."
+  },
+  "contentful": {
+    "name": "Contentful-integratie",
+    "description": "Selecteer Contentful-entries of gepubliceerde afbeeldings- en video-assets in Page Designer en render ze server-side met SFNext React-componenten of de meegeleverde SFRA-cartridge."
   }
 }

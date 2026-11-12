@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "نظام إدارة محتوى مخصص",
     "description": "تكوين تكامل نظام إدارة محتوى مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "contentful": {
+    "name": "تكامل Contentful",
+    "description": "اختر إدخالات Contentful أو أصول الصور والفيديو المنشورة في Page Designer واعرضها من جانب الخادم باستخدام مكونات SFNext React أو خرطوشة SFRA المضمّنة."
   }
 }

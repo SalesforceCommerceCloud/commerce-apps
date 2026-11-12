@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "自訂內容管理系統",
     "description": "透過提供您自己的 API 來設定自訂內容管理系統整合。"
+  },
+  "contentful": {
+    "name": "Contentful 整合",
+    "description": "在 Page Designer 中選擇 Contentful 項目或已發布的圖片與影片資源，並使用 SFNext React 元件或隨附的 SFRA cartridge 在伺服器端轉譯。"
   }
 }

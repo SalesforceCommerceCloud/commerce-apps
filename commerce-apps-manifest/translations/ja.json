@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "カスタムコンテンツ管理システム",
     "description": "独自のAPIを使用してカスタムコンテンツ管理システムの統合を設定します。"
+  },
+  "contentful": {
+    "name": "Contentful 連携",
+    "description": "Page Designer で Contentful のエントリまたは公開済みの画像・動画アセットを選択し、SFNext の React コンポーネントまたは付属の SFRA カートリッジでサーバーサイドレンダリングします。"
   }
 }

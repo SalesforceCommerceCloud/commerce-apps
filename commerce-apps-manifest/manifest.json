@@ -212,6 +212,24 @@
       "domain": "content-management",
       "type": "custom",
       "provider": "custom"
+    },
+    {
+      "id": "contentful",
+      "name": "Contentful Integration",
+      "description": "Select Contentful entries or published image and video assets in Page Designer and render them server-side with SFNext React components or the included SFRA cartridge.",
+      "iconName": "contentful.png",
+      "domain": "content-management",
+      "type": "app",
+      "provider": "salesforce",
+      "version": "1.0.0",
+      "zip": "contentful-v1.0.0.zip",
+      "sha256": "7f882b2959f1465c61cda456eac0aa9b4f5aff469dd0b1940400b0715b5a6c3d",
+      "storefrontSupport": {
+        "sfnext": {
+          "minVersion": "2026.7.0"
+        },
+        "sfra": {}
+      }
     }
   ]
 }

@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "Niestandardowy system zarządzania treścią",
     "description": "Skonfiguruj niestandardową integrację systemu zarządzania treścią, podając własne interfejsy API."
+  },
+  "contentful": {
+    "name": "Integracja z Contentful",
+    "description": "Wybieraj wpisy Contentful lub opublikowane zasoby graficzne i wideo w Page Designer i renderuj je po stronie serwera za pomocą komponentów React SFNext lub dołączonego kartridża SFRA."
   }
 }
