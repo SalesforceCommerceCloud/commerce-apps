@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "Benutzerdefiniertes Content-Management-System",
     "description": "Konfigurieren Sie eine benutzerdefinierte Content-Management-System-Integration mit Ihren eigenen APIs."
+  },
+  "contentful": {
+    "name": "Contentful-Integration",
+    "description": "Wählen Sie in Page Designer Contentful-Einträge oder veröffentlichte Bild- und Video-Assets aus und rendern Sie sie serverseitig mit SFNext-React-Komponenten oder der enthaltenen SFRA-Cartridge."
   }
 }

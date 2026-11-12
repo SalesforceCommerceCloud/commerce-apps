@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "自定义内容管理系统",
     "description": "通过提供您自己的 API 来配置自定义内容管理系统集成。"
+  },
+  "contentful": {
+    "name": "Contentful 集成",
+    "description": "在 Page Designer 中选择 Contentful 条目或已发布的图片和视频资源，并使用 SFNext React 组件或随附的 SFRA cartridge 在服务器端渲染。"
   }
 }

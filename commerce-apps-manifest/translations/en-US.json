@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "Custom Content Management",
     "description": "Configure a custom content management integration by providing your own APIs."
+  },
+  "contentful": {
+    "name": "Contentful Integration",
+    "description": "Select Contentful entries or published image and video assets in Page Designer and render them server-side with SFNext React components or the included SFRA cartridge."
   }
 }

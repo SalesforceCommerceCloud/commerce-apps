@@ -59,5 +59,9 @@
   "custom-content-management": {
     "name": "Sistema de gestión de contenido personalizado",
     "description": "Configure una integración de sistema de gestión de contenido personalizada proporcionando sus propias API."
+  },
+  "contentful": {
+    "name": "Integración de Contentful",
+    "description": "Seleccione entradas de Contentful o recursos de imagen y vídeo publicados en Page Designer y renderícelos en el servidor con componentes React de SFNext o el cartucho SFRA incluido."
   }
 }
