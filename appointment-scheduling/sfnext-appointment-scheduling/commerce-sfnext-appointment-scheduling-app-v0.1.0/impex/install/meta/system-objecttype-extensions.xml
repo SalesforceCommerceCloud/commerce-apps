@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+
+    <!--
+        SFNext Appointment Scheduling — site-level preferences (non-secret Core scheduling record IDs).
+        The Core My Domain origin + OAuth client id/secret live on the `scheduler.core.*` Service
+        credential (Administration > Operations > Services), NOT here. The merchant fills these values
+        in Business Manager after install (see app-configuration/tasksList.json, task 2).
+    -->
+    <type-extension type-id="SitePreferences">
+        <custom-attribute-definitions>
+
+            <attribute-definition attribute-id="sfnextSchedulerApiVersion">
+                <display-name xml:lang="x-default">Scheduler: Core API version</display-name>
+                <description xml:lang="x-default">Salesforce API version for Connect REST + Data API, e.g. v64.0.</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>v64.0</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="sfnextSchedulerParentRecordId">
+                <display-name xml:lang="x-default">Scheduler: ParentRecordId (anchor Account)</display-name>
+                <description xml:lang="x-default">Anchor Account used as ServiceAppointment.ParentRecordId (no-Contact correlation design).</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="sfnextSchedulerPolicyId">
+                <display-name xml:lang="x-default">Scheduler: AppointmentSchedulingPolicy Id (optional)</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="sfnextSchedulerResourceId">
+                <display-name xml:lang="x-default">Scheduler: required ServiceResource Id (optional)</display-name>
+                <description xml:lang="x-default">When set, assigned as the required resource so the slot is consumed (hard cap, anti-double-booking).</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+
+            <attribute-definition attribute-id="sfnextAppointmentAdvanceNoticeMinutes">
+                <display-name xml:lang="x-default">Appointment: advance notice (minutes)</display-name>
+                <description xml:lang="x-default">Minimum advance notice in minutes before a slot can be booked. Slots starting sooner than this from now are hidden in the storefront calendar. Corresponds to PUBLIC__app__features__appointment__advanceNoticeMinutes. Default: 120 (2 hours).</description>
+                <type>int</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>120</default-value>
+            </attribute-definition>
+
+            <attribute-definition attribute-id="sfnextSlotCacheTtlSeconds">
+                <display-name xml:lang="x-default">Slot: availability cache TTL (seconds)</display-name>
+                <description xml:lang="x-default">How long slot availability responses are cached (SCAPI gateway + CacheMgr). Lower values = fresher data but more Core API calls. Default: 30. Range: 10–120.</description>
+                <type>int</type>
+                <mandatory-flag>false</mandatory-flag>
+                <default-value>30</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="sfnextAppointmentCacheTtlSeconds">
+                <display-name xml:lang="x-default">Appointment: slot-hold TTL (seconds)</display-name>
+                <description xml:lang="x-default">How long a Platform Cache slot-hold counter entry lives (sfnextSlotHoldCounters partition). Set shorter than sfnextSlotCacheTtlSeconds because advisor slots are scarcer than delivery windows. Default: 10. Range: 5–60.</description>
+                <type>int</type>
+                <mandatory-flag>false</mandatory-flag>
+                <default-value>10</default-value>
+            </attribute-definition>
+
+        </custom-attribute-definitions>
+
+        <group-definitions>
+            <attribute-group group-id="sfnextScheduler">
+                <display-name xml:lang="x-default">Storefront Next — Scheduler</display-name>
+                <attribute attribute-id="sfnextSchedulerApiVersion"/>
+                <attribute attribute-id="sfnextSchedulerParentRecordId"/>
+                <attribute attribute-id="sfnextSchedulerPolicyId"/>
+                <attribute attribute-id="sfnextSchedulerResourceId"/>
+                <attribute attribute-id="sfnextAppointmentAdvanceNoticeMinutes"/>
+                <attribute attribute-id="sfnextSlotCacheTtlSeconds"/>
+                <attribute attribute-id="sfnextAppointmentCacheTtlSeconds"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+</metadata>
