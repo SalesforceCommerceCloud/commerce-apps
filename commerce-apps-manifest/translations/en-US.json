@@ -71,5 +71,13 @@
   "custom-oms": {
     "name": "Custom OMS",
     "description": "Configure a custom order management integration by providing your own APIs."
+  },
+  "custom-product-catalog": {
+    "name": "Custom Product Catalog",
+    "description": "Configure a custom product catalog integration by providing your own APIs."
+  },
+  "custom-scheduling": {
+    "name": "Custom Scheduling",
+    "description": "Configure a custom scheduling integration by providing your own APIs."
   }
 }

@@ -71,5 +71,13 @@
   "custom-oms": {
     "name": "自訂 OMS",
     "description": "透過提供您自己的 API 來設定自訂訂單管理整合。"
+  },
+  "custom-product-catalog": {
+    "name": "自訂商品目錄",
+    "description": "透過提供您自己的 API 來設定自訂商品目錄整合。"
+  },
+  "custom-scheduling": {
+    "name": "自訂排程",
+    "description": "透過提供您自己的 API 來設定自訂排程整合。"
   }
 }

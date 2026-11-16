@@ -71,5 +71,13 @@
   "custom-oms": {
     "name": "OMS personalizzato",
     "description": "Configura un'integrazione personalizzata di gestione degli ordini fornendo le tue API."
+  },
+  "custom-product-catalog": {
+    "name": "Catalogo prodotti personalizzato",
+    "description": "Configura un'integrazione di catalogo prodotti personalizzata fornendo le tue API."
+  },
+  "custom-scheduling": {
+    "name": "Pianificazione personalizzata",
+    "description": "Configura un'integrazione di pianificazione personalizzata fornendo le tue API."
   }
 }

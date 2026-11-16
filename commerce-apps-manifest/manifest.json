@@ -204,6 +204,17 @@
       }
     }
   ],
+  "product-catalog": [
+    {
+      "id": "custom-product-catalog",
+      "name": "Custom Product Catalog",
+      "description": "Configure a custom product catalog integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "product-catalog",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
   "ratings-and-reviews": [
     {
       "id": "custom-ratings-and-reviews",
@@ -244,6 +255,17 @@
       "description": "Configure a custom content management integration by providing your own APIs.",
       "iconName": "custom.svg",
       "domain": "content-management",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "scheduling": [
+    {
+      "id": "custom-scheduling",
+      "name": "Custom Scheduling",
+      "description": "Configure a custom scheduling integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "scheduling",
       "type": "custom",
       "provider": "custom"
     }
