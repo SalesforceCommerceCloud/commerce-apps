@@ -322,6 +322,8 @@ Every app's `domain` field must be one of these. Domains use hyphen-case. Provid
 | `oms` | Additional Setup | Order management | Custom OMS integrations |
 | `content-management` | Additional Setup | Content management and delivery | Salesforce CMS, Contentful |
 | `merchandising` | Additional Setup | Merchandising and promotion experiences | Salesforce Approaching Discounts |
+| `product-catalog` | Additional Setup | Product catalog management | Custom product catalog integrations |
+| `scheduling` | Additional Setup | Scheduling and appointments | Custom scheduling integrations |
 
 ## Tech Stack
 
