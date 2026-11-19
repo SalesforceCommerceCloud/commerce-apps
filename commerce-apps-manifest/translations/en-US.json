@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Custom Scheduling",
     "description": "Configure a custom scheduling integration by providing your own APIs."
+  },
+  "contentful": {
+    "name": "Contentful Integration",
+    "description": "Select Contentful entries or published image and video assets in Page Designer and render them server-side with SFNext React components."
   }
 }

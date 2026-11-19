@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Harmonogramowanie niestandardowe",
     "description": "Skonfiguruj niestandardową integrację harmonogramowania, podając własne interfejsy API."
+  },
+  "contentful": {
+    "name": "Integracja z Contentful",
+    "description": "Wybieraj wpisy Contentful lub opublikowane obrazy i filmy w Page Designer i renderuj je po stronie serwera za pomocą komponentów React SFNext."
   }
 }
