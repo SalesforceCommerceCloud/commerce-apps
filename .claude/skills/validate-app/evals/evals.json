@@ -29,7 +29,7 @@
       "id": 5,
       "prompt": "I'm getting impex import errors in Business Manager for my shipping app. Can you validate the impex files in shipping/fedex-shipping-v2.0.0.zip to see what's wrong?",
       "context": "User has impex-specific issues",
-      "expected_behavior": "Extracts ZIP, focuses on impex validation. Runs xmllint on all XML files in impex/ directory. Checks: services.xml syntax, install/uninstall pairs match (service IDs identical), attribute IDs use camelCase with app prefix, SITEID placeholder used (not actual site ID), no hardcoded credentials, service IDs use dotted notation. Reports specific XML errors with file paths and line numbers. References impex-validation.md for detailed rules."
+      "expected_behavior": "Extracts ZIP, focuses on impex validation. Runs xmllint on all XML files in impex/ directory. Checks: services.xml syntax, install/uninstall pairs match (service IDs identical), attribute IDs use camelCase or snake_case with app prefix (consistent within the app; snake_case is not flagged), SITEID placeholder used (not actual site ID), no hardcoded credentials, service IDs use dotted notation. Reports specific XML errors with file paths and line numbers. References impex-validation.md for detailed rules."
     },
     {
       "id": 6,

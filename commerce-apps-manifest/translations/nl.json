@@ -67,5 +67,17 @@
   "custom-giftcard": {
     "name": "Aangepaste cadeaubon",
     "description": "Configureer een aangepaste cadeaubonintegratie met uw eigen API's."
+  },
+  "custom-oms": {
+    "name": "Aangepast OMS",
+    "description": "Configureer een aangepaste orderbeheerintegratie met uw eigen API's."
+  },
+  "custom-product-catalog": {
+    "name": "Aangepaste productcatalogus",
+    "description": "Configureer een aangepaste productcatalogus-integratie met uw eigen API's."
+  },
+  "custom-scheduling": {
+    "name": "Aangepaste planning",
+    "description": "Configureer een aangepaste planningsintegratie met uw eigen API's."
   }
 }

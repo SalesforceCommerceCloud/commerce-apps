@@ -484,6 +484,21 @@ else
   FAIL=$((FAIL + 1))
 fi
 
+# Test 2c: oms domain has its own profile (10s timeout, 100 calls/s, cb-calls 5)
+cap="$(mkcap)"; mkdir -p "$cap/impex/install"
+printf '{"domain":"oms"}\n' > "$cap/commerce-app.json"
+printf '<service-profile service-id="MySvc"><timeout-millis>10000</timeout-millis><rate-limit-enabled>true</rate-limit-enabled></service-profile>\n' > "$cap/impex/install/services.xml"
+mkdir -p "$cap/impex/uninstall"
+printf '<services mode="delete"><service-credential service-id="MySvc" mode="delete"/></services>\n' > "$cap/impex/uninstall/services.xml"
+run_scan "$cap"
+if [[ "$LAST_RC" -eq 1 ]] && echo "$LAST_OUTPUT" | grep -qF "oms" && echo "$LAST_OUTPUT" | grep -qF "<rate-limit-calls>100</rate-limit-calls>" && echo "$LAST_OUTPUT" | grep -qF "<cb-calls>5</cb-calls>"; then
+  echo "  PASS: oms app missing circuit breaker — blocks with oms ideal values"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: oms app missing circuit breaker (expected block + oms ideal values, got exit $LAST_RC)"
+  FAIL=$((FAIL + 1))
+fi
+
 # Test 3: shipping domain missing both
 cap="$(mkcap)"; mkdir -p "$cap/impex/install"
 printf '{"domain":"shipping"}\n' > "$cap/commerce-app.json"

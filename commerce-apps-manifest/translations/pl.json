@@ -67,5 +67,17 @@
   "custom-giftcard": {
     "name": "Niestandardowa karta podarunkowa",
     "description": "Skonfiguruj niestandardową integrację kart podarunkowych, podając własne interfejsy API."
+  },
+  "custom-oms": {
+    "name": "Niestandardowy OMS",
+    "description": "Skonfiguruj niestandardową integrację zarządzania zamówieniami, podając własne interfejsy API."
+  },
+  "custom-product-catalog": {
+    "name": "Katalog produktów niestandardowy",
+    "description": "Skonfiguruj niestandardową integrację katalogu produktów, podając własne interfejsy API."
+  },
+  "custom-scheduling": {
+    "name": "Harmonogramowanie niestandardowe",
+    "description": "Skonfiguruj niestandardową integrację harmonogramowania, podając własne interfejsy API."
   }
 }

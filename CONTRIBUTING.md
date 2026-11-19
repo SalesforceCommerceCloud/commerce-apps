@@ -150,7 +150,7 @@ Find your app’s entry in the appropriate domain array (e.g., `tax`, `shipping`
 - `description` - App description
 - `iconName` - Icon filename (e.g., `avalara.png`)
 - `companyName` - (String) Name of the company/ISV that publishes the app (e.g., `"Avalara"`). Required for all third-party apps; shown alongside the app in the commerce apps workspace.
-- `domain` - One of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`
+- `domain` - One of: `tax`, `payment`, `shipping`, `analytics`, `merchandising`, `ratings-and-reviews`, `address-verification`, `search`, `content-management`, `fraud`, `giftcard`, `oms`
 - `type` - Always `"app"` for commerce apps
 - `provider` - Always `"thirdParty"` for ISV apps
 - `version` - Semantic version (e.g., `"1.0.0"`)
@@ -392,7 +392,7 @@ Every entry in `tasksList.json` must declare a unique non-empty `taskKey`:
 ```
 
 Rules:
-- `taskKey` matches `^[a-z][a-z0-9_]*$` (snake_case).
+- `taskKey` matches `^[a-z][a-z0-9_]*$` (snake_case). This rule applies only to `taskKey` (and `componentKey`); it is separate from impex attribute IDs, which may be camelCase or snake_case.
 - `taskKey` values must be unique within a single `tasksList.json`.
 - A `taskKey`, once shipped, is the stable identifier for that task across versions — translation files reference it. Avoid renaming.
 

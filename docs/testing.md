@@ -174,7 +174,6 @@ Run validation **before** installing on a sandbox to catch structural issues ear
 - `app-configuration/tasksList.json` exists and is a JSON array with `taskNumber`, `name`, `description`, `link` per task
 - At least one of `cartridges/`, `storefront-next/`, or `impex/` is present
 - No `pipeline/` directories or `*.ds` pipeline descriptor files
-- Site cartridges (`cartridges/site_cartridges/`) contain no `controllers/`
 - `README.md` exists
 
 ```bash
@@ -209,7 +208,7 @@ Beyond `b2c cap validate`, validate the XML directly:
 - Correct SFCC namespaces (`http://www.demandware.com/xml/impex/services/2014-09-26`, etc.)
 - `mode="delete"` on every entry in `impex/uninstall/`
 - Service IDs in install match uninstall; uninstall element order is credential → profile → service (same `services.xsd` sequence as install)
-- Attribute IDs are camelCase and prefixed with the app name
+- Attribute IDs are camelCase or snake_case, prefixed with the app name, and use one style consistently within the app
 - `SITEID` placeholder used in `preferences.xml` (not a real site ID)
 - No hardcoded production credentials
 
@@ -713,7 +712,6 @@ Before opening the PR:
 - [ ] No junk files (`.DS_Store`, `__MACOSX`, hidden files)
 - [ ] `commerce-app.json`, `README.md`, `app-configuration/tasksList.json` present
 - [ ] No `pipeline/` directories or `*.ds` files
-- [ ] No `controllers/` under `cartridges/site_cartridges/*`
 
 **Sandbox testing:**
 - [ ] CAP installs cleanly via `b2c cap install`

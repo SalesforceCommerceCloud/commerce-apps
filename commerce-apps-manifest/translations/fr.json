@@ -61,11 +61,23 @@
     "description": "Configurez une intégration de système de gestion de contenu personnalisée en fournissant vos propres API."
   },
   "custom-fraud": {
-    "name": "Fraude personnalisé",
+    "name": "Fraude personnalisée",
     "description": "Configurez une intégration de fraude personnalisée en fournissant vos propres API."
   },
   "custom-giftcard": {
     "name": "Carte cadeau personnalisée",
     "description": "Configurez une intégration de carte cadeau personnalisée en fournissant vos propres API."
+  },
+  "custom-oms": {
+    "name": "OMS personnalisé",
+    "description": "Configurez une intégration personnalisée de gestion des commandes en fournissant vos propres API."
+  },
+  "custom-product-catalog": {
+    "name": "Catalogue de produits personnalisé",
+    "description": "Configurez une intégration de catalogue de produits personnalisée en fournissant vos propres API."
+  },
+  "custom-scheduling": {
+    "name": "Planification personnalisée",
+    "description": "Configurez une intégration de planification personnalisée en fournissant vos propres API."
   }
 }

@@ -67,5 +67,17 @@
   "custom-giftcard": {
     "name": "Benutzerdefinierte Geschenkkarte",
     "description": "Konfigurieren Sie eine benutzerdefinierte Geschenkkartenintegration mit Ihren eigenen APIs."
+  },
+  "custom-oms": {
+    "name": "Benutzerdefiniertes OMS",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Auftragsverwaltungsintegration mit Ihren eigenen APIs."
+  },
+  "custom-product-catalog": {
+    "name": "Benutzerdefinierter Produktkatalog",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Produktkatalogintegration mit Ihren eigenen APIs."
+  },
+  "custom-scheduling": {
+    "name": "Benutzerdefinierte Terminplanung",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Terminplanungsintegration mit Ihren eigenen APIs."
   }
 }

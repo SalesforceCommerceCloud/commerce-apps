@@ -15,7 +15,16 @@ LEVEL="error"   # severity for rule violations in the current domain
 
 report() { # $1 = severity (error|warning), $2 = file, $3 = message
   echo "::$1 file=$2::$3"
-  [[ "$1" == "error" ]] && ERRORS=$((ERRORS + 1))
+  if [[ "$1" == "error" ]]; then
+    ERRORS=$((ERRORS + 1))
+  elif [[ "$1" == "warning" && -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+    # Shown at the top of the verify-zip job. ::warning on a ZIP does not
+    # appear in the pull request diff because the ZIP has no text lines.
+    if [[ ! -s "$GITHUB_STEP_SUMMARY" ]] || ! grep -q '### Hook warnings' "$GITHUB_STEP_SUMMARY"; then
+      printf '\n### Hook warnings\n\nThe check stays green. Prefer app-specific hooks that start with `sfcc.app.*`.\n\n' >> "$GITHUB_STEP_SUMMARY"
+    fi
+    printf -- '- `%s`: %s\n' "$2" "$3" >> "$GITHUB_STEP_SUMMARY"
+  fi
   return 0
 }
 violation() { report "$LEVEL" "$ZIP" "$1"; }
@@ -101,6 +110,13 @@ if [[ -n "$hooks_file" ]]; then
       report error "$ZIP" "Hook \"$name\" is not in this app's domain \"$domain\" (expected sfcc.app.${domain}.*)"
     fi
   done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
+
+  # Warn on any hook that is not a commerce-app extension point. This does not
+  # fail the build. Domains with a strict allow-list still error below.
+  while IFS= read -r name; do
+    [[ "$name" == sfcc.app.* ]] && continue
+    report warning "$ZIP" "Hook \"$name\" is not an app-specific hook. If possible, use app-specific hooks which start with sfcc.app.*"
+  done < <(jq -r '.hooks[]?.name // empty' "$hooks_file")
 fi
 
 if [[ "$enforce" == "none" ]]; then
@@ -135,14 +151,15 @@ script_for() { jq -r --arg n "sfcc.app.${domain}.$1" '.hooks[]? | select(.name =
 
 check_script() { # $1 = suffix; verifies script exists, exports the function, and domain rules
   local suffix="$1" script target
+  local fn="${suffix##*.}"
   script="$(script_for "$suffix")"
   [[ -z "$script" ]] && return 0
   target="$hooks_dir/${script#./}"
   [[ -f "$target" || -f "$target.js" ]] || { violation "Script for \"sfcc.app.${domain}.${suffix}\" points to missing file: $script"; return 0; }
   [[ -f "$target" ]] || target="$target.js"
   # The platform calls the export named after the last hook-name segment.
-  if ! grep -qE "\b${suffix}\b" "$target"; then
-    violation "Script $script does not define/export a function named \"${suffix}\" (the platform calls the hook by that name)"
+  if ! grep -qE "\b${fn}\b" "$target"; then
+    violation "Script $script does not define/export a function named \"${fn}\" (the platform calls the hook by that name)"
   fi
   if [[ "$domain" == "payment" ]] && grep -q 'COMMERCE_APP_GIFT_CARD' "$target"; then
     violation "Script $script references COMMERCE_APP_GIFT_CARD; that payment method ID is reserved and cannot be claimed by a payment app"
@@ -175,12 +192,8 @@ for name in ${registered[@]+"${registered[@]}"}; do
       continue
     fi
     check_script "$suffix"
-  elif [[ "$name" != sfcc.app.* ]]; then
-    if [[ "$strict" == "true" ]]; then
-      violation "Disallowed hook \"$name\". Only sfcc.app.${domain}.* hooks are allowed for $domain apps"
-    else
-      report warning "$ZIP" "Hook \"$name\" is outside the commerce-app extension points (sfcc.app.${domain}.*)"
-    fi
+  elif [[ "$name" != sfcc.app.* && "$strict" == "true" ]]; then
+    violation "Disallowed hook \"$name\". Only sfcc.app.${domain}.* hooks are allowed for $domain apps"
   fi
 done
 
