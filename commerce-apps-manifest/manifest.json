@@ -81,9 +81,9 @@
       "type": "app",
       "provider": "thirdParty",
       "companyName": "Zenkraft",
-      "version": "1.1.0",
-      "zip": "zenkraft-shipping-v1.1.0.zip",
-      "sha256": "32983eefa9278b3a4a191fc85e9c93b4051789d2246552a86d342f2b32aaf1f8",
+      "version": "1.1.1",
+      "zip": "zenkraft-shipping-v1.1.1.zip",
+      "sha256": "e63d4a8d94b20e966329850c32c546a4a16600a2ba106f48902b609f3f66cfd7",
       "featuredLearnMoreUrl": "https://learn.zenkraft.com/salesforce-native-shipping-for-agentic-commerce-storefronts?utm_source=salesforce&utm_medium=referral&utm_campaign=storefront-next"
     }
   ],
