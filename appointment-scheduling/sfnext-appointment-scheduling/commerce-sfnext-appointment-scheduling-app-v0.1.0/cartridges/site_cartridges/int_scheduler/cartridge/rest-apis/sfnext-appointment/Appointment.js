@@ -93,6 +93,14 @@ exports.createAppointment = function () {
     }
     var b2cCustomerId = customer.ID;
 
+    // Read name from the authenticated shopper's B2C profile (registered shoppers only).
+    // No extra API call needed — customer.profile is available from the DW session.
+    var firstName = (customer.profile && customer.profile.firstName) ? String(customer.profile.firstName) : '';
+    var lastName  = (customer.profile && customer.profile.lastName)  ? String(customer.profile.lastName)  : '';
+
+    // Locale from the current site request (e.g. "en_US", "en_GB").
+    var locale = (request.locale && request.locale.ID) ? String(request.locale.ID) : '';
+
     var body;
     try {
         body = JSON.parse(request.httpParameterMap.requestBodyAsString);
@@ -130,7 +138,10 @@ exports.createAppointment = function () {
         b2cCustomerId: b2cCustomerId,
         subject: subject,
         territoryId: typeof body.territoryId === 'string' ? body.territoryId : null,
-        workTypeId: typeof body.workTypeId === 'string' ? body.workTypeId : null
+        workTypeId: typeof body.workTypeId === 'string' ? body.workTypeId : null,
+        firstName: firstName,
+        lastName: lastName,
+        locale: locale
     });
 
     if (!result.ok) {

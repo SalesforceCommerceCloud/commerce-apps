@@ -309,7 +309,10 @@ function bookAppointment(input) {
         SchedStartTime: input.schedStartTime,
         SchedEndTime: input.schedEndTime,
         Email: input.email,
-        ExternalId__c: input.b2cCustomerId
+        ExternalId__c: input.b2cCustomerId,
+        SN_FirstName__c: input.firstName || '',
+        SN_LastName__c: input.lastName || '',
+        SN_Locale__c: input.locale || ''
     };
     if (input.subject) {
         saBody.Subject = input.subject;
