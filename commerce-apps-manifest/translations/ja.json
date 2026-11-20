@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 配送",
-    "description": "Zenkraftによる配送料計算と推定配達日。"
+    "description": "Zenkraftによる配送料計算、推定配達日、注文追跡、返品。"
   },
   "custom-payment": {
     "name": "カスタム決済",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "カスタムOMS",
     "description": "独自のAPIを使用してカスタム注文管理の統合を設定します。"
+  },
+  "custom-product-catalog": {
+    "name": "カスタム商品カタログ",
+    "description": "独自のAPIを使用してカスタム商品カタログ統合を設定します。"
+  },
+  "custom-scheduling": {
+    "name": "カスタムスケジューリング",
+    "description": "独自のAPIを使用してカスタムスケジューリング統合を設定します。"
   }
 }

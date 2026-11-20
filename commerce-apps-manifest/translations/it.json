@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Spedizione",
-    "description": "Calcolo delle tariffe di spedizione e date di consegna stimate powered by Zenkraft."
+    "description": "Calcolo delle tariffe di spedizione, date di consegna stimate, tracciamento degli ordini e resi powered by Zenkraft."
   },
   "custom-payment": {
     "name": "Pagamento personalizzato",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "OMS personalizzato",
     "description": "Configura un'integrazione personalizzata di gestione degli ordini fornendo le tue API."
+  },
+  "custom-product-catalog": {
+    "name": "Catalogo prodotti personalizzato",
+    "description": "Configura un'integrazione di catalogo prodotti personalizzata fornendo le tue API."
+  },
+  "custom-scheduling": {
+    "name": "Pianificazione personalizzata",
+    "description": "Configura un'integrazione di pianificazione personalizzata fornendo le tue API."
   }
 }

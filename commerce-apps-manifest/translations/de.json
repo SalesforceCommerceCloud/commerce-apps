@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Versand",
-    "description": "Versandkostenberechnung und geschätzte Liefertermine powered by Zenkraft."
+    "description": "Versandkostenberechnung, geschätzte Liefertermine, Sendungsverfolgung und Retouren powered by Zenkraft."
   },
   "custom-payment": {
     "name": "Benutzerdefinierte Zahlung",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "Benutzerdefiniertes OMS",
     "description": "Konfigurieren Sie eine benutzerdefinierte Auftragsverwaltungsintegration mit Ihren eigenen APIs."
+  },
+  "custom-product-catalog": {
+    "name": "Benutzerdefinierter Produktkatalog",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Produktkatalogintegration mit Ihren eigenen APIs."
+  },
+  "custom-scheduling": {
+    "name": "Benutzerdefinierte Terminplanung",
+    "description": "Konfigurieren Sie eine benutzerdefinierte Terminplanungsintegration mit Ihren eigenen APIs."
   }
 }

@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Wysyłka",
-    "description": "Obliczanie stawek wysyłki i szacowane daty dostawy obsługiwane przez Zenkraft."
+    "description": "Obliczanie stawek wysyłki, szacowane daty dostawy, śledzenie zamówień i zwroty obsługiwane przez Zenkraft."
   },
   "custom-payment": {
     "name": "Płatność niestandardowa",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "Niestandardowy OMS",
     "description": "Skonfiguruj niestandardową integrację zarządzania zamówieniami, podając własne interfejsy API."
+  },
+  "custom-product-catalog": {
+    "name": "Katalog produktów niestandardowy",
+    "description": "Skonfiguruj niestandardową integrację katalogu produktów, podając własne interfejsy API."
+  },
+  "custom-scheduling": {
+    "name": "Harmonogramowanie niestandardowe",
+    "description": "Skonfiguruj niestandardową integrację harmonogramowania, podając własne interfejsy API."
   }
 }

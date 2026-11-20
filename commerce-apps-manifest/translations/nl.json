@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft Verzending",
-    "description": "Berekening van verzendkosten en geschatte leveringsdatums aangedreven door Zenkraft."
+    "description": "Berekening van verzendkosten, geschatte leveringsdatums, ordertracking en retouren aangedreven door Zenkraft."
   },
   "custom-payment": {
     "name": "Aangepaste betaling",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "Aangepast OMS",
     "description": "Configureer een aangepaste orderbeheerintegratie met uw eigen API's."
+  },
+  "custom-product-catalog": {
+    "name": "Aangepaste productcatalogus",
+    "description": "Configureer een aangepaste productcatalogus-integratie met uw eigen API's."
+  },
+  "custom-scheduling": {
+    "name": "Aangepaste planning",
+    "description": "Configureer een aangepaste planningsintegratie met uw eigen API's."
   }
 }

@@ -75,14 +75,16 @@
     {
       "id": "zenkraft-shipping",
       "name": "Zenkraft Shipping",
-      "description": "Shipping rate calculation and estimated delivery dates powered by Zenkraft.",
+      "description": "Shipping rate calculation, estimated delivery dates, order tracking, and returns powered by Zenkraft.",
       "iconName": "zenkraft.png",
       "domain": "shipping",
       "type": "app",
       "provider": "thirdParty",
-      "version": "1.0.0",
-      "zip": "zenkraft-shipping-v1.0.0.zip",
-      "sha256": "fbdf241dfca9c412c634c107a8d5d02a5f0e55fd9b26d36f92c5b340a250bf55"
+      "companyName": "Zenkraft",
+      "version": "1.1.1",
+      "zip": "zenkraft-shipping-v1.1.1.zip",
+      "sha256": "e63d4a8d94b20e966329850c32c546a4a16600a2ba106f48902b609f3f66cfd7",
+      "featuredLearnMoreUrl": "https://learn.zenkraft.com/salesforce-native-shipping-for-agentic-commerce-storefronts?utm_source=salesforce&utm_medium=referral&utm_campaign=storefront-next"
     }
   ],
   "payment": [
@@ -215,6 +217,17 @@
       }
     }
   ],
+  "product-catalog": [
+    {
+      "id": "custom-product-catalog",
+      "name": "Custom Product Catalog",
+      "description": "Configure a custom product catalog integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "product-catalog",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
   "ratings-and-reviews": [
     {
       "id": "custom-ratings-and-reviews",
@@ -255,6 +268,17 @@
       "description": "Configure a custom content management integration by providing your own APIs.",
       "iconName": "custom.svg",
       "domain": "content-management",
+      "type": "custom",
+      "provider": "custom"
+    }
+  ],
+  "scheduling": [
+    {
+      "id": "custom-scheduling",
+      "name": "Custom Scheduling",
+      "description": "Configure a custom scheduling integration by providing your own APIs.",
+      "iconName": "custom.svg",
+      "domain": "scheduling",
       "type": "custom",
       "provider": "custom"
     }

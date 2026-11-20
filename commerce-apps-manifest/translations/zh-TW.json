@@ -17,7 +17,7 @@
   },
   "zenkraft-shipping": {
     "name": "Zenkraft 配送",
-    "description": "由 Zenkraft 提供支援的運費計算及預計交貨日期。"
+    "description": "由 Zenkraft 提供支援的運費計算、預計交貨日期、訂單追蹤及退貨。"
   },
   "custom-payment": {
     "name": "自訂付款",
@@ -75,5 +75,13 @@
   "custom-oms": {
     "name": "自訂 OMS",
     "description": "透過提供您自己的 API 來設定自訂訂單管理整合。"
+  },
+  "custom-product-catalog": {
+    "name": "自訂商品目錄",
+    "description": "透過提供您自己的 API 來設定自訂商品目錄整合。"
+  },
+  "custom-scheduling": {
+    "name": "自訂排程",
+    "description": "透過提供您自己的 API 來設定自訂排程整合。"
   }
 }
