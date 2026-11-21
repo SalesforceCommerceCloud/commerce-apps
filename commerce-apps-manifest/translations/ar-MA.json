@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "جدولة مخصصة",
     "description": "تكوين تكامل جدولة مخصص من خلال توفير واجهات API الخاصة بك."
+  },
+  "contentful": {
+    "name": "تكامل Contentful",
+    "description": "اختر إدخالات Contentful أو أصول الصور والفيديو المنشورة في Page Designer واعرضها على الخادم باستخدام مكونات SFNext React."
   }
 }

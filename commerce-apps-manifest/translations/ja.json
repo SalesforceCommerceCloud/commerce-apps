@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "カスタムスケジューリング",
     "description": "独自のAPIを使用してカスタムスケジューリング統合を設定します。"
+  },
+  "contentful": {
+    "name": "Contentful 連携",
+    "description": "Page Designer で Contentful のエントリや公開済みの画像・動画アセットを選択し、SFNext React コンポーネントでサーバー側レンダリングを行います。"
   }
 }

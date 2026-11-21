@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Aangepaste planning",
     "description": "Configureer een aangepaste planningsintegratie met uw eigen API's."
+  },
+  "contentful": {
+    "name": "Contentful-integratie",
+    "description": "Selecteer Contentful-items of gepubliceerde afbeeldingen en video’s in Page Designer en render deze op de server met SFNext React-componenten."
   }
 }

@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "맞춤 일정 관리",
     "description": "자체 API를 제공하여 맞춤 일정 관리 통합을 구성합니다."
+  },
+  "contentful": {
+    "name": "Contentful 통합",
+    "description": "Page Designer에서 Contentful 항목 또는 게시된 이미지와 동영상 에셋을 선택하고 SFNext React 컴포넌트로 서버 측에서 렌더링합니다."
   }
 }
