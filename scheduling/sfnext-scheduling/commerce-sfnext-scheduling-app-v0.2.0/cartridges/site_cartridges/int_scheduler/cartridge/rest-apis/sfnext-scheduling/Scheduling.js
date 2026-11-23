@@ -115,7 +115,9 @@ exports.createAppointment = function () {
 
     var schedStartTime = body.schedStartTime;
     var schedEndTime = body.schedEndTime;
-    var email = body.email;
+
+    // Email: prefer the authenticated shopper's profile email; fall back to request body.
+    var email = (customer.profile && customer.profile.email) ? String(customer.profile.email) : body.email;
 
     if (!ISO_DATETIME.test(String(schedStartTime)) || !ISO_DATETIME.test(String(schedEndTime))) {
         RESTResponseMgr.createError(400, 'INVALID_REQUEST', 'Bad Request', 'schedStartTime/schedEndTime must be ISO 8601').render();
@@ -193,3 +195,97 @@ exports.getWorkTypes = function () {
     RESTResponseMgr.createSuccess({ workTypes: result.workTypes }).render();
 };
 exports.getWorkTypes.public = true;
+
+/**
+ * GET /delivery-availability
+ * Returns available delivery slots for the given territory + work-type group.
+ * Reuses the same schedulerCore.getAvailability helper as appointment availability.
+ */
+exports.getDeliverySlotAvailability = function () {
+    var schedulerCore = require('*/cartridge/scripts/helpers/schedulerCore');
+    var customer = session.customer;
+    if (!customer || !customer.isAuthenticated()) {
+        RESTResponseMgr.createError(401, 'SCHEDULER_AUTHORIZATION', 'Unauthorized', 'A registered shopper session is required').render();
+        return;
+    }
+
+    var startTime = paramString('c_startTime');
+    var endTime = paramString('c_endTime');
+    var territoryId = paramString('c_territoryId');
+    var workTypeGroupId = paramString('c_workTypeGroupId');
+
+    var result = schedulerCore.getAvailability({
+        startTime: startTime,
+        endTime: endTime,
+        territoryId: territoryId || undefined,
+        workTypeGroupId: workTypeGroupId,
+        isDelivery: true
+    });
+    if (!result.success) {
+        renderError(result.error && result.error.code ? result.error.code : 'SCHEDULER_UNAVAILABLE');
+        return;
+    }
+    RESTResponseMgr.createSuccess({ success: true, slots: result.slots, timezone: result.timezone }).render();
+};
+exports.getDeliverySlotAvailability.public = true;
+
+/**
+ * POST /delivery-slots
+ * Reserves a delivery slot by creating a ServiceAppointment in Core.
+ * Reuses bookAppointment helper; slot hold counters from W-24902251 apply.
+ */
+exports.reserveDeliverySlot = function () {
+    var schedulerCore = require('*/cartridge/scripts/helpers/schedulerCore');
+    var customer = session.customer;
+    if (!customer || !customer.isAuthenticated()) {
+        RESTResponseMgr.createError(401, 'SCHEDULER_AUTHORIZATION', 'Unauthorized', 'A registered shopper session is required').render();
+        return;
+    }
+    var b2cCustomerId = customer.ID;
+    var body = JSON.parse(request.httpParameterMap.requestBodyAsString);
+
+    var schedStartTime = body.schedStartTime;
+    var schedEndTime = body.schedEndTime;
+    var email = (customer.profile && customer.profile.email) ? String(customer.profile.email) : body.email;
+
+    if (!ISO_DATETIME.test(String(schedStartTime)) || !ISO_DATETIME.test(String(schedEndTime))) {
+        RESTResponseMgr.createError(400, 'INVALID_REQUEST', 'Bad Request', 'schedStartTime/schedEndTime must be ISO 8601').render();
+        return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email)) || String(email).length > 254) {
+        RESTResponseMgr.createError(400, 'INVALID_REQUEST', 'Bad Request', 'Invalid email').render();
+        return;
+    }
+
+    var subject = typeof body.subject === 'string' ? body.subject : null;
+    if (typeof subject === 'string' && subject.length > 255) {
+        subject = subject.slice(0, 255);
+    }
+
+    var result = schedulerCore.bookAppointment({
+        schedStartTime: schedStartTime,
+        schedEndTime: schedEndTime,
+        email: email,
+        b2cCustomerId: b2cCustomerId,
+        subject: subject,
+        territoryId: body.territoryId || undefined,
+        workTypeId: body.workTypeId || undefined,
+        isDelivery: true
+    });
+
+    if (!result.success) {
+        var code = result.error && result.error.code ? result.error.code : 'SCHEDULER_UNAVAILABLE';
+        if (code === 'SCHEDULER_SLOT_TAKEN') {
+            RESTResponseMgr.createError(409, 'SCHEDULER_SLOT_TAKEN', 'Conflict', 'Slot no longer available').render();
+        } else {
+            renderError(code);
+        }
+        return;
+    }
+    RESTResponseMgr.createSuccess({
+        success: true,
+        serviceAppointmentId: result.serviceAppointmentId,
+        assignedResourceId: result.assignedResourceId
+    }).render();
+};
+exports.reserveDeliverySlot.public = true;

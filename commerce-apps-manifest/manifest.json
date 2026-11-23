@@ -246,18 +246,18 @@
       "provider": "custom"
     }
   ],
-  "appointment-scheduling": [
+  "scheduling": [
     {
-      "id": "sfnext-appointment-scheduling",
-      "name": "Storefront Next — Boutique Appointment Booking",
-      "description": "Enables shoppers to book in-boutique appointments with a trained advisor via Salesforce Scheduler. Requires a connected Salesforce Core org provisioned from the luxury-core dataset.",
+      "id": "sfnext-scheduling",
+      "name": "Storefront Next — Scheduling (Appointments + Delivery Slots)",
+      "description": "Shared Salesforce Scheduler CAP for Storefront Next. Provides appointment booking and delivery slot scheduling endpoints backed by a connected Salesforce Core org. Appointment UX ships as a canonical extension; delivery slot UX ships as a separate extension (SFDC_EXT_DELIVERY_SLOTS).",
       "iconName": "salesforce.svg",
-      "domain": "appointment-scheduling",
+      "domain": "scheduling",
       "type": "app",
       "provider": "salesforce",
-      "version": "0.1.0",
-      "zip": "sfnext-appointment-scheduling-v0.1.0.zip",
-      "sha256": "63e4dd101fed92d3c2176e61fc6e6563d3a7a180b2659c5734978084244ab086"
+      "version": "0.2.0",
+      "zip": "sfnext-scheduling-v0.2.0.zip",
+      "sha256": "8bf732298acbe8a64818e4dcae1bfeb7fa234144777afc4200aca2c59943b827"
     }
   ]
 }
