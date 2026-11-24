@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  version: 2.0.0
+  title: SFNext Scheduling API
+  description: >-
+    Storefront-facing Custom SCAPI for Salesforce Scheduler. Shared by appointment booking and
+    delivery slot scheduling. The cartridge handler reaches a Salesforce Core org via the B2C
+    Service Framework (OAuth client-credentials; the Core credential lives on the B2C instance).
+    `b2cCustomerId` is derived server-side from the authenticated shopper session and must NOT
+    be supplied by the client.
+components:
+  securitySchemes:
+    ShopperToken:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://{shortCode}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{organizationId}/oauth2/token
+          scopes:
+            c_sfnext_appointment: Access appointment booking and delivery slot scheduling via Storefront Next
+paths:
+  /appointment-availability:
+    get:
+      summary: Get appointment availability (open slots) for the configured territory + work-type group
+      operationId: getAppointmentAvailability
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_startTime
+          required: true
+          description: ISO 8601 start of the search window.
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_endTime
+          required: true
+          description: ISO 8601 end of the search window (Core caps results to 31 days from c_startTime).
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_territoryId
+          required: false
+          description: ServiceTerritory ExternalId__c or SF record Id. Resolved via isSfRecordId discriminator.
+          schema:
+            type: string
+        - in: query
+          name: c_workTypeGroupId
+          required: true
+          description: WorkTypeGroup SF record Id resolved per territory by getWorkTypes.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Availability returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  slots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        startTime:
+                          type: string
+                        endTime:
+                          type: string
+                        resources:
+                          type: array
+                          items:
+                            type: string
+                  timezone:
+                    type: string
+                    description: IANA timezone of the territory (e.g. 'Europe/London').
+                  advanceNoticeMinutes:
+                    type: integer
+                    description: Minimum advance notice in minutes before a slot can be booked (from BM site preference sfnextAppointmentAdvanceNoticeMinutes, default 120).
+        '400':
+          description: Invalid request
+        '401':
+          description: Shopper authentication required
+        '429':
+          description: Core org rate limit exceeded
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]
+  /territories:
+    get:
+      summary: List active ServiceTerritory records, optionally filtered by site
+      operationId: getServiceTerritories
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_siteId
+          required: false
+          description: Filter territories to this B2C site id (matches SN_SiteId__c).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Territories returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  territories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ExternalId__c if set, otherwise Salesforce record Id.
+                        sfId:
+                          type: string
+                        name:
+                          type: string
+                        timezone:
+                          type: string
+                        externalId:
+                          type: string
+                        siteId:
+                          type: string
+                        address1:
+                          type: string
+                        city:
+                          type: string
+                        postalCode:
+                          type: string
+                        stateCode:
+                          type: string
+                        countryCode:
+                          type: string
+                        phone:
+                          type: string
+                        latitude:
+                          type: number
+                        longitude:
+                          type: number
+        '401':
+          description: Shopper authentication required
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]
+  /appointments:
+    post:
+      summary: Book an appointment
+      operationId: createAppointment
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schedStartTime, schedEndTime, email]
+              properties:
+                schedStartTime:
+                  type: string
+                  description: ISO 8601 appointment start (must match an available slot).
+                schedEndTime:
+                  type: string
+                  description: ISO 8601 appointment end.
+                email:
+                  type: string
+                  description: Shopper email the confirmation is sent to.
+                subject:
+                  type: string
+                  description: Optional appointment subject (max 255 characters; truncated server-side).
+                territoryId:
+                  type: string
+                  description: ServiceTerritory ExternalId__c or SF record Id.
+                workTypeId:
+                  type: string
+                  description: Storefront service id — maps to WorkType.ServiceId__c. Falls back to site pref.
+      responses:
+        '200':
+          description: Appointment booked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  serviceAppointmentId:
+                    type: string
+                  assignedResourceId:
+                    type: string
+        '400':
+          description: Invalid request
+        '401':
+          description: Shopper authentication required
+        '429':
+          description: Core org rate limit exceeded
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]
+  /work-types:
+    get:
+      summary: List WorkTypes available for a territory (via WorkTypeGroup), or the site-pref default group
+      operationId: getWorkTypes
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_territoryId
+          required: false
+          description: SF record Id or ExternalId__c of the ServiceTerritory to resolve WorkTypes for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Work types returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workTypes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Salesforce WorkType record Id.
+                        name:
+                          type: string
+                        durationMinutes:
+                          type: number
+                        workTypeGroupId:
+                          type: string
+        '401':
+          description: Shopper authentication required
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]
+  /delivery-availability:
+    get:
+      summary: Get delivery slot availability for the configured territory + work-type group
+      operationId: getDeliverySlotAvailability
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_startTime
+          required: true
+          description: ISO 8601 start of the search window.
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_endTime
+          required: true
+          description: ISO 8601 end of the search window.
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: c_territoryId
+          required: false
+          description: Delivery zone ServiceTerritory ExternalId__c or SF record Id.
+          schema:
+            type: string
+        - in: query
+          name: c_workTypeGroupId
+          required: true
+          description: WorkTypeGroup SF record Id for the delivery window type.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delivery slot availability returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  slots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        startTime:
+                          type: string
+                        endTime:
+                          type: string
+                  timezone:
+                    type: string
+                  advanceNoticeMinutes:
+                    type: integer
+        '400':
+          description: Invalid request
+        '401':
+          description: Shopper authentication required
+        '429':
+          description: Core org rate limit exceeded
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]
+  /delivery-slots:
+    post:
+      summary: Reserve a delivery slot
+      operationId: reserveDeliverySlot
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [schedStartTime, schedEndTime, email]
+              properties:
+                schedStartTime:
+                  type: string
+                  description: ISO 8601 delivery slot start (must match an available slot).
+                schedEndTime:
+                  type: string
+                  description: ISO 8601 delivery slot end.
+                email:
+                  type: string
+                  description: Shopper email for delivery confirmation.
+                subject:
+                  type: string
+                  description: Optional order reference or delivery subject (max 255 chars; truncated server-side).
+                territoryId:
+                  type: string
+                  description: Delivery zone ServiceTerritory ExternalId__c or SF record Id.
+                workTypeId:
+                  type: string
+                  description: Delivery window WorkType service id.
+      responses:
+        '200':
+          description: Delivery slot reserved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  serviceAppointmentId:
+                    type: string
+                  assignedResourceId:
+                    type: string
+        '400':
+          description: Invalid request
+        '401':
+          description: Shopper authentication required
+        '409':
+          description: Slot no longer available (concurrent reservation)
+        '429':
+          description: Core org rate limit exceeded
+        '502':
+          description: Core org authorization error
+        '503':
+          description: Scheduler unavailable or not configured
+      security:
+        - ShopperToken: [c_sfnext_appointment]

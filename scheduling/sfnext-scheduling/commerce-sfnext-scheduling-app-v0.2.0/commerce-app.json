@@ -1,0 +1,18 @@
+{
+  "id": "sfnext-scheduling",
+  "name": "SFNext Scheduling (Salesforce Scheduler)",
+  "description": "Shared scheduling CAP for Storefront Next — ships the B2C cartridge Custom SCAPI provider and storefront UX extensions for both appointment booking and delivery slot scheduling. Backed by Salesforce Scheduler on a Core org via the B2C Service Framework.",
+  "domain": "scheduling",
+  "version": "0.2.0",
+  "publisher": {
+    "name": "CC Sharks",
+    "url": "https://www.salesforce.com",
+    "support": "https://www.salesforce.com"
+  },
+  "dependencies": {},
+  "storefront": {
+    "type": "sfnext",
+    "extensionId": "SFDC_EXT_APPOINTMENT_SCHEDULING",
+    "extensionPath": "storefront-next/src/extensions/appointment-scheduling"
+  }
+}
