@@ -269,7 +269,7 @@
       "provider": "salesforce",
       "version": "1.0.0",
       "zip": "contentful-v1.0.0.zip",
-      "sha256": "b807e4c2a0a5197d1b466b2b5793665291f3c2f342ec13e4d119a8c627618322",
+      "sha256": "20c47268577f0f4ff13fe9d8cc1f339eb249f08aa73531a37582867f6d779048",
       "storefrontSupport": {
         "sfnext": {
           "minVersion": "2026.7.0"
