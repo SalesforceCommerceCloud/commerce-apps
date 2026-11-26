@@ -28,6 +28,10 @@
     "description": "在 Storefront Next 中原生處理付款。Salesforce Payments 支援多種付款閘道和付款方式。",
     "featuredTagline": "透過適用於 Adyen、Stripe 和 PayPal 的無縫端對端解決方案快速收款。"
   },
+  "esw-sfnext": {
+    "name": "ESW",
+    "description": "適用於 Storefront Next 的 ESW 整合，支援跨境定價、結帳與訂單履行。"
+  },
   "noibu": {
     "name": "Noibu",
     "description": "在每個店面頁面載入 Noibu 工作階段監控指令碼"
