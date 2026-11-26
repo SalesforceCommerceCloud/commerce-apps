@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Pianificazione personalizzata",
     "description": "Configura un'integrazione di pianificazione personalizzata fornendo le tue API."
+  },
+  "contentful": {
+    "name": "Integrazione Contentful",
+    "description": "Seleziona voci Contentful o immagini e video pubblicati in Page Designer ed eseguine il rendering lato server con componenti React SFNext."
   }
 }

@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Agendamento personalizado",
     "description": "Configure uma integração de agendamento personalizada fornecendo suas próprias APIs."
+  },
+  "contentful": {
+    "name": "Integração com Contentful",
+    "description": "Selecione entradas do Contentful ou imagens e vídeos publicados no Page Designer e renderize-os no servidor com componentes React do SFNext."
   }
 }

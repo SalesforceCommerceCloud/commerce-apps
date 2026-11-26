@@ -79,5 +79,9 @@
   "custom-scheduling": {
     "name": "Benutzerdefinierte Terminplanung",
     "description": "Konfigurieren Sie eine benutzerdefinierte Terminplanungsintegration mit Ihren eigenen APIs."
+  },
+  "contentful": {
+    "name": "Contentful-Integration",
+    "description": "Wählen Sie Contentful-Einträge oder veröffentlichte Bild- und Videoressourcen in Page Designer aus und rendern Sie sie serverseitig mit SFNext-React-Komponenten."
   }
 }
