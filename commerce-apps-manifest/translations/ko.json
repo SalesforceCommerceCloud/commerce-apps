@@ -28,6 +28,10 @@
     "description": "Storefront Next에서 기본적으로 결제를 처리합니다. Salesforce Payments는 여러 결제 게이트웨이 및 방식을 지원합니다.",
     "featuredTagline": "Adyen, Stripe, PayPal용 원활한 엔드투엔드 솔루션으로 빠르게 결제를 수집하세요."
   },
+  "esw-sfnext": {
+    "name": "ESW",
+    "description": "Storefront Next에서 국가 간 가격 책정, 결제 및 주문 처리를 지원하는 ESW 통합입니다."
+  },
   "custom-analytics": {
     "name": "맞춤 분석",
     "description": "자체 API를 제공하여 맞춤 분석 통합을 구성합니다."
